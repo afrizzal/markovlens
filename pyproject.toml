@@ -1,0 +1,81 @@
+[project]
+name = "markovlens"
+version = "0.1.0"
+description = "Multi-domain forecasting workbench using Markov chain models for brand share and customer churn forecasting"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [{ name = "afrizzal", email = "it@miracle-clinic.com" }]
+keywords = ["markov-chain", "forecasting", "monte-carlo", "streamlit", "duckdb"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+dependencies = [
+    # Web app
+    "streamlit>=1.40.0",
+    "streamlit-shadcn-ui>=0.1.18",
+    "streamlit-extras>=0.5.0",
+    # Numerical
+    "numpy>=2.0.0",
+    "pandas>=2.2.0",
+    "scipy>=1.14.0",
+    "scikit-learn>=1.5.0",
+    # Storage
+    "duckdb>=1.1.0",
+    "pyarrow>=18.0.0",
+    # Visualization
+    "plotly>=5.24.0",
+    # Reporting
+    "reportlab>=4.2.0",
+    # Config
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+    "pytest-mock>=3.14.0",
+    "ruff>=0.7.0",
+    "mypy>=1.13.0",
+    "ipykernel>=6.29.0",
+    "jupyter>=1.1.0",
+    "nbformat>=5.10.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["notebooks", "data", "reports"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "RUF", "C4", "PT"]
+ignore = ["E501", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short --strict-markers"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: integration tests requiring DuckDB",
+]

@@ -1,0 +1,63 @@
+/* MarkovLens — Theme tokens (CSS variables) */
+/* Will be replaced/extended with Claude Design output in Phase 05 */
+
+:root {
+  /* Colors — Light mode */
+  --color-bg: #FAFAFA;
+  --color-surface: #FFFFFF;
+  --color-text-primary: #0A0A0A;
+  --color-text-secondary: #52525B;
+  --color-text-tertiary: #A1A1AA;
+  --color-primary: #4338CA;
+  --color-success: #059669;
+  --color-warning: #D97706;
+  --color-danger: #DC2626;
+  --color-border-subtle: #E4E4E7;
+  --color-border-visible: #D4D4D8;
+
+  /* Chart palette (categorical) */
+  --chart-1: #4338CA;
+  --chart-2: #059669;
+  --chart-3: #D97706;
+  --chart-4: #0891B2;
+  --chart-5: #DC2626;
+  --chart-6: #7C3AED;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  /* Shadows */
+  --shadow-resting: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  /* Typography */
+  --font-mono: "JetBrains Mono", "Geist Mono", monospace;
+}
+
+/* Streamlit overrides — refine for cleaner look */
+.stApp {
+  background-color: var(--color-bg);
+}
+
+/* Tabular numbers in metrics */
+[data-testid="stMetricValue"] {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle borders on default Streamlit containers */
+[data-testid="stExpander"] {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+}
