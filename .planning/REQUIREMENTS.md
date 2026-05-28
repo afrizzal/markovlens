@@ -101,49 +101,47 @@
 
 ## Traceability
 
-*Populated during roadmap creation.*
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENG-01 | — | Pending |
-| ENG-02 | — | Pending |
-| ENG-03 | — | Pending |
-| ENG-04 | — | Pending |
-| ENG-05 | — | Pending |
-| ENG-06 | — | Pending |
-| ENG-07 | — | Pending |
-| ENG-08 | — | Pending |
-| ENG-09 | — | Pending |
-| ENG-10 | — | Pending |
-| DATA-01 | — | Pending |
-| DATA-02 | — | Pending |
-| DATA-03 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
-| BS-01 | — | Pending |
-| BS-02 | — | Pending |
-| BS-03 | — | Pending |
-| BS-04 | — | Pending |
-| BS-05 | — | Pending |
-| BS-06 | — | Pending |
-| CH-01 | — | Pending |
-| CH-02 | — | Pending |
-| CH-03 | — | Pending |
-| CH-04 | — | Pending |
-| RPT-01 | — | Pending |
-| HOME-01 | — | Pending |
-| SET-01 | — | Pending |
-| DEPLOY-01 | — | Pending |
-| DEPLOY-02 | — | Pending |
-| QA-01 | — | Pending |
-| QA-02 | — | Pending |
-| QA-03 | — | Pending |
+| ENG-01 | Phase 01 | Pending |
+| ENG-02 | Phase 01 | Pending |
+| ENG-03 | Phase 01 | Pending |
+| ENG-04 | Phase 01 | Pending |
+| ENG-05 | Phase 01 | Pending |
+| ENG-06 | Phase 01 | Pending |
+| ENG-07 | Phase 01 | Pending |
+| ENG-08 | Phase 01 | Pending |
+| ENG-09 | Phase 01 | Pending |
+| ENG-10 | Phase 01 | Pending |
+| DATA-01 | Phase 01 | Pending |
+| DATA-02 | Phase 01 | Pending |
+| DATA-03 | Phase 01 | Pending |
+| UI-01 | Phase 02 | Pending |
+| UI-02 | Phase 02 | Pending |
+| BS-01 | Phase 02 | Pending |
+| BS-02 | Phase 02 | Pending |
+| BS-03 | Phase 02 | Pending |
+| BS-04 | Phase 02 | Pending |
+| BS-05 | Phase 02 | Pending |
+| BS-06 | Phase 02 | Pending |
+| CH-01 | Phase 03 | Pending |
+| CH-02 | Phase 03 | Pending |
+| CH-03 | Phase 03 | Pending |
+| CH-04 | Phase 03 | Pending |
+| HOME-01 | Phase 04 | Pending |
+| RPT-01 | Phase 04 | Pending |
+| SET-01 | Phase 04 | Pending |
+| QA-01 | Phase 05 | Pending |
+| QA-02 | Phase 05 | Pending |
+| QA-03 | Phase 05 | Pending |
+| DEPLOY-01 | Phase 05 | Pending |
+| DEPLOY-02 | Phase 05 | Pending |
 
 **Coverage:**
 - v1 requirements: 33 total
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 33 ⚠️
+- Mapped to phases: 33
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-29*
-*Last updated: 2026-05-29 after initial definition*
+*Last updated: 2026-05-29 after roadmap creation — traceability populated*
