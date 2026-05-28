@@ -28,7 +28,13 @@
   3. `validate_transition_matrix()` raises `InvalidTransitionMatrixError` for a row that sums to 1.1, a matrix with a negative cell, and a non-square input — and passes silently on a valid 3x3 stochastic matrix
   4. Running `uv run pytest tests/unit/ -m "not slow"` reports > 80% coverage for `core/` with all ENG-01..ENG-10 regression tests green
   5. `scripts/seed_data.py` runs to completion and populates the `transitions` and `forecasts` DuckDB tables with at least 5 reference forecast rows visible via a `SELECT COUNT(*)` query
-**Plans**: TBD
+**Plans**: 6 plans
+- [ ] 01-PLAN-01-test-infrastructure.md — Scaffold Wave 0 test stubs across all phase modules
+- [ ] 01-PLAN-02-matrix-validation-and-models.md — validate_transition_matrix + M1/M2/M3 (Chan 2015 regression)
+- [ ] 01-PLAN-03-simulation-engine.md — monte_carlo_simulate + calibrate + quantile_bands + walk_forward + metrics
+- [ ] 01-PLAN-04-data-layer.md — serialization helpers + build_transition_matrix + validate_transitions_df
+- [ ] 01-PLAN-05-seed-script.md — IBM Telco CSV + synthetic FMCG DGP + reference forecasts (idempotent)
+- [ ] 01-PLAN-06-coverage-gate.md — >=80% core/ coverage + ruff + mypy clean
 
 ### Phase 02: Design System + Brand Share
 **Goal**: The Brand Share page is fully functional end-to-end — a recruiter can open it, select a dataset, run m1/m2/m3 forecasts, inspect the transition matrix heatmap, view the Monte Carlo fan chart, and compare model accuracy
@@ -82,7 +88,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 01. Markov Engine | 0/TBD | Not started | - |
+| 01. Markov Engine | 0/6 | Not started | - |
 | 02. Design System + Brand Share | 0/TBD | Not started | - |
 | 03. Churn Domain | 0/TBD | Not started | - |
 | 04. Home, Export & Settings | 0/TBD | Not started | - |
