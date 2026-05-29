@@ -29,7 +29,7 @@
   4. Running `uv run pytest tests/unit/ -m "not slow"` reports > 80% coverage for `core/` with all ENG-01..ENG-10 regression tests green
   5. `scripts/seed_data.py` runs to completion and populates the `transitions` and `forecasts` DuckDB tables with at least 5 reference forecast rows visible via a `SELECT COUNT(*)` query
 **Plans**: 6 plans
-- [ ] 01-01-PLAN.md — Scaffold Wave 0 test stubs across all phase modules
+- [x] 01-01-PLAN.md — Scaffold Wave 0 test stubs across all phase modules
 - [ ] 01-02-PLAN.md — validate_transition_matrix + M1/M2/M3 (Chan 2015 regression)
 - [ ] 01-03-PLAN.md — monte_carlo_simulate + calibrate + quantile_bands + walk_forward + metrics
 - [ ] 01-04-PLAN.md — serialization helpers + build_transition_matrix + validate_transitions_df
@@ -88,7 +88,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 01. Markov Engine | 0/6 | Not started | - |
+| 01. Markov Engine | 1/6 | In Progress|  |
 | 02. Design System + Brand Share | 0/TBD | Not started | - |
 | 03. Churn Domain | 0/TBD | Not started | - |
 | 04. Home, Export & Settings | 0/TBD | Not started | - |
