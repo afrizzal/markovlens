@@ -35,9 +35,9 @@ def test_m1_forecast_replicates_chan_2015_table3(sample_4x4_chan_matrix):
     model = M1Homogeneous(P=sample_4x4_chan_matrix)
     result = model.forecast(Y_1=Y_1, horizon=5)
 
-    # Expected from Chan 2015 Table 3, row t=2
+    # Chan 2015 Table 3 row t=2 = Y_2 = forecast_array[0] (array excludes initial Y_1; RESEARCH Pitfall 2)
     expected_t2 = np.array([0.5829, 0.2780, 0.0667, 0.0724])
-    np.testing.assert_allclose(result.forecast_array[1], expected_t2, atol=1e-3)
+    np.testing.assert_allclose(result.forecast_array[0], expected_t2, atol=1e-3)
 
 
 def test_validate_rejects_negative():
@@ -64,7 +64,6 @@ def test_validate_warns_sparse_cells(caplog):
     assert any("sparsity" in r.message.lower() or "sparse" in r.message.lower() for r in caplog.records)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_m1_forecast_shape(sample_2x2_matrix):
     from core.models import M1Homogeneous
     model = M1Homogeneous(P=sample_2x2_matrix)

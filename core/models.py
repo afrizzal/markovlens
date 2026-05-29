@@ -100,8 +100,23 @@ class M1Homogeneous:
         self.n_states = P.shape[0]
 
     def forecast(self, Y_1: StateVector, horizon: int) -> ForecastResult:
-        # TODO(phase01): Y_{t+1} = Y_1 · P^t per Eq.(1)
-        raise NotImplementedError("M1Homogeneous.forecast — implement in Phase 01")
+        """Forecast Y_{t+1} = Y_t · P per Chan 2015 Eq.(1).
+
+        forecast_array[0] is Y_2 (one matmul applied to Y_1).
+        forecast_array[h-1] is Y_{h+1}.
+        """
+        validate_transition_matrix(self.P)
+        forecast_array = np.zeros((horizon, self.n_states), dtype=np.float64)
+        Y_t = Y_1.astype(np.float64, copy=True)
+        for t in range(horizon):
+            Y_t = Y_t @ self.P  # Chan 2015 Eq.(1)
+            forecast_array[t] = Y_t
+        return ForecastResult(
+            forecast_array=forecast_array,
+            confidence_bands=None,
+            model_type="m1",
+            horizon=horizon,
+        )
 
 
 class M2TimeVarying:
