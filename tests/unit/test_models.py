@@ -74,7 +74,6 @@ def test_m1_forecast_shape(sample_2x2_matrix):
     assert result.horizon == 5
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_m2_forecast_shape():
     from core.models import M2TimeVarying
     P_t = np.array([
@@ -89,7 +88,6 @@ def test_m2_forecast_shape():
     assert result.model_type == "m2"
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_m2_holds_last_pt_at_horizon():
     from core.models import M2TimeVarying
     P_t = np.array([
@@ -107,7 +105,6 @@ def test_m2_holds_last_pt_at_horizon():
     np.testing.assert_allclose(result_4.forecast_array[3], Y5, atol=1e-9)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_m3_forecast_replicates_chan_2015(sample_4x4_chan_matrix):
     """Verify M3 forecast matches Chan 2015 m3 table within reasonable tolerance.
 
@@ -122,5 +119,7 @@ def test_m3_forecast_replicates_chan_2015(sample_4x4_chan_matrix):
     Q_1 = np.array([0.5878, 0.2830, 0.0585, 0.0708])
     model = M3Extended(P_t_sequence=P_t, G=G)
     result = model.forecast(Q_1=Q_1, horizon=5)
+    # m3 returns ABSOLUTE counts (sum grows with G); Chan's table reports normalized shares
     expected_t2 = np.array([0.5799, 0.2847, 0.0603, 0.0751])
-    np.testing.assert_allclose(result.forecast_array[0], expected_t2, atol=1e-2)
+    shares_t2 = result.forecast_array[0] / result.forecast_array[0].sum()
+    np.testing.assert_allclose(shares_t2, expected_t2, atol=1e-2)

@@ -120,31 +120,99 @@ class M1Homogeneous:
 
 
 class M2TimeVarying:
-    """Time-varying P_t. Y_{t+1} = Y_t · P_t. Eq. (2) in Chan 2015."""
+    """Time-varying P_t. Y_{t+1} = Y_t · P_t. Eq. (2) in Chan 2015.
 
-    def __init__(self, P_t_sequence: list[TransitionMatrix]) -> None:
-        for P in P_t_sequence:
-            validate_transition_matrix(P)
+    Per D-06: when horizon > n_periods, holds last P_t constant for remaining steps.
+    Per D-08: P_t_sequence stored as np.ndarray of shape (n_periods, n_states, n_states),
+    NOT list[np.ndarray] — cleaner indexing, NumPy-broadcasting-friendly, JSON-serializable.
+    """
+
+    def __init__(self, P_t_sequence: np.ndarray) -> None:
+        if P_t_sequence.ndim != 3:
+            raise ValueError(
+                f"P_t_sequence must be 3D ndarray (n_periods, n_states, n_states), "
+                f"got ndim={P_t_sequence.ndim}"
+            )
+        if P_t_sequence.shape[1] != P_t_sequence.shape[2]:
+            raise ValueError(
+                f"P_t_sequence inner shape must be square; got {P_t_sequence.shape}"
+            )
+        for t in range(P_t_sequence.shape[0]):
+            validate_transition_matrix(P_t_sequence[t])
         self.P_t = P_t_sequence
-        self.n_states = P_t_sequence[0].shape[0]
+        self.n_periods = P_t_sequence.shape[0]
+        self.n_states = P_t_sequence.shape[1]
 
     def forecast(self, Y_1: StateVector, horizon: int) -> ForecastResult:
-        # TODO(phase01): Y_{t+1} = Y_1 · ∏ P_n per Eq.(2)
-        raise NotImplementedError("M2TimeVarying.forecast — implement in Phase 01")
+        """Forecast Y_{t+1} = Y_t · P_t per Chan 2015 Eq.(2).
+
+        D-06: when t >= n_periods, P_t[-1] is reused for remaining steps.
+        """
+        forecast_array = np.zeros((horizon, self.n_states), dtype=np.float64)
+        Y_t = Y_1.astype(np.float64, copy=True)
+        for t in range(horizon):
+            P_at_t = self.P_t[t] if t < self.n_periods else self.P_t[-1]
+            Y_t = Y_t @ P_at_t
+            forecast_array[t] = Y_t
+        return ForecastResult(
+            forecast_array=forecast_array,
+            confidence_bands=None,
+            model_type="m2",
+            horizon=horizon,
+        )
 
 
 class M3Extended:
-    """Extended Markov with growth multiplier G. Q_{t+1} = (G ⊙ Q_t) · P_t. Eq. (3)."""
+    """Extended Markov with growth multiplier G. Q_{t+1} = (G ⊙ Q_t) · P_t. Eq. (3).
 
-    def __init__(self, P_t_sequence: list[TransitionMatrix], G: np.ndarray) -> None:
-        for P in P_t_sequence:
-            validate_transition_matrix(P)
-        if G.shape != (P_t_sequence[0].shape[0],):
-            raise ValueError(f"G must have shape ({P_t_sequence[0].shape[0]},), got {G.shape}")
+    Per D-07: when horizon > n_periods, holds last P_t AND G constant.
+    Per D-09: G is np.ndarray of shape (n_states,) for scalar growth per state,
+    or (n_periods, n_states) for time-varying growth.
+    Per D-10: constructor validates P_t.shape[1] == P_t.shape[2] and G.shape[-1] == P_t.shape[1].
+    """
+
+    def __init__(self, P_t_sequence: np.ndarray, G: np.ndarray) -> None:
+        if P_t_sequence.ndim != 3:
+            raise ValueError(
+                f"P_t_sequence must be 3D ndarray (n_periods, n_states, n_states), "
+                f"got ndim={P_t_sequence.ndim}"
+            )
+        if P_t_sequence.shape[1] != P_t_sequence.shape[2]:
+            raise ValueError(
+                f"P_t_sequence inner shape must be square; got {P_t_sequence.shape}"
+            )
+        for t in range(P_t_sequence.shape[0]):
+            validate_transition_matrix(P_t_sequence[t])
+        n_states = P_t_sequence.shape[1]
+        if G.ndim not in (1, 2):
+            raise ValueError(f"G must be 1D (shape (n_states,)) or 2D (shape (n_periods, n_states)); got ndim={G.ndim}")
+        if G.shape[-1] != n_states:
+            raise ValueError(
+                f"G last dim must equal n_states={n_states}; got G.shape={G.shape}"
+            )
         self.P_t = P_t_sequence
         self.G = G
-        self.n_states = G.shape[0]
+        self.n_periods = P_t_sequence.shape[0]
+        self.n_states = n_states
 
     def forecast(self, Q_1: PopulationVector, horizon: int) -> ForecastResult:
-        # TODO(phase01): Q_{t+1} = (G ⊙ Q_t) · P_t per Eq.(3)
-        raise NotImplementedError("M3Extended.forecast — implement in Phase 01")
+        """Forecast Q_{t+1} = (G ⊙ Q_t) · P_t per Chan 2015 Eq.(3).
+
+        D-07: when t >= n_periods, P_t[-1] and (if 2D) G[-1] are reused.
+        """
+        forecast_array = np.zeros((horizon, self.n_states), dtype=np.float64)
+        Q_t = Q_1.astype(np.float64, copy=True)
+        for t in range(horizon):
+            P_at_t = self.P_t[t] if t < self.n_periods else self.P_t[-1]
+            if self.G.ndim == 1:
+                G_at_t = self.G
+            else:
+                G_at_t = self.G[t] if t < self.G.shape[0] else self.G[-1]
+            Q_t = (G_at_t * Q_t) @ P_at_t  # Chan 2015 Eq.(3)
+            forecast_array[t] = Q_t
+        return ForecastResult(
+            forecast_array=forecast_array,
+            confidence_bands=None,
+            model_type="m3",
+            horizon=horizon,
+        )
