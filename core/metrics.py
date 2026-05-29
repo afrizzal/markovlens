@@ -1,4 +1,5 @@
 """Forecast accuracy metrics — MAPE, Brier, log-loss."""
+
 from __future__ import annotations
 
 import logging
@@ -36,7 +37,8 @@ def mape(actual: np.ndarray, forecast: np.ndarray) -> float:
     if (~mask).any():
         logging.getLogger(__name__).warning(
             "MAPE: skipping %d zero-actual rows out of %d total",
-            int((~mask).sum()), int(actual.size),
+            int((~mask).sum()),
+            int(actual.size),
         )
     if not mask.any():
         return 0.0

@@ -24,6 +24,7 @@ Synthetic FMCG DGP parameters (Claude's Discretion):
 Run with:
     uv run python scripts/seed_data.py
 """
+
 from __future__ import annotations
 
 import logging
@@ -70,7 +71,7 @@ P_BASE_FMCG: np.ndarray = np.array(
 )
 
 # Churn state thresholds
-INACTIVE_TENURE_THRESHOLD: int = 6   # months; <= this → 'inactive'
+INACTIVE_TENURE_THRESHOLD: int = 6  # months; <= this → 'inactive'
 CHURNED_STATE: str = "churned"
 
 REFERENCE_FORECAST_HORIZON: int = 12
@@ -170,7 +171,9 @@ def _load_telco_transitions(csv_path: Path) -> pd.DataFrame:
         axis=1,
     )
     raw["to_state"] = raw.apply(
-        lambda r: CHURNED_STATE if r["Churn"] == "Yes" else _customer_state(r["tenure"], r["Contract"]),
+        lambda r: (
+            CHURNED_STATE if r["Churn"] == "Yes" else _customer_state(r["tenure"], r["Contract"])
+        ),
         axis=1,
     )
     return pd.DataFrame(
@@ -245,7 +248,7 @@ def _seed_brand_share(conn, rng: np.random.Generator) -> None:
     register_dataset(
         conn,
         domain="brand_share",
-        name="Synthetic FMCG 2024 (5 brands × 24 periods)",
+        name="Synthetic FMCG 2024 (5 brands x 24 periods)",
         source_path="data/seed/synthetic",
         row_count=n_rows,
         n_states=len(FMCG_BRANDS),
@@ -268,12 +271,16 @@ def _seed_brand_share(conn, rng: np.random.Generator) -> None:
     Y_1 = FMCG_INITIAL_SHARE.copy()
     m1_model = M1Homogeneous(m1_matrix)
     m1_result = m1_model.forecast(Y_1, REFERENCE_FORECAST_HORIZON)
-    _store_forecast(conn, BRAND_SHARE_DATASET_ID, "m1", REFERENCE_FORECAST_HORIZON, m1_result.forecast_array)
+    _store_forecast(
+        conn, BRAND_SHARE_DATASET_ID, "m1", REFERENCE_FORECAST_HORIZON, m1_result.forecast_array
+    )
 
     P_t_sequence = np.stack(P_t_list)  # (n_periods, n_states, n_states)
     m2_model = M2TimeVarying(P_t_sequence)
     m2_result = m2_model.forecast(Y_1, REFERENCE_FORECAST_HORIZON)
-    _store_forecast(conn, BRAND_SHARE_DATASET_ID, "m2", REFERENCE_FORECAST_HORIZON, m2_result.forecast_array)
+    _store_forecast(
+        conn, BRAND_SHARE_DATASET_ID, "m2", REFERENCE_FORECAST_HORIZON, m2_result.forecast_array
+    )
 
     log.info("  Brand share seeding complete ✓")
 
@@ -302,7 +309,11 @@ def _seed_churn(conn) -> None:
         metadata={"source": "IBM Watson Sample Data", "state_counts": state_counts},
     )
     bulk_insert_transitions(conn, CHURN_DATASET_ID, transitions_df)
-    log.info("  Inserted %d transition rows (states: %s)", n_rows, sorted(set(transitions_df["from_state"]) | set(transitions_df["to_state"])))
+    log.info(
+        "  Inserted %d transition rows (states: %s)",
+        n_rows,
+        sorted(set(transitions_df["from_state"]) | set(transitions_df["to_state"])),
+    )
 
     # m1 matrix
     m1_matrix, m1_counts = build_transition_matrix(conn, CHURN_DATASET_ID)
@@ -344,7 +355,10 @@ def main() -> None:
 
     log.info(
         "Seed complete — datasets=%d, transitions=%d, matrices=%d, forecasts=%d",
-        n_datasets, n_transitions, n_matrices, n_forecasts,
+        n_datasets,
+        n_transitions,
+        n_matrices,
+        n_forecasts,
     )
     assert n_forecasts >= 5, f"DATA-02 SC 5 failed: only {n_forecasts} forecast rows"
 

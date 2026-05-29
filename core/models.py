@@ -1,4 +1,5 @@
 """Markov chain model implementations — m1, m2, m3 from Chan (2015)."""
+
 from __future__ import annotations
 
 import logging
@@ -56,7 +57,7 @@ def validate_transition_matrix(
         else:
             if (P < 0).any():
                 errors.append(f"P has negative values; min={P.min()}")
-            if (P > 1.0 + tol).any():
+            if (1.0 + tol < P).any():
                 errors.append(f"P has values > 1; max={P.max()}")
             row_sums = P.sum(axis=1)
             if not np.allclose(row_sums, 1.0, atol=tol):
@@ -134,9 +135,7 @@ class M2TimeVarying:
                 f"got ndim={P_t_sequence.ndim}"
             )
         if P_t_sequence.shape[1] != P_t_sequence.shape[2]:
-            raise ValueError(
-                f"P_t_sequence inner shape must be square; got {P_t_sequence.shape}"
-            )
+            raise ValueError(f"P_t_sequence inner shape must be square; got {P_t_sequence.shape}")
         for t in range(P_t_sequence.shape[0]):
             validate_transition_matrix(P_t_sequence[t])
         self.P_t = P_t_sequence
@@ -178,18 +177,16 @@ class M3Extended:
                 f"got ndim={P_t_sequence.ndim}"
             )
         if P_t_sequence.shape[1] != P_t_sequence.shape[2]:
-            raise ValueError(
-                f"P_t_sequence inner shape must be square; got {P_t_sequence.shape}"
-            )
+            raise ValueError(f"P_t_sequence inner shape must be square; got {P_t_sequence.shape}")
         for t in range(P_t_sequence.shape[0]):
             validate_transition_matrix(P_t_sequence[t])
         n_states = P_t_sequence.shape[1]
         if G.ndim not in (1, 2):
-            raise ValueError(f"G must be 1D (shape (n_states,)) or 2D (shape (n_periods, n_states)); got ndim={G.ndim}")
-        if G.shape[-1] != n_states:
             raise ValueError(
-                f"G last dim must equal n_states={n_states}; got G.shape={G.shape}"
+                f"G must be 1D (shape (n_states,)) or 2D (shape (n_periods, n_states)); got ndim={G.ndim}"
             )
+        if G.shape[-1] != n_states:
+            raise ValueError(f"G last dim must equal n_states={n_states}; got G.shape={G.shape}")
         self.P_t = P_t_sequence
         self.G = G
         self.n_periods = P_t_sequence.shape[0]

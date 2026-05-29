@@ -1,4 +1,5 @@
 """Stubs for MAPE, Brier score, log-loss."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -7,6 +8,7 @@ import pytest
 
 def test_mape_known_value():
     from core.metrics import mape
+
     actual = np.array([100.0, 200.0])
     forecast = np.array([110.0, 190.0])
     # (|10|/100 + |10|/200) / 2 * 100 = (0.1 + 0.05) / 2 * 100 = 7.5
@@ -15,6 +17,7 @@ def test_mape_known_value():
 
 def test_mape_skips_zero_actual(caplog):
     from core.metrics import mape
+
     actual = np.array([0.0, 100.0, 200.0])
     forecast = np.array([5.0, 110.0, 190.0])
     with caplog.at_level("WARNING"):
@@ -25,6 +28,7 @@ def test_mape_skips_zero_actual(caplog):
 
 def test_brier_known_value():
     from core.metrics import brier_score
+
     forecast_prob = np.array([[0.7, 0.3], [0.4, 0.6]])
     actual = np.array([[1, 0], [0, 1]])
     # ((0.7-1)^2 + (0.3-0)^2)/2 + ((0.4-0)^2 + (0.6-1)^2)/2 — then mean
@@ -34,6 +38,7 @@ def test_brier_known_value():
 
 def test_log_loss_known_value():
     from core.metrics import log_loss
+
     forecast_prob = np.array([[0.9, 0.1], [0.2, 0.8]])
     actual = np.array([[1, 0], [0, 1]])
     # -mean(log(0.9) + log(0.8))
@@ -43,6 +48,7 @@ def test_log_loss_known_value():
 
 def test_log_loss_clips_zeros():
     from core.metrics import log_loss
+
     forecast_prob = np.array([[1.0, 0.0]])
     actual = np.array([[0, 1]])  # predicted prob 0 for true class
     result = log_loss(forecast_prob, actual)

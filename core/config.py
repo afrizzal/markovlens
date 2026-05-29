@@ -1,4 +1,5 @@
 """Application settings — read from environment via pydantic-settings."""
+
 from __future__ import annotations
 
 from pathlib import Path

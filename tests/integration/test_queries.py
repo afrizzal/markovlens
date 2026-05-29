@@ -1,4 +1,5 @@
 """Integration tests for core/db/queries.py and seed script paths."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -20,11 +21,13 @@ def test_build_transition_matrix_normalized(temp_duckdb_path: Path):
         "INSERT INTO datasets (id, domain, name, source_path, row_count, n_states) "
         "VALUES ('ds_test', 'churn', 'test', 'test.csv', 4, 2)"
     )
-    conn.execute("INSERT INTO transitions VALUES "
-                 "('ds_test','e1',1,'A','A',1.0), "
-                 "('ds_test','e1',1,'A','B',1.0), "
-                 "('ds_test','e2',1,'B','A',1.0), "
-                 "('ds_test','e2',1,'B','B',3.0)")
+    conn.execute(
+        "INSERT INTO transitions VALUES "
+        "('ds_test','e1',1,'A','A',1.0), "
+        "('ds_test','e1',1,'A','B',1.0), "
+        "('ds_test','e2',1,'B','A',1.0), "
+        "('ds_test','e2',1,'B','B',3.0)"
+    )
     matrix, counts = build_transition_matrix(conn, dataset_id="ds_test")
     assert matrix.shape == (2, 2)
     np.testing.assert_allclose(matrix.sum(axis=1), [1.0, 1.0], atol=1e-9)
@@ -43,11 +46,13 @@ def test_build_transition_matrix_counts(temp_duckdb_path: Path):
         "INSERT INTO datasets (id, domain, name, source_path, row_count, n_states) "
         "VALUES ('ds_test', 'churn', 'test', 'test.csv', 4, 2)"
     )
-    conn.execute("INSERT INTO transitions VALUES "
-                 "('ds_test','e1',1,'A','A',7.0), "
-                 "('ds_test','e1',1,'A','B',3.0), "
-                 "('ds_test','e2',1,'B','A',4.0), "
-                 "('ds_test','e2',1,'B','B',6.0)")
+    conn.execute(
+        "INSERT INTO transitions VALUES "
+        "('ds_test','e1',1,'A','A',7.0), "
+        "('ds_test','e1',1,'A','B',3.0), "
+        "('ds_test','e2',1,'B','A',4.0), "
+        "('ds_test','e2',1,'B','B',6.0)"
+    )
     matrix, counts = build_transition_matrix(conn, dataset_id="ds_test")
     assert counts.shape == (2, 2)
     assert counts.sum() == 20
@@ -67,10 +72,12 @@ def test_build_transition_matrix_filters_dataset(temp_duckdb_path: Path):
         "VALUES ('ds_a', 'churn', 'a', 'a.csv', 2, 2), "
         "('ds_b', 'churn', 'b', 'b.csv', 2, 2)"
     )
-    conn.execute("INSERT INTO transitions VALUES "
-                 "('ds_a','e1',1,'A','A',1.0), "
-                 "('ds_a','e1',1,'A','B',1.0), "
-                 "('ds_b','e2',1,'A','A',99.0)")
+    conn.execute(
+        "INSERT INTO transitions VALUES "
+        "('ds_a','e1',1,'A','A',1.0), "
+        "('ds_a','e1',1,'A','B',1.0), "
+        "('ds_b','e2',1,'A','A',99.0)"
+    )
     matrix, counts = build_transition_matrix(conn, dataset_id="ds_a")
     assert counts.sum() == 2  # not 101
     conn.close()
@@ -82,13 +89,17 @@ def test_seed_idempotency(temp_duckdb_path: Path, monkeypatch):
     monkeypatch.setenv("DUCKDB_PATH", str(temp_duckdb_path))
     # Reload settings so DUCKDB_PATH change takes effect
     import importlib
+
     from core import config as cfg
+
     importlib.reload(cfg)
     from core.db import connection as cn
+
     importlib.reload(cn)
     cn.close_connection()
 
     from scripts import seed_data
+
     seed_data.main()
     conn1 = duckdb.connect(str(temp_duckdb_path))
     count_a_transitions = conn1.execute("SELECT COUNT(*) FROM transitions").fetchone()[0]
@@ -111,13 +122,17 @@ def test_seed_produces_reference_forecasts(temp_duckdb_path: Path, monkeypatch):
     """DATA-02: forecasts table populated with >= 5 rows after seed (cold-start KPI requirement)."""
     monkeypatch.setenv("DUCKDB_PATH", str(temp_duckdb_path))
     import importlib
+
     from core import config as cfg
+
     importlib.reload(cfg)
     from core.db import connection as cn
+
     importlib.reload(cn)
     cn.close_connection()
 
     from scripts import seed_data
+
     seed_data.main()
 
     conn = duckdb.connect(str(temp_duckdb_path))

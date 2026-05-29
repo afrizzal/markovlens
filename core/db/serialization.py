@@ -3,6 +3,7 @@
 Per D-24: NaN and Inf are rejected at the boundary — silent NaN persistence
 would corrupt downstream forecasts and validation.
 """
+
 from __future__ import annotations
 
 import json

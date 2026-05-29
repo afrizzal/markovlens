@@ -1,4 +1,5 @@
 """DuckDB connection singleton + schema initialization."""
+
 from __future__ import annotations
 
 from pathlib import Path

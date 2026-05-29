@@ -63,7 +63,14 @@ select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "RUF", "C4", "PT"]
 ignore = ["E501", "B008"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101"]
+"tests/*" = ["S101", "N806"]
+# core/ and scripts use Chan 2015 mathematical variable names (P, Y_1, Q_t, G) — N803/N806 intentional
+"core/models.py" = ["N803", "N806", "UP040"]
+"core/simulation.py" = ["N803", "N806", "UP040"]
+"scripts/seed_data.py" = ["N806"]
+"tests/unit/test_models.py" = ["N806"]
+"tests/unit/test_simulation.py" = ["N806", "PT018"]
+"tests/integration/test_queries.py" = ["RUF059"]
 
 [tool.mypy]
 python_version = "3.12"

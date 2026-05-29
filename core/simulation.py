@@ -1,4 +1,5 @@
 """Monte Carlo simulation + longshot-bias calibration (Becker 2026)."""
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -166,10 +167,7 @@ def compute_quantile_bands(
             f"got ndim={extracted.ndim}. Reduce within the extractor only if it "
             f"preserves the time axis."
         )
-    return {
-        float(q): np.percentile(extracted, q * 100, axis=0)
-        for q in quantiles
-    }
+    return {float(q): np.percentile(extracted, q * 100, axis=0) for q in quantiles}
 
 
 def _counts_from_long_df(
@@ -185,11 +183,7 @@ def _counts_from_long_df(
     counts = np.zeros((n_states, n_states), dtype=np.float64)
     if df.empty:
         return counts
-    grouped = (
-        df.groupby(["from_state", "to_state"], sort=False)["weight"]
-        .sum()
-        .reset_index()
-    )
+    grouped = df.groupby(["from_state", "to_state"], sort=False)["weight"].sum().reset_index()
     rows = grouped["from_state"].map(state_idx).to_numpy()
     cols = grouped["to_state"].map(state_idx).to_numpy()
     counts[rows, cols] = grouped["weight"].to_numpy(dtype=np.float64)
@@ -209,11 +203,7 @@ def _state_distribution_from_long_df(
     vec = np.zeros(n_states, dtype=np.float64)
     if df.empty:
         return vec
-    grouped = (
-        df.groupby(state_col, sort=False)["weight"]
-        .sum()
-        .reset_index()
-    )
+    grouped = df.groupby(state_col, sort=False)["weight"].sum().reset_index()
     idx = grouped[state_col].map(state_idx).to_numpy()
     vec[idx] = grouped["weight"].to_numpy(dtype=np.float64)
     total = vec.sum()
@@ -289,12 +279,14 @@ def walk_forward_backtest(
             mape_val = None
         brier_val = float(((forecast_vec - Y_true) ** 2).mean())
 
-        results.append({
-            "period": int(truth_period),
-            "forecast": forecast_vec,
-            "actual": Y_true,
-            "mape": mape_val,
-            "brier": brier_val,
-        })
+        results.append(
+            {
+                "period": int(truth_period),
+                "forecast": forecast_vec,
+                "actual": Y_true,
+                "mape": mape_val,
+                "brier": brier_val,
+            }
+        )
 
     return results

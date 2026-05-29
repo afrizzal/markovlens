@@ -1,4 +1,5 @@
 """Query helpers — all SQL wrapped here, never inline in app/ or domains/."""
+
 from __future__ import annotations
 
 import json
@@ -137,8 +138,7 @@ def get_dataset(conn: duckdb.DuckDBPyConnection, dataset_id: str) -> Dataset:
         If no dataset with the given id exists.
     """
     df = conn.execute(
-        "SELECT id, domain, name, source_path, row_count, n_states "
-        "FROM datasets WHERE id = ?",
+        "SELECT id, domain, name, source_path, row_count, n_states FROM datasets WHERE id = ?",
         [dataset_id],
     ).df()
     if df.empty:
@@ -299,7 +299,7 @@ def build_transition_matrix(
     for _, row in df.iterrows():
         i = state_idx[row["from_state"]]
         j = state_idx[row["to_state"]]
-        counts[i, j] = int(round(float(row["n"])))
+        counts[i, j] = round(float(row["n"]))
 
     row_sums = counts.sum(axis=1, keepdims=True)
     safe_row_sums = np.where(row_sums == 0, 1, row_sums)

@@ -1,4 +1,5 @@
 """Shared pytest fixtures."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -16,12 +17,14 @@ def sample_2x2_matrix() -> np.ndarray:
 @pytest.fixture
 def sample_4x4_chan_matrix() -> np.ndarray:
     """The 4-provider matrix from Chan 2015 numerical example."""
-    return np.array([
-        [0.98230, 0.00753, 0.00464, 0.00552],
-        [0.01158, 0.96161, 0.02489, 0.00192],
-        [0.01442, 0.01105, 0.95721, 0.01732],
-        [0.01978, 0.01122, 0.01364, 0.95536],
-    ])
+    return np.array(
+        [
+            [0.98230, 0.00753, 0.00464, 0.00552],
+            [0.01158, 0.96161, 0.02489, 0.00192],
+            [0.01442, 0.01105, 0.95721, 0.01732],
+            [0.01978, 0.01122, 0.01364, 0.95536],
+        ]
+    )
 
 
 @pytest.fixture

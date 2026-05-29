@@ -1,4 +1,5 @@
 """Unit tests for core.models — validators and m1/m2/m3 forecast."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -43,6 +44,7 @@ def test_m1_forecast_replicates_chan_2015_table3(sample_4x4_chan_matrix):
 def test_validate_rejects_negative():
     from core.exceptions import InvalidTransitionMatrixError
     from core.models import validate_transition_matrix
+
     with pytest.raises(InvalidTransitionMatrixError):
         validate_transition_matrix(np.array([[1.5, -0.5], [0.5, 0.5]]))
 
@@ -50,6 +52,7 @@ def test_validate_rejects_negative():
 def test_validate_rejects_wrong_dtype():
     from core.exceptions import InvalidTransitionMatrixError
     from core.models import validate_transition_matrix
+
     P = np.array([[0.7, 0.3], [0.4, 0.6]], dtype=np.float32)
     with pytest.raises(InvalidTransitionMatrixError):
         validate_transition_matrix(P)
@@ -57,15 +60,19 @@ def test_validate_rejects_wrong_dtype():
 
 def test_validate_warns_sparse_cells(caplog):
     from core.models import validate_transition_matrix
+
     P = np.array([[0.7, 0.3], [0.4, 0.6]])
     counts = np.array([[100, 100], [5, 5]])  # row 1 sparse
     with caplog.at_level("WARNING"):
         validate_transition_matrix(P, transition_counts=counts)
-    assert any("sparsity" in r.message.lower() or "sparse" in r.message.lower() for r in caplog.records)
+    assert any(
+        "sparsity" in r.message.lower() or "sparse" in r.message.lower() for r in caplog.records
+    )
 
 
 def test_m1_forecast_shape(sample_2x2_matrix):
     from core.models import M1Homogeneous
+
     model = M1Homogeneous(P=sample_2x2_matrix)
     Y_1 = np.array([0.6, 0.4])
     result = model.forecast(Y_1=Y_1, horizon=5)
@@ -76,11 +83,15 @@ def test_m1_forecast_shape(sample_2x2_matrix):
 
 def test_m2_forecast_shape():
     from core.models import M2TimeVarying
-    P_t = np.array([
-        [[0.7, 0.3], [0.4, 0.6]],
-        [[0.6, 0.4], [0.5, 0.5]],
-        [[0.8, 0.2], [0.3, 0.7]],
-    ], dtype=np.float64)
+
+    P_t = np.array(
+        [
+            [[0.7, 0.3], [0.4, 0.6]],
+            [[0.6, 0.4], [0.5, 0.5]],
+            [[0.8, 0.2], [0.3, 0.7]],
+        ],
+        dtype=np.float64,
+    )
     model = M2TimeVarying(P_t_sequence=P_t)
     Y_1 = np.array([0.6, 0.4])
     result = model.forecast(Y_1=Y_1, horizon=3)
@@ -90,10 +101,14 @@ def test_m2_forecast_shape():
 
 def test_m2_holds_last_pt_at_horizon():
     from core.models import M2TimeVarying
-    P_t = np.array([
-        [[0.7, 0.3], [0.4, 0.6]],
-        [[0.6, 0.4], [0.5, 0.5]],
-    ], dtype=np.float64)
+
+    P_t = np.array(
+        [
+            [[0.7, 0.3], [0.4, 0.6]],
+            [[0.6, 0.4], [0.5, 0.5]],
+        ],
+        dtype=np.float64,
+    )
     model = M2TimeVarying(P_t_sequence=P_t)
     Y_1 = np.array([0.6, 0.4])
     result_4 = model.forecast(Y_1=Y_1, horizon=4)
@@ -114,6 +129,7 @@ def test_m3_forecast_replicates_chan_2015(sample_4x4_chan_matrix):
     Expected at t=2: [0.5799, 0.2847, 0.0603, 0.0751] (per docs/MARKOV-MODELS.md m3 table)
     """
     from core.models import M3Extended
+
     P_t = np.tile(sample_4x4_chan_matrix[None, :, :], (5, 1, 1))  # repeat 5 times
     G = np.array([1.0315, 1.0561, 0.9029, 1.0897])
     Q_1 = np.array([0.5878, 0.2830, 0.0585, 0.0708])
