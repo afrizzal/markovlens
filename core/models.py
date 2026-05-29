@@ -1,6 +1,7 @@
 """Markov chain model implementations — m1, m2, m3 from Chan (2015)."""
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import TypeAlias
 
@@ -41,8 +42,42 @@ def validate_transition_matrix(
     InvalidTransitionMatrixError
         If any invariant fails.
     """
-    # TODO(phase01): implement per .claude/rules/markov-patterns.md
-    raise NotImplementedError("validate_transition_matrix — implement in Phase 01")
+    errors: list[str] = []
+
+    if P.ndim != 2:
+        errors.append(f"P must be 2D, got {P.ndim}D")
+    elif P.shape[0] != P.shape[1]:
+        errors.append(f"P must be square, got {P.shape}")
+    else:
+        if P.dtype != np.float64:
+            errors.append(f"P must be float64, got {P.dtype}")
+        if not np.isfinite(P).all():
+            errors.append("P contains NaN or Inf values")
+        else:
+            if (P < 0).any():
+                errors.append(f"P has negative values; min={P.min()}")
+            if (P > 1.0 + tol).any():
+                errors.append(f"P has values > 1; max={P.max()}")
+            row_sums = P.sum(axis=1)
+            if not np.allclose(row_sums, 1.0, atol=tol):
+                bad = np.where(~np.isclose(row_sums, 1.0, atol=tol))[0]
+                errors.append(
+                    f"Rows {bad.tolist()} do not sum to 1.0; sums={row_sums[bad].tolist()}"
+                )
+
+    if errors:
+        raise InvalidTransitionMatrixError("; ".join(errors))
+
+    if transition_counts is not None:
+        sparse_mask = transition_counts < min_obs
+        if sparse_mask.any():
+            sparse_cells = list(zip(*np.where(sparse_mask), strict=False))
+            logging.getLogger(__name__).warning(
+                "Sparsity detected: %d cells below min_obs=%d: first_five=%s",
+                int(sparse_mask.sum()),
+                min_obs,
+                sparse_cells[:5],
+            )
 
 
 @dataclass(frozen=True)

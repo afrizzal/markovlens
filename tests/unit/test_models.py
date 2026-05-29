@@ -40,7 +40,6 @@ def test_m1_forecast_replicates_chan_2015_table3(sample_4x4_chan_matrix):
     np.testing.assert_allclose(result.forecast_array[1], expected_t2, atol=1e-3)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_validate_rejects_negative():
     from core.exceptions import InvalidTransitionMatrixError
     from core.models import validate_transition_matrix
@@ -48,7 +47,6 @@ def test_validate_rejects_negative():
         validate_transition_matrix(np.array([[1.5, -0.5], [0.5, 0.5]]))
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_validate_rejects_wrong_dtype():
     from core.exceptions import InvalidTransitionMatrixError
     from core.models import validate_transition_matrix
@@ -57,7 +55,6 @@ def test_validate_rejects_wrong_dtype():
         validate_transition_matrix(P)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_validate_warns_sparse_cells(caplog):
     from core.models import validate_transition_matrix
     P = np.array([[0.7, 0.3], [0.4, 0.6]])
