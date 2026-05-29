@@ -2,7 +2,7 @@
 
 > Living document. Updated after every coding session.
 >
-> Last updated: 2026-05-28
+> Last updated: 2026-05-29
 
 ## Conventions
 
@@ -65,13 +65,13 @@ Format per row: `<task>` — `<status>` — `<commit hash if Done>` — `<notes>
 
 | Task | Status | Commit | Notes |
 |---|---|---|---|
-| DuckDB schema (schema.sql) | 🟡 Pending | — | datasets, transitions, matrices, sim_runs |
-| Connection singleton | 🟡 Pending | — | core/db/connection.py |
-| Query helpers | 🟡 Pending | — | core/db/queries.py |
-| Dataset registration | 🟡 Pending | — | core/io/loaders.py |
-| Kaggle e-commerce brand-share seed | 🟡 Pending | — | scripts/seed_data.py |
-| Kaggle Telco churn seed | 🟡 Pending | — | scripts/seed_data.py |
-| Integration tests | 🟡 Pending | — | tests/integration/ |
+| DuckDB schema (schema.sql) | ✅ Done | abb74af | datasets, transitions, matrices, sim_runs, forecasts, scenarios |
+| Connection singleton | ✅ Done | abb74af | core/db/connection.py — get_connection() + init_schema() |
+| Query helpers | ✅ Done | — | register_dataset, list_datasets, get_dataset, load_transitions, bulk_insert_transitions, build_transition_matrix |
+| Dataset registration | ✅ Done | 2eb18b0 | validate_transitions_df in core/io/loaders.py |
+| Kaggle e-commerce brand-share seed | ✅ Done | — | Synthetic FMCG DGP — 5 brands × 24 periods, 600 rows |
+| Kaggle Telco churn seed | ✅ Done | — | IBM Telco CSV → 4 states (active/at_risk/inactive/churned), 7032 rows |
+| Integration tests | ✅ Done | — | tests/integration/test_queries.py — 3 pass |
 
 ---
 

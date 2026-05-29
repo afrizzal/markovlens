@@ -1,12 +1,16 @@
 """Query helpers — all SQL wrapped here, never inline in app/ or domains/."""
 from __future__ import annotations
 
+import json
+import uuid
 from dataclasses import dataclass
 
 import duckdb
 import numpy as np
 import pandas as pd
 
+from core.exceptions import DatasetNotFoundError
+from core.io.loaders import validate_transitions_df
 from core.models import validate_transition_matrix
 
 
@@ -23,40 +27,209 @@ class Dataset:
 
 
 def register_dataset(
+    conn: duckdb.DuckDBPyConnection,
     domain: str,
     name: str,
     source_path: str,
     row_count: int,
     n_states: int,
+    *,
+    dataset_id: str | None = None,
     metadata: dict | None = None,
 ) -> str:
-    """Insert a new dataset row, return its id."""
-    # TODO(phase02)
-    raise NotImplementedError("register_dataset — implement in Phase 02")
+    """Insert a new dataset row and return its id.
+
+    Parameters
+    ----------
+    conn : duckdb.DuckDBPyConnection
+        Open DuckDB connection.
+    domain : str
+        Dataset domain, e.g. 'brand_share' or 'churn'.
+    name : str
+        Human-readable dataset name.
+    source_path : str
+        Relative path to the source file.
+    row_count : int
+        Number of transition rows.
+    n_states : int
+        Number of distinct states.
+    dataset_id : str | None
+        Optional fixed id (e.g. for idempotent seed scripts). Auto-generated if None.
+    metadata : dict | None
+        Optional metadata dict, stored as JSON.
+
+    Returns
+    -------
+    str
+        The dataset id.
+    """
+    ds_id = dataset_id or str(uuid.uuid4())
+    meta_json = json.dumps(metadata) if metadata else None
+    conn.execute(
+        "INSERT INTO datasets (id, domain, name, source_path, row_count, n_states, metadata_json) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [ds_id, domain, name, source_path, row_count, n_states, meta_json],
+    )
+    return ds_id
 
 
-def list_datasets(domain: str | None = None) -> list[Dataset]:
-    """List registered datasets, optionally filtered by domain."""
-    # TODO(phase02)
-    raise NotImplementedError("list_datasets — implement in Phase 02")
+def list_datasets(
+    conn: duckdb.DuckDBPyConnection,
+    domain: str | None = None,
+) -> list[Dataset]:
+    """List registered datasets, optionally filtered by domain.
+
+    Parameters
+    ----------
+    conn : duckdb.DuckDBPyConnection
+        Open DuckDB connection.
+    domain : str | None
+        Optional domain filter.
+
+    Returns
+    -------
+    list[Dataset]
+        All matching datasets, ordered by created_at descending.
+    """
+    if domain is None:
+        df = conn.execute(
+            "SELECT id, domain, name, source_path, row_count, n_states "
+            "FROM datasets ORDER BY created_at DESC"
+        ).df()
+    else:
+        df = conn.execute(
+            "SELECT id, domain, name, source_path, row_count, n_states "
+            "FROM datasets WHERE domain = ? ORDER BY created_at DESC",
+            [domain],
+        ).df()
+
+    return [
+        Dataset(
+            id=row["id"],
+            domain=row["domain"],
+            name=row["name"],
+            source_path=row["source_path"],
+            row_count=int(row["row_count"] or 0),
+            n_states=int(row["n_states"] or 0),
+        )
+        for _, row in df.iterrows()
+    ]
 
 
-def get_dataset(dataset_id: str) -> Dataset:
-    """Fetch a single dataset by id. Raises DatasetNotFoundError if missing."""
-    # TODO(phase02)
-    raise NotImplementedError("get_dataset — implement in Phase 02")
+def get_dataset(conn: duckdb.DuckDBPyConnection, dataset_id: str) -> Dataset:
+    """Fetch a single dataset by id.
+
+    Parameters
+    ----------
+    conn : duckdb.DuckDBPyConnection
+        Open DuckDB connection.
+    dataset_id : str
+        Dataset identifier.
+
+    Returns
+    -------
+    Dataset
+        The matching dataset.
+
+    Raises
+    ------
+    DatasetNotFoundError
+        If no dataset with the given id exists.
+    """
+    df = conn.execute(
+        "SELECT id, domain, name, source_path, row_count, n_states "
+        "FROM datasets WHERE id = ?",
+        [dataset_id],
+    ).df()
+    if df.empty:
+        raise DatasetNotFoundError(
+            f"Dataset '{dataset_id}' not found. "
+            "Register it first via register_dataset() or scripts/seed_data.py."
+        )
+    row = df.iloc[0]
+    return Dataset(
+        id=row["id"],
+        domain=row["domain"],
+        name=row["name"],
+        source_path=row["source_path"],
+        row_count=int(row["row_count"] or 0),
+        n_states=int(row["n_states"] or 0),
+    )
 
 
-def load_transitions(dataset_id: str, period_range: tuple[int, int] | None = None) -> pd.DataFrame:
-    """Load raw transitions for a dataset, optionally filtered by period range."""
-    # TODO(phase02)
-    raise NotImplementedError("load_transitions — implement in Phase 02")
+def load_transitions(
+    conn: duckdb.DuckDBPyConnection,
+    dataset_id: str,
+    period_range: tuple[int, int] | None = None,
+) -> pd.DataFrame:
+    """Load raw transitions for a dataset, optionally filtered by period range.
+
+    Parameters
+    ----------
+    conn : duckdb.DuckDBPyConnection
+        Open DuckDB connection.
+    dataset_id : str
+        Dataset identifier.
+    period_range : tuple[int, int] | None
+        Inclusive (min_period, max_period) filter. None = all periods.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns: entity_id, period, from_state, to_state, weight.
+    """
+    if period_range is None:
+        return conn.execute(
+            "SELECT entity_id, period, from_state, to_state, weight "
+            "FROM transitions WHERE dataset_id = ? ORDER BY period",
+            [dataset_id],
+        ).df()
+    min_p, max_p = period_range
+    return conn.execute(
+        "SELECT entity_id, period, from_state, to_state, weight "
+        "FROM transitions WHERE dataset_id = ? AND period BETWEEN ? AND ? ORDER BY period",
+        [dataset_id, min_p, max_p],
+    ).df()
 
 
-def bulk_insert_transitions(dataset_id: str, df: pd.DataFrame) -> int:
-    """Bulk insert transitions for a dataset. Returns row count inserted."""
-    # TODO(phase02)
-    raise NotImplementedError("bulk_insert_transitions — implement in Phase 02")
+def bulk_insert_transitions(
+    conn: duckdb.DuckDBPyConnection,
+    dataset_id: str,
+    df: pd.DataFrame,
+) -> int:
+    """Bulk insert transitions for a dataset. Returns row count inserted.
+
+    Parameters
+    ----------
+    conn : duckdb.DuckDBPyConnection
+        Open DuckDB connection.
+    dataset_id : str
+        Dataset identifier (must already exist in datasets table).
+    df : pd.DataFrame
+        Long-format transitions. Required columns: entity_id, period, from_state, to_state.
+        Optional: weight (defaults to 1.0 per schema).
+
+    Returns
+    -------
+    int
+        Number of rows inserted.
+
+    Raises
+    ------
+    ValueError
+        If required columns are missing or contain NaN.
+    """
+    validate_transitions_df(df)
+    insert_df = df.assign(dataset_id=dataset_id)[
+        ["dataset_id", "entity_id", "period", "from_state", "to_state"]
+        + (["weight"] if "weight" in df.columns else [])
+    ]
+    conn.register("_bulk_insert_tmp", insert_df)
+    try:
+        conn.execute("INSERT INTO transitions SELECT * FROM _bulk_insert_tmp")
+    finally:
+        conn.unregister("_bulk_insert_tmp")
+    return len(insert_df)
 
 
 def build_transition_matrix(
