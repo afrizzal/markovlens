@@ -31,7 +31,7 @@
 **Plans**: 6 plans
 - [x] 01-01-PLAN.md — Scaffold Wave 0 test stubs across all phase modules
 - [x] 01-02-PLAN.md — validate_transition_matrix + M1/M2/M3 (Chan 2015 regression)
-- [ ] 01-03-PLAN.md — monte_carlo_simulate + calibrate + quantile_bands + walk_forward + metrics
+- [x] 01-03-PLAN.md — monte_carlo_simulate + calibrate + quantile_bands + walk_forward + metrics
 - [ ] 01-04-PLAN.md — serialization helpers + build_transition_matrix + validate_transitions_df
 - [ ] 01-05-PLAN.md — IBM Telco CSV + synthetic FMCG DGP + reference forecasts (idempotent)
 - [ ] 01-06-PLAN.md — >=80% core/ coverage + ruff + mypy clean
@@ -88,7 +88,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 01. Markov Engine | 2/6 | In Progress|  |
+| 01. Markov Engine | 3/6 | In Progress|  |
 | 02. Design System + Brand Share | 0/TBD | Not started | - |
 | 03. Churn Domain | 0/TBD | Not started | - |
 | 04. Home, Export & Settings | 0/TBD | Not started | - |

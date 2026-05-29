@@ -11,12 +11,12 @@
 - [x] **ENG-02**: `M1Homogeneous.forecast()` implements Y_{t+1} = Y_t · P (constant P), verified against Chan (2015) Table 3 regression test
 - [x] **ENG-03**: `M2TimeVarying.forecast()` implements Y_{t+1} = Y_t · P_t (P changes per period), per Chan (2015)
 - [x] **ENG-04**: `M3Extended.forecast()` implements Q_{t+1} = G ⊙ Q_t · P_t with growth multiplier G, accepting absolute counts not normalized shares
-- [ ] **ENG-05**: `monte_carlo_simulate()` runs 10,000 vectorized paths using `np.random.default_rng(seed)` + cumsum inverse-CDF; reproducible with same seed
-- [ ] **ENG-06**: `calibrate_probability()` applies LONGSHOT_CALIBRATION table interpolation, returns both raw and calibrated probabilities
-- [ ] **ENG-07**: `compute_quantile_bands()` returns 10th/50th/90th percentile paths with `target_extractor` callable guard (not raw state-index percentiles)
+- [x] **ENG-05**: `monte_carlo_simulate()` runs 10,000 vectorized paths using `np.random.default_rng(seed)` + cumsum inverse-CDF; reproducible with same seed
+- [x] **ENG-06**: `calibrate_probability()` applies LONGSHOT_CALIBRATION table interpolation, returns both raw and calibrated probabilities
+- [x] **ENG-07**: `compute_quantile_bands()` returns 10th/50th/90th percentile paths with `target_extractor` callable guard (not raw state-index percentiles)
 - [x] **ENG-08**: Sparsity detection warns on transition cells with < `MIN_OBSERVATIONS_PER_CELL` (20) observations; flag surfaced to UI layer
-- [ ] **ENG-09**: `walk_forward_backtest()` re-fits matrix at each step using only past data; no future data leakage
-- [ ] **ENG-10**: `core/metrics.py` implements MAPE, Brier score, log-loss for forecast accuracy reporting
+- [x] **ENG-09**: `walk_forward_backtest()` re-fits matrix at each step using only past data; no future data leakage
+- [x] **ENG-10**: `core/metrics.py` implements MAPE, Brier score, log-loss for forecast accuracy reporting
 
 ### Data Layer
 
@@ -107,12 +107,12 @@
 | ENG-02 | Phase 01 | Complete |
 | ENG-03 | Phase 01 | Complete |
 | ENG-04 | Phase 01 | Complete |
-| ENG-05 | Phase 01 | Pending |
-| ENG-06 | Phase 01 | Pending |
-| ENG-07 | Phase 01 | Pending |
+| ENG-05 | Phase 01 | Complete |
+| ENG-06 | Phase 01 | Complete |
+| ENG-07 | Phase 01 | Complete |
 | ENG-08 | Phase 01 | Complete |
-| ENG-09 | Phase 01 | Pending |
-| ENG-10 | Phase 01 | Pending |
+| ENG-09 | Phase 01 | Complete |
+| ENG-10 | Phase 01 | Complete |
 | DATA-01 | Phase 01 | Pending |
 | DATA-02 | Phase 01 | Pending |
 | DATA-03 | Phase 01 | Pending |
