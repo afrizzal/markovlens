@@ -9,7 +9,6 @@ import pytest
 
 
 @pytest.mark.integration
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_build_transition_matrix_normalized(temp_duckdb_path: Path):
     """DATA-03: matrix returned must have rows summing to 1.0."""
     from core.db.connection import init_schema
@@ -33,7 +32,6 @@ def test_build_transition_matrix_normalized(temp_duckdb_path: Path):
 
 
 @pytest.mark.integration
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_build_transition_matrix_counts(temp_duckdb_path: Path):
     """DATA-03: counts array returned with correct values."""
     from core.db.connection import init_schema
@@ -57,7 +55,6 @@ def test_build_transition_matrix_counts(temp_duckdb_path: Path):
 
 
 @pytest.mark.integration
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_build_transition_matrix_filters_dataset(temp_duckdb_path: Path):
     """DATA-03: only rows matching dataset_id are aggregated."""
     from core.db.connection import init_schema
