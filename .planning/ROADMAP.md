@@ -8,7 +8,7 @@
 
 ## Phases
 
-- [ ] **Phase 01: Markov Engine** — Implement and validate the complete core engine: all three model classes, Monte Carlo simulation, calibration, metrics, and data layer
+- [x] **Phase 01: Markov Engine** — Implement and validate the complete core engine: all three model classes, Monte Carlo simulation, calibration, metrics, and data layer
 - [ ] **Phase 02: Design System + Brand Share** — Establish the Plotly/CSS design system and deliver the fully wired Brand Share domain page
 - [ ] **Phase 03: Churn Domain** — Deliver the fully wired Customer Churn domain page reusing Phase 02 design system
 - [ ] **Phase 04: Home, Export & Settings** — Wire the Home dashboard to real data, add CSV export, and complete the Settings page
@@ -33,8 +33,8 @@
 - [x] 01-02-PLAN.md — validate_transition_matrix + M1/M2/M3 (Chan 2015 regression)
 - [x] 01-03-PLAN.md — monte_carlo_simulate + calibrate + quantile_bands + walk_forward + metrics
 - [x] 01-04-PLAN.md — serialization helpers + build_transition_matrix + validate_transitions_df
-- [ ] 01-05-PLAN.md — IBM Telco CSV + synthetic FMCG DGP + reference forecasts (idempotent)
-- [ ] 01-06-PLAN.md — >=80% core/ coverage + ruff + mypy clean
+- [x] 01-05-PLAN.md — IBM Telco CSV + synthetic FMCG DGP + reference forecasts (idempotent)
+- [x] 01-06-PLAN.md — >=80% core/ coverage + ruff + mypy clean
 
 ### Phase 02: Design System + Brand Share
 **Goal**: The Brand Share page is fully functional end-to-end — a recruiter can open it, select a dataset, run m1/m2/m3 forecasts, inspect the transition matrix heatmap, view the Monte Carlo fan chart, and compare model accuracy
@@ -88,7 +88,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 01. Markov Engine | 4/6 | In Progress|  |
+| 01. Markov Engine | 6/6 | Complete | 2026-05-29 |
 | 02. Design System + Brand Share | 0/TBD | Not started | - |
 | 03. Churn Domain | 0/TBD | Not started | - |
 | 04. Home, Export & Settings | 0/TBD | Not started | - |

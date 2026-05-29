@@ -21,7 +21,7 @@
 ### Data Layer
 
 - [x] **DATA-01**: `core/io/loaders.py` loads CSV/Parquet → validated DataFrame with required columns (`entity_id`, `period`, `from_state`, `to_state`), `dtype=float64` for numeric columns
-- [ ] **DATA-02**: `scripts/seed_data.py` downloads Kaggle telco churn dataset + brand share dataset (synthetic DGP with documented parameters if no clean Kaggle source), populates DuckDB `transitions` table, and pre-populates 3-5 reference forecast runs into `forecasts` table to avoid empty KPIs on cold start
+- [x] **DATA-02**: `scripts/seed_data.py` downloads Kaggle telco churn dataset + brand share dataset (synthetic DGP with documented parameters if no clean Kaggle source), populates DuckDB `transitions` table, and pre-populates 3-5 reference forecast runs into `forecasts` table to avoid empty KPIs on cold start
 - [x] **DATA-03**: `build_transition_matrix()` in `core/db/queries.py` uses DuckDB GROUP BY → normalized NumPy matrix with row-stochastic normalization (`df.div(df.sum(axis=1), axis=0)`); returns matrix + observation counts per cell
 
 ### Design System
@@ -114,7 +114,7 @@
 | ENG-09 | Phase 01 | Complete |
 | ENG-10 | Phase 01 | Complete |
 | DATA-01 | Phase 01 | Complete |
-| DATA-02 | Phase 01 | Pending |
+| DATA-02 | Phase 01 | Complete |
 | DATA-03 | Phase 01 | Complete |
 | UI-01 | Phase 02 | Pending |
 | UI-02 | Phase 02 | Pending |
