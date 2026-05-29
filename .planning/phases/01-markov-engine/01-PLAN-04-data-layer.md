@@ -244,7 +244,7 @@ Run: `uv run pytest tests/unit/test_serialization.py -x -q` — all 4 tests must
     - The required columns are: entity_id, period, from_state, to_state.
   </behavior>
   <action>
-Add this function to `core/io/loaders.py` BELOW the existing Phase 02 stubs (DO NOT modify or remove `load_brand_share_csv` or `load_churn_csv`). Add `import numpy as np` at the top if not present:
+Add this function to `core/io/loaders.py` BELOW the existing Phase 02 stubs (DO NOT modify or remove `load_brand_share_csv` or `load_churn_csv`). Ensure both `import numpy as np` AND `import pandas as pd` are present at the top of the file (the function signature uses `pd.DataFrame` and the body calls `df[col].isna()` — without pandas imported, the module will fail at import time with NameError on pd):
 
 ```python
 REQUIRED_TRANSITION_COLUMNS: frozenset[str] = frozenset(
@@ -302,6 +302,7 @@ Run: `uv run pytest tests/unit/test_loaders.py -x -q` — all 3 tests pass.
   <acceptance_criteria>
     - `grep -n "def validate_transitions_df" core/io/loaders.py` returns 1 match.
     - `grep -n "REQUIRED_TRANSITION_COLUMNS" core/io/loaders.py` returns at least 1 match.
+    - `grep -E "^import numpy as np|^import pandas as pd" core/io/loaders.py` returns 2 matches (both imports present at module top — required because the new function uses pd.DataFrame in its type hint and pd-style isna() in its body).
     - `grep -c "raise NotImplementedError" core/io/loaders.py` returns 2 (the two Phase 02 stubs are untouched).
     - `uv run pytest tests/unit/test_loaders.py -x -q` exits 0 with `3 passed`.
     - `grep -c "@pytest.mark.skip" tests/unit/test_loaders.py` returns 0.

@@ -13,6 +13,7 @@ files_modified:
   - .gitignore
   - scripts/seed_data.py
   - tests/integration/test_queries.py
+  - README.md
 autonomous: false
 requirements:
   - DATA-02
@@ -27,6 +28,7 @@ must_haves:
     - "data/seed/telco_churn.csv is committed to the repo (D-02, D-03)"
     - "data/SOURCES.md exists and documents IBM Telco origin + license context (D-04)"
     - ".gitignore allows data/seed/*.csv to be tracked while data/raw/ and data/*.duckdb stay ignored (D-03)"
+    - "README.md links the Kaggle source page and attributes IBM Telco (D-05)"
     - "scripts/seed_data.py populates transitions table with synthetic FMCG DGP (D-01) and IBM Telco discretized data (D-02)"
     - "scripts/seed_data.py is idempotent — running twice produces identical row counts (D-23)"
     - "scripts/seed_data.py writes at least 5 rows to the forecasts table (Roadmap Success Criterion 5)"
@@ -41,6 +43,9 @@ must_haves:
     - path: ".gitignore"
       provides: "Updated to track data/seed/*.csv while excluding data/raw/ and data/*.duckdb"
       contains: "!data/seed/"
+    - path: "README.md"
+      provides: "User-visible attribution + Kaggle source link for IBM Telco (D-05)"
+      contains: "blastchar/telco-customer-churn"
     - path: "scripts/seed_data.py"
       provides: "Synthetic FMCG DGP + IBM Telco ingest + reference forecasts populate DuckDB"
       contains: "synthetic_fmcg"
@@ -72,6 +77,7 @@ Output:
 - Committed data/seed/telco_churn.csv (committed dataset, ~7k rows)
 - New data/SOURCES.md with attribution
 - Updated .gitignore (allow data/seed/*.csv tracked)
+- README.md updated with IBM Telco attribution + Kaggle source link (D-05)
 - Fully implemented scripts/seed_data.py with synthetic FMCG DGP + Telco processing + reference forecasts
 - 2 remaining integration tests (test_seed_idempotency, test_seed_produces_reference_forecasts) pass green
 </objective>
@@ -99,6 +105,7 @@ Output:
 @core/models.py
 @core/db/schema.sql
 @.gitignore
+@README.md
 @tests/integration/test_queries.py
 @.claude/skills/dataset-prepper/SKILL.md
 @.claude/rules/data-storage.md
@@ -148,20 +155,20 @@ If True, run: kaggle datasets download -d blastchar/telco-customer-churn -p data
 
 If credentials are missing, ask the user via the checkpoint below to either provide a public mirror URL for curl, or place the file manually.
 
-After the file is at data/seed/telco_churn.csv, run head/wc validation to confirm correctness (see how-to-verify below).
+After the file is at data/seed/telco_churn.csv, run head/wc validation to confirm correctness (see how-to-verify below). After verification succeeds, **stage and commit the CSV** so downstream plans can rely on `git ls-files data/seed/telco_churn.csv` returning the path. Use: `rtk git add data/seed/telco_churn.csv && rtk git commit -m "data(01): commit IBM Telco churn reference CSV (D-02)"`.
   </action>
   <verify>
-    <automated>test -f data/seed/telco_churn.csv && head -1 data/seed/telco_churn.csv | grep -q customerID && wc -l data/seed/telco_churn.csv | awk '{exit !( $1 > 7000 && $1 < 7050 )}'</automated>
+    <automated>test -f data/seed/telco_churn.csv && head -1 data/seed/telco_churn.csv | grep -q customerID && wc -l data/seed/telco_churn.csv | awk '{exit !( $1 > 7000 && $1 < 7050 )}' && git ls-files data/seed/telco_churn.csv | grep -q telco_churn.csv</automated>
   </verify>
-  <done>data/seed/telco_churn.csv exists at correct size and shape (header includes customerID, tenure, Churn; ~7044 rows).</done>
+  <done>data/seed/telco_churn.csv exists at correct size and shape (header includes customerID, tenure, Churn; ~7044 rows) AND is tracked by git (committed so subsequent plans / CI can rely on its presence).</done>
   <what-built>
-    The IBM Telco Customer Churn CSV (`WA_Fn-UseC_-Telco-Customer-Churn.csv`) must exist at `data/seed/telco_churn.csv` (renamed) before any subsequent task can run. CONTEXT.md D-02 confirms this file IS committed to the repo per project decision, but it does not exist yet.
+    The IBM Telco Customer Churn CSV (`WA_Fn-UseC_-Telco-Customer-Churn.csv`) must exist at `data/seed/telco_churn.csv` (renamed) AND be tracked/committed by git before any subsequent task can run. CONTEXT.md D-02 confirms this file IS committed to the repo per project decision, but it does not exist yet.
 
     Claude has attempted CLI-based download options:
     1. `kaggle datasets download -d blastchar/telco-customer-churn -p data/seed --unzip` (requires KAGGLE_USERNAME + KAGGLE_KEY env vars)
     2. Direct fetch from a public mirror via `curl` (Claude can attempt this if user authorizes a specific URL)
 
-    If neither automation path succeeds, the human must place the file manually.
+    If neither automation path succeeds, the human must place the file manually. Either way, the file must end up committed — Plan 06 has a Task 0 that verifies `git ls-files data/seed/telco_churn.csv` returns the path, and the integration tests in this plan call `seed_data.main()` which hardcodes the path.
   </what-built>
   <how-to-verify>
     1. Confirm one of the following has happened:
@@ -171,21 +178,23 @@ After the file is at data/seed/telco_churn.csv, run head/wc validation to confir
     2. Run: `ls -la data/seed/telco_churn.csv` — must show a file of approximately 950 KB.
     3. Run: `head -2 data/seed/telco_churn.csv` — must show a header line containing the words `customerID`, `tenure`, `Churn` (among ~21 columns).
     4. Run: `wc -l data/seed/telco_churn.csv` — must show approximately 7044 lines (header + 7043 data rows).
+    5. Run: `git ls-files data/seed/telco_churn.csv` — must print `data/seed/telco_churn.csv`. (If empty, the file has not been committed yet — stage with `rtk git add data/seed/telco_churn.csv` and commit before approving.)
   </how-to-verify>
-  <resume-signal>Type "approved" when `data/seed/telco_churn.csv` exists and the head/wc checks succeed. Reply with a description of any issue you encountered if the file could not be placed.</resume-signal>
+  <resume-signal>Type "approved" when `data/seed/telco_churn.csv` exists, the head/wc checks succeed, AND `git ls-files data/seed/telco_churn.csv` shows it as tracked. Reply with a description of any issue you encountered if the file could not be placed.</resume-signal>
   <acceptance_criteria>
     - `data/seed/telco_churn.csv` exists.
     - First line of file contains the substrings `customerID`, `tenure`, `Churn`.
     - File has between 7000 and 7050 lines total (header + ~7043 rows).
+    - `git ls-files data/seed/telco_churn.csv | grep -q "telco_churn.csv"` exits 0 (file is tracked by git — Plan 06 Task 0 will re-check this).
   </acceptance_criteria>
 </task>
 
 <task type="auto" tdd="false">
-  <name>Task 2: Update .gitignore to track data/seed/*.csv + create data/SOURCES.md</name>
+  <name>Task 2: Update .gitignore to track data/seed/*.csv + create data/SOURCES.md + update README.md with D-05 attribution</name>
   <read_first>
     - .gitignore (current state — note lines 41-51 for the data/ section)
-    - .planning/phases/01-markov-engine/01-CONTEXT.md (D-03, D-04 — gitignore policy + SOURCES.md requirement)
-    - README.md (optional — D-05 wants attribution; if it exists, link Kaggle source)
+    - README.md (current state — locate a sensible section header to add the dataset attribution under, e.g. an existing "Data" or "About" or "Datasets" section, or append a new "Data Sources" section near the bottom)
+    - .planning/phases/01-markov-engine/01-CONTEXT.md (D-03, D-04, D-05 — gitignore policy + SOURCES.md requirement + README attribution)
   </read_first>
   <action>
 **Step A: Edit `.gitignore`** — Update the `# Data — never commit` section. Replace lines 41-51 (the current data section) with this exact block:
@@ -245,10 +254,25 @@ bundled in `data/seed/`.
 | Why synthetic | Brand share Kaggle datasets are noisy and inconsistent; a documented synthetic DGP gives the portfolio piece reproducible, paper-comparable numerics without compromising honesty (the README clearly states "synthetic"). |
 ```
 
-Run `git status` to confirm both files are staged-able.
+**Step C: Update `README.md` with IBM Telco attribution + Kaggle link (locked decision D-05).**
+
+D-05 from CONTEXT.md: "README attributes source and links to Kaggle page." Add a "## Data Sources" subsection near the bottom of README.md (after the main "About"/"How to Run" content, before any final footer/license section). If the README already has a "Data" or "Datasets" or "Acknowledgements" section, append underneath it instead of creating a new section. Use this content:
+
+```markdown
+## Data Sources
+
+| Dataset | Source | Why committed |
+|---|---|---|
+| IBM Telco Customer Churn | [Kaggle: blastchar/telco-customer-churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn) (originally IBM Watson Sample Data) | Cold-start deployability on Streamlit Cloud — see `data/SOURCES.md` for license context |
+| Synthetic FMCG brand share | Generated by `scripts/seed_data.py` (5 brands × 24 periods, hand-crafted base P + Dirichlet noise) | Reproducible synthetic DGP — keeps brand share numerics paper-comparable without claiming to use real proprietary data |
+
+See [`data/SOURCES.md`](data/SOURCES.md) for full attribution, discretization rules, and license context.
+```
+
+Run `git status` to confirm `.gitignore`, `data/SOURCES.md`, and `README.md` are all staged-able.
   </action>
   <verify>
-    <automated>grep -q "!data/seed/" .gitignore && test -f data/SOURCES.md && grep -q "Telco" data/SOURCES.md && echo OK</automated>
+    <automated>grep -q "!data/seed/" .gitignore && test -f data/SOURCES.md && grep -q "Telco" data/SOURCES.md && grep -q "blastchar/telco-customer-churn" README.md && echo OK</automated>
   </verify>
   <acceptance_criteria>
     - `.gitignore` contains `!data/seed/` (allowlist directive).
@@ -257,36 +281,39 @@ Run `git status` to confirm both files are staged-able.
     - `data/SOURCES.md` exists.
     - `data/SOURCES.md` contains the strings `Telco`, `customerID`, `Synthetic FMCG`, `Dirichlet`.
     - `git check-ignore data/seed/telco_churn.csv` exits nonzero (file is NOT ignored — i.e., it can be tracked).
+    - `README.md` contains the substring `blastchar/telco-customer-churn` (Kaggle slug — D-05 attribution).
+    - `README.md` contains the substring `data/SOURCES.md` (cross-reference back to attribution file).
   </acceptance_criteria>
   <done>
-    .gitignore allows data/seed/*.csv to be tracked. SOURCES.md documents both datasets per D-04.
+    .gitignore allows data/seed/*.csv to be tracked. SOURCES.md documents both datasets per D-04. README.md attributes IBM Telco with Kaggle link per D-05.
   </done>
 </task>
 
 <task type="auto" tdd="true">
-  <name>Task 3: Implement scripts/seed_data.py with synthetic FMCG DGP + Telco + reference forecasts + idempotency</name>
+  <name>Task 3a: Implement scripts/seed_data.py helpers (constants, _delete_dataset_rows, _generate_synthetic_fmcg, _load_telco_transitions, _bulk_insert_transitions, _persist_reference_forecast)</name>
   <read_first>
-    - scripts/seed_data.py (current 30-line stub — replace entirely)
+    - scripts/seed_data.py (current 30-line stub — will be replaced; Task 3a creates the imports + constants + helper functions only)
     - core/db/schema.sql (verify all 6 table columns and types)
     - core/models.py (M1Homogeneous, M2TimeVarying constructor signatures from Plan 02 — note D-08 ndarray)
     - core/db/queries.py (build_transition_matrix signature)
     - core/db/serialization.py (ndarray_to_json signature)
     - core/io/loaders.py (validate_transitions_df)
     - data/seed/telco_churn.csv (verify column names — sample first 2 rows via head if needed)
-    - tests/integration/test_queries.py (read test_seed_idempotency and test_seed_produces_reference_forecasts exactly)
     - .claude/skills/dataset-prepper/SKILL.md (canonical format)
     - .planning/phases/01-markov-engine/01-RESEARCH.md (section "Synthetic FMCG DGP Design" + "Telco Churn State Discretization" + "Pitfall 8: Seed Script Idempotency")
     - .planning/phases/01-markov-engine/01-CONTEXT.md (D-01, D-02, D-23)
   </read_first>
   <behavior>
-    - Running `uv run python scripts/seed_data.py` (a) initializes the DuckDB schema, (b) populates `datasets` table with 2 rows (one brand_share, one churn), (c) populates `transitions` table with synthetic FMCG transitions (5 brands x 24 periods) and IBM Telco transitions (tenure-discretized), (d) populates `forecasts` table with at least 5 reference forecast rows.
-    - Running the script a second time produces IDENTICAL row counts in every table (D-23 idempotency via DELETE-before-INSERT).
-    - All transitions inserted are validated via `validate_transitions_df` before insertion.
-    - All matrices serialized via `ndarray_to_json` (no raw NaN/Inf leaks).
-    - The script can be invoked as `uv run python scripts/seed_data.py` and exits 0.
+    - Module top contains the docstring + imports + constants block + helper functions, but NOT yet the public `seed_brand_share`, `seed_churn`, or `main` (those land in Task 3b).
+    - `_delete_dataset_rows(conn, dataset_id)` issues DELETE for every dataset-scoped table (forecasts, transition_matrices, simulation_runs, scenarios, transitions, datasets).
+    - `_generate_synthetic_fmcg(rng)` returns `(pd.DataFrame transitions, list[np.ndarray] P_t_list)` — the per-period matrices that will be fed to M2TimeVarying.
+    - `_load_telco_transitions(csv_path)` reads the CSV and returns a long-format DataFrame with the canonical columns (entity_id, period, from_state, to_state, weight). Raises FileNotFoundError if the CSV is missing.
+    - `_bulk_insert_transitions(conn, dataset_id, df)` validates df via validate_transitions_df then inserts via DuckDB native df registration.
+    - `_persist_reference_forecast(conn, dataset_id, model_type, horizon, forecast_array)` writes one row to the forecasts table using ndarray_to_json for the JSON column.
+    - Running `uv run python -c "import scripts.seed_data as s"` succeeds — no syntax errors, no NameError.
   </behavior>
   <action>
-Replace `scripts/seed_data.py` entirely. The module is large because it embeds two distinct ingestion paths + reference-forecast loops. Implementation:
+**Replace `scripts/seed_data.py` entirely with this scaffolding.** Task 3a delivers ONLY the docstring, imports, constants, and private helpers. The public entry points (`seed_brand_share`, `seed_churn`, `main`) land in Task 3b — until then there is no `if __name__ == "__main__":` block.
 
 ```python
 """Seed local DuckDB with brand-share + churn datasets.
@@ -306,7 +333,7 @@ Synthetic FMCG DGP parameters (Claude's Discretion):
 - Per-period variation: small Dirichlet noise around P_BASE (drives M2/M3 interest)
 - Aggregate transitions = (share_t[i] * P_BASE[i,j]) scaled to integer 'weight' units
 
-Run with:
+Run with (after Task 3b lands):
     uv run python scripts/seed_data.py
 """
 from __future__ import annotations
@@ -492,8 +519,50 @@ def _persist_reference_forecast(
             ndarray_to_json(forecast_array),
         ],
     )
+```
 
+Do NOT add `seed_brand_share`, `seed_churn`, `main`, or `if __name__ == "__main__":` yet — those belong to Task 3b. The module must still be importable without errors at the end of Task 3a (smoke test: `uv run python -c "import scripts.seed_data as s; print(s.BRAND_SHARE_DATASET_ID)"`).
+  </action>
+  <verify>
+    <automated>uv run python -c "import scripts.seed_data as s; assert s.BRAND_SHARE_DATASET_ID == 'ds_brand_share_synthetic'; assert s.CHURN_DATASET_ID == 'ds_churn_telco'; assert callable(s._delete_dataset_rows); assert callable(s._generate_synthetic_fmcg); assert callable(s._load_telco_transitions); assert callable(s._bulk_insert_transitions); assert callable(s._persist_reference_forecast); print('OK')"</automated>
+  </verify>
+  <acceptance_criteria>
+    - `grep -n "def _delete_dataset_rows" scripts/seed_data.py` returns 1 match (D-23 idempotency helper).
+    - `grep -n "def _generate_synthetic_fmcg" scripts/seed_data.py` returns 1 match.
+    - `grep -n "def _load_telco_transitions" scripts/seed_data.py` returns 1 match.
+    - `grep -n "def _bulk_insert_transitions" scripts/seed_data.py` returns 1 match.
+    - `grep -n "def _persist_reference_forecast" scripts/seed_data.py` returns 1 match.
+    - `grep -E "DELETE FROM (forecasts|transition_matrices|simulation_runs|scenarios|transitions|datasets) WHERE" scripts/seed_data.py` returns at least 5 matches (each table deleted before INSERT per D-23).
+    - `grep -c "def seed_brand_share\\|def seed_churn\\|def main" scripts/seed_data.py` returns 0 (these arrive in Task 3b — Task 3a is helpers-only).
+    - `grep -c "raise NotImplementedError" scripts/seed_data.py` returns 0 (original stub fully replaced).
+    - `uv run python -c "import scripts.seed_data"` exits 0 (module imports cleanly with all expected names defined).
+  </acceptance_criteria>
+  <done>
+    Helper layer of seed_data.py is in place: constants, idempotency DELETEs, synthetic FMCG generator, IBM Telco parser, bulk-insert wrapper, forecast persister. Module imports cleanly; public entry points still pending in Task 3b.
+  </done>
+</task>
 
+<task type="auto" tdd="true">
+  <name>Task 3b: Implement public seed_brand_share, seed_churn, main + un-skip integration tests + run end-to-end</name>
+  <read_first>
+    - scripts/seed_data.py (after Task 3a — verify helpers are in place)
+    - tests/integration/test_queries.py (read test_seed_idempotency and test_seed_produces_reference_forecasts exactly)
+    - core/models.py (M1Homogeneous, M2TimeVarying signatures from Plan 02)
+    - core/db/queries.py (build_transition_matrix signature)
+    - core/db/serialization.py (ndarray_to_json)
+    - .planning/phases/01-markov-engine/01-CONTEXT.md (D-01, D-02, D-23 once more — public entry points must wire everything together)
+  </read_first>
+  <behavior>
+    - `seed_brand_share(conn, rng)` calls `_delete_dataset_rows`, inserts the dataset row, runs `_generate_synthetic_fmcg`, bulk-inserts transitions, builds the m1 and m2 reference forecasts, and persists both.
+    - `seed_churn(conn, rng)` calls `_delete_dataset_rows`, inserts the dataset row, loads telco transitions via `_load_telco_transitions`, bulk-inserts them, builds the m1 reference forecasts at horizons 6/12/24, and persists all three.
+    - `main()` opens the singleton connection, applies schema, calls both seed functions, and prints a summary line.
+    - `uv run python scripts/seed_data.py` exits 0. Second invocation also exits 0 and produces identical row counts (D-23 idempotency).
+    - The forecasts table contains exactly 5 rows after a clean seed: 2 brand_share (m1, m2) + 3 churn (m1 @ h=6, 12, 24).
+  </behavior>
+  <action>
+Append the public entry points and the `if __name__ == "__main__":` guard to the end of `scripts/seed_data.py` (after `_persist_reference_forecast`). DO NOT touch the helpers or the top imports — Task 3a already shipped them.
+
+```python
 def seed_brand_share(conn, rng: np.random.Generator) -> None:
     """Populate brand_share dataset + transitions + 2 reference forecasts."""
     _delete_dataset_rows(conn, BRAND_SHARE_DATASET_ID)
@@ -587,7 +656,7 @@ if __name__ == "__main__":
     main()
 ```
 
-After implementation lands, un-skip the 2 remaining integration tests in `tests/integration/test_queries.py`:
+After the public entry points are appended, **un-skip the 2 remaining integration tests** in `tests/integration/test_queries.py`:
 - `test_seed_idempotency`
 - `test_seed_produces_reference_forecasts`
 
@@ -613,9 +682,8 @@ All 5 tests must pass.
   <acceptance_criteria>
     - `grep -n "def seed_brand_share" scripts/seed_data.py` returns 1 match.
     - `grep -n "def seed_churn" scripts/seed_data.py` returns 1 match.
-    - `grep -n "def _delete_dataset_rows" scripts/seed_data.py` returns 1 match (D-23 idempotency helper).
-    - `grep -E "DELETE FROM (forecasts|transition_matrices|simulation_runs|scenarios|transitions|datasets) WHERE" scripts/seed_data.py` returns at least 5 matches (each table deleted before INSERT per D-23).
-    - `grep -c "raise NotImplementedError" scripts/seed_data.py` returns 0 (no stubs remain).
+    - `grep -n "def main()" scripts/seed_data.py` returns 1 match.
+    - `grep -n "if __name__ == \"__main__\":" scripts/seed_data.py` returns 1 match.
     - `grep -n "from core\\." scripts/seed_data.py` returns at least 4 matches (uses core/db/connection, core/db/queries, core/db/serialization, core/io/loaders, core/models).
     - `grep -E "f\".*WHERE|f\".*INSERT" scripts/seed_data.py` returns nothing (no f-string SQL injection paths — all queries use `?` parameter binding).
     - `uv run python scripts/seed_data.py` exits 0 on the first invocation.
@@ -653,9 +721,10 @@ Output must show forecasts >= 5 and 2 distinct domains (`brand_share`, `churn`).
 </verification>
 
 <success_criteria>
-- data/seed/telco_churn.csv committed.
+- data/seed/telco_churn.csv committed (Task 1 acceptance includes `git ls-files` check).
 - data/SOURCES.md documents both datasets.
 - .gitignore tracks data/seed/*.csv while keeping data/raw/ and data/*.duckdb ignored.
+- README.md attributes IBM Telco + Kaggle link per D-05.
 - scripts/seed_data.py populates datasets, transitions, and forecasts idempotently.
 - forecasts table has >= 5 rows after seed (Roadmap SC 5).
 - All 5 integration tests pass green.
@@ -663,9 +732,10 @@ Output must show forecasts >= 5 and 2 distinct domains (`brand_share`, `churn`).
 
 <output>
 After completion, create `.planning/phases/01-markov-engine/01-05-SUMMARY.md` documenting:
-- IBM Telco CSV provenance and commit decision
+- IBM Telco CSV provenance and commit decision (with git ls-files evidence)
 - Synthetic FMCG DGP parameters used
 - Idempotency mechanism (D-23 DELETE-before-INSERT helpers)
 - Final row counts in each table after running the seed
+- README D-05 attribution location (section name + line range)
 - DATA-02 marked complete
 </output>

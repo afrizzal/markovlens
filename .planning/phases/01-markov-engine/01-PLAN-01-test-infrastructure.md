@@ -66,7 +66,7 @@ Purpose: Implementations in Waves 2-5 must have a named test stub waiting for th
 
 Output:
 - 5 new test files with skip-annotated stubs covering every requirement
-- 1 modified test file (tests/unit/test_models.py) with skips removed from 4 existing tests + 6 new stubs added
+- 1 modified test file (tests/unit/test_models.py) with skips removed from 4 existing tests + 7 new stubs added
 </objective>
 
 <execution_context>
@@ -156,7 +156,7 @@ Modify `tests/unit/test_models.py` to:
 
    After removal, these 4 tests will FAIL with `NotImplementedError` until Plan 02 implements the functions — that is correct.
 
-2. **Add 6 new skip-annotated test stubs** at the bottom of the file. Use the EXACT names from VALIDATION.md so verification commands match. Each stub body should just be `pass` or a single assertion comment. Add this skip reason on every NEW test: `@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")`.
+2. **Add 7 new skip-annotated test stubs** at the bottom of the file. Use the EXACT names from VALIDATION.md so verification commands match. Each stub body should just be `pass` or a single assertion comment. Add this skip reason on every NEW test: `@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")`.
 
 ```python
 @pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
@@ -249,15 +249,15 @@ def test_m3_forecast_replicates_chan_2015(sample_4x4_chan_matrix):
     np.testing.assert_allclose(result.forecast_array[0], expected_t2, atol=1e-2)
 ```
 
-**IMPORTANT:** the existing 4 tests are NOT changed in body — only the skip decorator is removed. The 6 NEW tests are skip-annotated so collection passes cleanly.
+**IMPORTANT:** the existing 4 tests are NOT changed in body — only the skip decorator is removed. The 7 NEW tests are skip-annotated so collection passes cleanly.
   </action>
   <verify>
     <automated>uv run pytest tests/unit/test_models.py --collect-only -q</automated>
   </verify>
   <acceptance_criteria>
-    - `tests/unit/test_models.py` collection lists exactly 10 tests (4 existing + 6 new): `test_validate_transition_matrix_accepts_valid`, `test_validate_transition_matrix_rejects_non_square`, `test_validate_transition_matrix_rejects_unnormalized`, `test_m1_forecast_replicates_chan_2015_table3`, `test_validate_rejects_negative`, `test_validate_rejects_wrong_dtype`, `test_validate_warns_sparse_cells`, `test_m1_forecast_shape`, `test_m2_forecast_shape`, `test_m2_holds_last_pt_at_horizon`, `test_m3_forecast_replicates_chan_2015` — wait that is 11 — re-count: the 4 originals plus 7 new makes 11. Acceptance: count of collected items in test_models.py == 11.
+    - `tests/unit/test_models.py` collection lists exactly 11 tests (4 existing + 7 new): `test_validate_transition_matrix_accepts_valid`, `test_validate_transition_matrix_rejects_non_square`, `test_validate_transition_matrix_rejects_unnormalized`, `test_m1_forecast_replicates_chan_2015_table3`, `test_validate_rejects_negative`, `test_validate_rejects_wrong_dtype`, `test_validate_warns_sparse_cells`, `test_m1_forecast_shape`, `test_m2_forecast_shape`, `test_m2_holds_last_pt_at_horizon`, `test_m3_forecast_replicates_chan_2015`. Acceptance: count of collected items in test_models.py == 11.
     - `grep -c "@pytest.mark.skip(reason=\"TODO Phase 01" tests/unit/test_models.py` returns 0 (the original skip marker text is gone from all 4 existing tests).
-    - `grep -c "@pytest.mark.skip(reason=\"Wave 0 stub" tests/unit/test_models.py` returns 7 (the 7 new stubs all carry the Wave 0 marker — adjust to 7 since we added 7 new tests total: test_validate_rejects_negative, test_validate_rejects_wrong_dtype, test_validate_warns_sparse_cells, test_m1_forecast_shape, test_m2_forecast_shape, test_m2_holds_last_pt_at_horizon, test_m3_forecast_replicates_chan_2015).
+    - `grep -c "@pytest.mark.skip(reason=\"Wave 0 stub" tests/unit/test_models.py` returns 7 (the 7 new stubs all carry the Wave 0 marker — test_validate_rejects_negative, test_validate_rejects_wrong_dtype, test_validate_warns_sparse_cells, test_m1_forecast_shape, test_m2_forecast_shape, test_m2_holds_last_pt_at_horizon, test_m3_forecast_replicates_chan_2015).
     - `uv run pytest tests/unit/test_models.py --collect-only -q` exits 0 (no import errors during collection).
   </acceptance_criteria>
   <done>
