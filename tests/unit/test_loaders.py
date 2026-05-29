@@ -6,7 +6,6 @@ import pandas as pd
 import pytest
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_validate_transitions_df_missing_col():
     from core.io.loaders import validate_transitions_df
     df = pd.DataFrame({"entity_id": ["a"], "period": [1], "from_state": ["x"]})
@@ -15,7 +14,6 @@ def test_validate_transitions_df_missing_col():
         validate_transitions_df(df)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_validate_transitions_df_accepts_valid():
     from core.io.loaders import validate_transitions_df
     df = pd.DataFrame({
@@ -27,7 +25,6 @@ def test_validate_transitions_df_accepts_valid():
     validate_transitions_df(df)  # should not raise
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_validate_transitions_df_rejects_nan_entity():
     from core.io.loaders import validate_transitions_df
     df = pd.DataFrame({
