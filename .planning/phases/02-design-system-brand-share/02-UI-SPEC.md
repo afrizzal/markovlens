@@ -1,7 +1,7 @@
 ---
 phase: 2
 slug: design-system-brand-share
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-05-29
