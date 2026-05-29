@@ -37,20 +37,31 @@ are from `markov.css` `:root` values.
 
 ## Spacing Scale
 
-All tokens from `markov.css` `--space-*`. Scale base = 4 px.
+### Active Phase 02 layout-spacing scale
+
+Primary layout spacing uses **standard multiples of 4 only**:
 
 | Token | CSS Variable | Value | Usage |
 |-------|-------------|-------|-------|
 | space-1 | `--space-1` | 4px | Icon gaps, inline label gaps |
 | space-2 | `--space-2` | 8px | Compact element spacing, badge padding |
-| space-3 | `--space-3` | 12px | Control row gaps, table cell padding |
 | space-4 | `--space-4` | 16px | Card interior padding unit, grid gap |
 | space-5 | `--space-5` | 24px | Card padding (`.card-pad`), section gaps |
 | space-6 | `--space-6` | 32px | Layout column gaps |
 | space-7 | `--space-7` | 48px | Empty-state vertical padding |
 | space-8 | `--space-8` | 64px | Page-level top/bottom padding |
 
-Exceptions:
+### Ported design tokens (CSS variable layer)
+
+The following token ships verbatim from `markov.css` and is present in `theme.css` for CSS
+fidelity (D-01/D-03). It is NOT used as a primary layout spacing unit in Phase 02:
+
+| Token | CSS Variable | Value | Justification |
+|-------|-------------|-------|---------------|
+| space-3 | `--space-3` | 12px | `markov.css` ships `--space-3: 12px` verbatim; retained as a CSS fidelity token (e.g. control inner padding / gap in `.input`, `.select`, `.tbl` cell padding, `.tip` body padding). NOT used as a primary layout spacing unit. Primary layout spacing uses the standard set (4, 8, 16, 24, 32, 48, 64). |
+
+### Exceptions (multiples of 4, non-standard usage)
+
 - Touch targets on heatmap cells: minimum 44px height (from `ui.jsx` Heatmap `minHeight: 44`)
 - Sidebar width: `--sidebar-w: 240px` (Streamlit's native sidebar approximates this; do not hard-fight)
 - Top bar height: `--topbar-h: 56px` (aspirational; use Streamlit's native top bar)
@@ -59,27 +70,43 @@ Exceptions:
 
 ## Typography
 
-All sizes and weights from `markov.css` `--fs-*` variables.
+### Active Phase 02 type scale
+
+The executor applies **exactly these 4 sizes and 2 weights** in Phase 02. No other sizes or
+weights should appear in Phase 02 HTML/CSS output.
 
 | Role | Size | CSS Variable | Weight | Line Height | Notes |
 |------|------|-------------|--------|-------------|-------|
-| Display | 48px | `--fs-48` | 700 | 1.05 | Landing hero only (not used in Phase 02) |
-| Heading 1 (page title) | 32px | `--fs-32` | 600 | 1.2 | Page `<h1>` via `.t-h1` |
-| Heading 2 (section) | 24px | `--fs-24` | 600 | 1.2 | Chart container titles via `.t-h2` |
-| Heading 3 (card) | 18px | `--fs-18` | 600 | 1.2 | KPI card labels, panel headings via `.t-h3` |
-| Body | 16px | `--fs-16` | 400 | 1.5 | `body` default, description paragraphs |
-| Small | 14px | `--fs-14` | 400/500 | 1.5 | Control labels, table cells, tab labels |
-| Extra small / label | 12px | `--fs-12` | 500 | 1.4 | Uppercase field labels (`.t-label`), badge text, axis tick labels |
+| Heading (page title / h1) | 32px | `--fs-32` | 600 | 1.2 | Page `<h1>` via `.t-h1` |
+| Heading (card / section / panel) | 18px | `--fs-18` | 600 | 1.2 | KPI card labels, chart container titles, panel headings via `.t-h3` |
+| Body / control labels / small | 14px | `--fs-14` | 400 | 1.5 | `body` default, control labels, table cells, tab labels, description paragraphs |
+| Extra small / label / axis | 12px | `--fs-12` | 400 | 1.4 | Uppercase field labels (`.t-label`), badge text, axis tick labels |
 
-Font weights used: regular (400), medium (500), semibold (600), bold (700).
-Active pairing for UI: **400 + 600** (body + headings). 500 for control labels; 700 reserved for display only.
-
-Mono usage: all numeric values in KPI cards, table cells with class `.num`, axis tick labels, heatmap cell values, model IDs (m1/m2/m3). Apply `font-variant-numeric: tabular-nums`.
+Active weights: **regular (400)** — body, control labels, small text. **Semibold (600)** — all headings, emphasis labels.
 
 Letter spacing:
-- Headings h1–h3: `-0.01em`
+- Headings (`.t-h1`, `.t-h3`): `-0.01em`
 - Uppercase labels (`.t-label`): `+0.04em` with `text-transform: uppercase`
-- Display: `-0.02em`
+
+Mono usage: all numeric values in KPI cards, table cells with class `.num`, axis tick labels, heatmap cell values, model IDs (m1/m2/m3). Apply `font-variant-numeric: tabular-nums`. Mono is a font-family choice, not an additional size/weight — it uses the same sizes from the active scale above.
+
+### Ported design tokens (CSS variable layer)
+
+All `--fs-*` tokens ship verbatim from `markov.css` in `theme.css` for CSS fidelity (D-01/D-03).
+The following tokens exist in the CSS file but are NOT active working sizes in Phase 02:
+
+| Token | Value | Status | Note |
+|-------|-------|--------|------|
+| `--fs-48` | 48px | CSS token only — not active in Phase 02 | Display/landing hero; not used on any Phase 02 page |
+| `--fs-24` | 24px | CSS token only — not active in Phase 02 | Collapsed into 18px for Phase 02 heading hierarchy; retained for Phase 03+ reuse |
+| `--fs-16` | 16px | CSS token only — not active in Phase 02 | Collapsed into 14px for Phase 02 body; retained for Phase 03+ reuse |
+
+Ported weights that exist in `markov.css` utility classes but are NOT active in Phase 02:
+
+| Weight | Status | Note |
+|--------|--------|------|
+| 500 (medium) | CSS token only — not active in Phase 02 | Present in `.t-label`, `.badge`, `.btn` classes; those elements use 600 semibold in Phase 02 output |
+| 700 (bold) | CSS token only — not active in Phase 02 | May appear only in Plotly chart annotations (Plotly renders weight internally); not present in the CSS contract for Phase 02 |
 
 ---
 
@@ -206,11 +233,11 @@ Extends the existing stub. Replace `st.metric` fallback with custom HTML/CSS.
 - Card: `.card .accent-card` with `--accent` CSS var set to `accent` param
 - Top accent bar: 3px, full-width, color = accent
 - Label row: `.t-label` + optional tooltip info icon at right
-- Value row: `--fs-32` weight 600, `font-family: var(--font-mono)`, `letter-spacing: -0.02em`; unit appended in `.t-sm .t-ter .mono`
-- Delta row: `--color-success` for positive, `--color-danger` for negative; arrow glyph + absolute value + suffix; mono 12px weight 500
+- Value row: `--fs-32` weight 600, `font-family: var(--font-mono)`, `letter-spacing: -0.02em`; unit appended in `.t-xs .t-ter .mono`
+- Delta row: `--color-success` for positive, `--color-danger` for negative; arrow glyph + absolute value + suffix; mono 12px weight 600
 - Sparkline: SVG 96×28px, stroke 1.5px, fill gradient opacity 0–0.18; color = accent
 - Empty value `"—"` renders in `.t-ter` without delta row
-- Padding: `--space-5` (24px) all sides; internal gap `--space-3` (12px)
+- Padding: `--space-5` (24px) all sides; internal gap `--space-3` (12px — CSS fidelity token per Spacing section)
 
 **Brand Share KPI strip (D-09):**
 | KPI | Label | Value source | Accent | Delta suffix |
@@ -529,7 +556,7 @@ Each card:
 - Model ID in mono `.t-h3`, colored `--color-primary` if recommended else `--color-text-tertiary`
 - Model formula in mono `.t-xs .t-sec`
 - Mini forecast sparkline: `MiniForecast`-style SVG or `Sparkline` component, height 64px, color = `chart-1` for winner else `--color-text-tertiary`
-- Metrics below divider: MAPE in `--fs-28` weight 700 (success color for winner), Brier in 18px weight 600
+- Metrics below divider: MAPE in `--fs-32` weight 600 (success color for winner), Brier in 18px weight 600
 
 **Metrics table (`st.dataframe` or custom HTML table):**
 
@@ -607,8 +634,8 @@ No destructive actions in Phase 02 scope (no dataset delete, no forecast delete)
 | `dataset_selected` | User picks dataset from selectbox | Heatmap tab renders immediately. Other tabs still show empty state. KPI strip hidden or shows `"—"` values. |
 | `running` | "Run Forecast" clicked | `st.spinner("Running forecast across all three models…")` wraps service call |
 | `results_loaded` | Forecast completes | KPI strip populated. All four tabs show content. |
-| `error_sparse` | `DatasetTooSparseError` raised | `st.error(message)` + `st.info("Suggestion: …")`. Heatmap still renders if matrix was partially built. Forecast tabs remain empty. |
-| `error_generic` | Unexpected exception | `st.error(f"Unexpected error: {e}")` + `st.exception(e)` if dev mode. |
+| `error_sparse` | `DatasetTooSparseError` raised | `st.error(message)` + `st.info("Try selecting a longer date range or merging states with fewer than 20 observations.")`. Heatmap still renders if matrix was partially built. Forecast tabs remain empty. |
+| `error_generic` | Unexpected exception | `st.error(f"Unexpected error: {e}")` + `st.exception(e)` if dev mode + `st.info("If this persists, re-run the seed script or check the logs.")` |
 | `mc_running` | "Run Simulation" clicked in Monte Carlo tab | `st.spinner("Running {n_simulations:,} simulations…")` |
 
 ---
@@ -696,8 +723,9 @@ No component registry required. All UI is CSS injection + Plotly + Streamlit nat
 | Field category | Source | Count |
 |----------------|--------|-------|
 | Design system tool | CONTEXT.md D-02, translation_constraint | 1 |
-| Spacing tokens | markov.css `--space-*` | 8 |
-| Typography sizes/weights | markov.css `--fs-*` | 7 sizes, 4 weights |
+| Spacing tokens (active layout scale) | markov.css `--space-*` (standard-set values only) | 7 active, 1 CSS-fidelity exception |
+| Typography sizes (active Phase 02 scale) | markov.css `--fs-*` | 4 sizes (active), 3 ported-token only |
+| Typography weights (active Phase 02 scale) | markov.css weight classes | 2 weights (active: 400 + 600), 2 ported-token only |
 | Color tokens (light) | markov.css `:root` | 26 |
 | Chart categorical palette | markov.css `--chart-1..6` | 6 |
 | Heatmap sequential ramp | markov.css `--chart-seq-1..5` | 5 |
@@ -711,7 +739,7 @@ No component registry required. All UI is CSS injection + Plotly + Streamlit nat
 | Plotly template | CONTEXT.md D-04, D-05 | full spec |
 | Page IA (Brand Share) | pages2.jsx + CONTEXT.md D-08..D-17 | full 4-tab IA |
 | Copywriting | CONTEXT.md D-08..D-17, D-12 | 22 elements |
-| Page state machine | CONTEXT.md D-15..D-17 | 6 states |
+| Page state machine | CONTEXT.md D-15..D-17 | 7 states (error_generic updated with resolution hint) |
 | Registry safety | translation_constraint | declared N/A |
 | User questions asked | — | 0 |
 
@@ -721,5 +749,6 @@ All fields pre-populated from upstream artifacts and prototype. No user question
 
 *Phase: 02-design-system-brand-share*
 *UI-SPEC created: 2026-05-29*
+*UI-SPEC revised: 2026-05-29 — fixed checker issues A (typography scale), B (weight scale), C (spacing 12px); added error_generic resolution hint*
 *Token source: docs/design-reference/markov.css (verbatim)*
 *Visual ground truth: docs/design-reference/js/*.jsx + shots/*.png*
