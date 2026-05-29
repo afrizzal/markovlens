@@ -88,7 +88,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 01. Markov Engine | 6/6 | Complete | 2026-05-29 |
+| 01. Markov Engine | 6/6 | Complete    | 2026-05-29 |
 | 02. Design System + Brand Share | 0/TBD | Not started | - |
 | 03. Churn Domain | 0/TBD | Not started | - |
 | 04. Home, Export & Settings | 0/TBD | Not started | - |

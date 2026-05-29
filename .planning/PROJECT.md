@@ -24,24 +24,26 @@ A GitHub repo that convinces a senior BA/BI recruiter that the developer can thi
 - ✓ Constants and type aliases: DEFAULT_N_SIMULATIONS=10_000, TransitionMatrix, StateVector — existing
 - ✓ Test infrastructure: conftest.py with matrix fixtures, integration markers — existing
 
-### Active
+### Validated — Phase 01 (Markov Engine, complete 2026-05-29)
 
 **Markov Engine (core/)**
-- [ ] ENG-01: validate_transition_matrix() — square, non-negative, rows sum to 1.0 within 1e-9
-- [ ] ENG-02: M1Homogeneous.forecast() — constant P, Y_{t+1} = Y_t · P
-- [ ] ENG-03: M2TimeVarying.forecast() — time-varying P_t per period
-- [ ] ENG-04: M3Extended.forecast() — P_t with growth multiplier G (market size changes)
-- [ ] ENG-05: monte_carlo_simulate() — 10,000 paths, reproducible seed, np.random.default_rng
-- [ ] ENG-06: calibrate_probability() — apply LONGSHOT_CALIBRATION table interpolation
-- [ ] ENG-07: compute_quantile_bands() — 10th/50th/90th percentile paths
-- [ ] ENG-08: Sparsity detection — warn on cells with < 20 observations
-- [ ] ENG-09: walk_forward_backtest() — no future data leakage
-- [ ] ENG-10: Metrics: MAPE, Brier score, log-loss (core/metrics.py)
+- ✓ ENG-01: validate_transition_matrix() — square, non-negative, rows sum to 1.0 within 1e-9
+- ✓ ENG-02: M1Homogeneous.forecast() — constant P, Y_{t+1} = Y_t · P
+- ✓ ENG-03: M2TimeVarying.forecast() — time-varying P_t per period
+- ✓ ENG-04: M3Extended.forecast() — P_t with growth multiplier G (market size changes)
+- ✓ ENG-05: monte_carlo_simulate() — 10,000 paths, reproducible seed, np.random.default_rng
+- ✓ ENG-06: calibrate_probability() — apply LONGSHOT_CALIBRATION table interpolation
+- ✓ ENG-07: compute_quantile_bands() — 10th/50th/90th percentile paths
+- ✓ ENG-08: Sparsity detection — warn on cells with < 20 observations
+- ✓ ENG-09: walk_forward_backtest() — no future data leakage
+- ✓ ENG-10: Metrics: MAPE, Brier score, log-loss (core/metrics.py)
 
 **Data Layer**
-- [ ] DATA-01: core/io/loaders.py — CSV/Parquet → validated DataFrame with sparsity check
-- [ ] DATA-02: scripts/seed_data.py — download Kaggle CSVs → process → populate DuckDB
-- [ ] DATA-03: build_transition_matrix() — DuckDB GROUP BY → normalized NumPy matrix
+- ✓ DATA-01: core/io/loaders.py — CSV/Parquet → validated DataFrame with sparsity check
+- ✓ DATA-02: scripts/seed_data.py — download Kaggle CSVs → process → populate DuckDB
+- ✓ DATA-03: build_transition_matrix() — DuckDB GROUP BY → normalized NumPy matrix
+
+### Active
 
 **Domain Services**
 - [ ] SVC-01: domains/brand_share/service.py — orchestrate m1/m2/m3 for market share data
@@ -72,7 +74,7 @@ A GitHub repo that convinces a senior BA/BI recruiter that the developer can thi
 
 ## Context
 
-**Codebase state:** Architecture and scaffolding are complete. All `core/` functions raise `NotImplementedError`. No Streamlit pages exist beyond `app/Home.py` (placeholder). Domain services are empty stubs. The project is ~15% complete (infrastructure built, implementation pending).
+**Codebase state (as of Phase 01 completion, 2026-05-29):** Markov engine complete — all ENG-01..ENG-10 + DATA-01..DATA-03 implemented and test-gated (90.76% coverage). Two Kaggle datasets seeded into DuckDB (synthetic FMCG brand share + IBM Telco churn). Domain services are empty stubs. No Streamlit pages beyond `app/Home.py` placeholder. The project is ~30% complete (engine + data layer done, UI + domain services pending).
 
 **Mathematical foundation:** Chan (2015) *Market Share Modelling and Forecasting Using Markov Chains and Alternative Models*, IJICIC Vol.11 No.4. All model implementations must cite specific equations.
 
