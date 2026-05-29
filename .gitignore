@@ -38,7 +38,7 @@ desktop.ini
 # Streamlit secrets (committable: config.toml; uncommittable: secrets.toml)
 .streamlit/secrets.toml
 
-# Data — never commit (datasets too large, may be PII)
+# Data — never commit raw or compiled
 data/markovlens.duckdb
 data/markovlens.duckdb.wal
 data/raw/*.csv
@@ -49,6 +49,9 @@ data/processed/*
 !data/processed/.gitkeep
 data/cache/*
 !data/cache/.gitkeep
+# Seed reference datasets are tracked (D-03) — small, publicly redistributable, needed for cold-start deploy
+!data/seed/
+!data/seed/*.csv
 
 # Reports — generated outputs
 reports/exports/*
