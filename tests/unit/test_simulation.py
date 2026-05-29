@@ -99,7 +99,6 @@ def test_quantile_bands_target_extractor_applied():
     np.testing.assert_allclose(bands[0.5], [2.0, 4.0, 6.0])
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_walk_forward_no_leakage():
     """ENG-09: backtest must only use past data to fit matrix at each step."""
     from core.simulation import walk_forward_backtest
