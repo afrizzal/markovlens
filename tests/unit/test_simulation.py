@@ -5,7 +5,6 @@ import numpy as np
 import pytest
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_monte_carlo_same_seed_reproducible(sample_2x2_matrix):
     from core.simulation import monte_carlo_simulate
     P = sample_2x2_matrix.astype(np.float64)
@@ -14,7 +13,6 @@ def test_monte_carlo_same_seed_reproducible(sample_2x2_matrix):
     np.testing.assert_array_equal(paths_a, paths_b)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_monte_carlo_different_seeds_differ(sample_2x2_matrix):
     from core.simulation import monte_carlo_simulate
     P = sample_2x2_matrix.astype(np.float64)
@@ -23,7 +21,6 @@ def test_monte_carlo_different_seeds_differ(sample_2x2_matrix):
     assert not np.array_equal(paths_a, paths_c)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_monte_carlo_output_shape(sample_2x2_matrix):
     from core.simulation import monte_carlo_simulate
     P = sample_2x2_matrix.astype(np.float64)
@@ -31,7 +28,6 @@ def test_monte_carlo_output_shape(sample_2x2_matrix):
     assert paths.shape == (500, 13)  # n_steps + 1
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_monte_carlo_dtype_int64(sample_2x2_matrix):
     from core.simulation import monte_carlo_simulate
     P = sample_2x2_matrix.astype(np.float64)
@@ -39,7 +35,6 @@ def test_monte_carlo_dtype_int64(sample_2x2_matrix):
     assert paths.dtype == np.int64
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_monte_carlo_accepts_distribution_start():
     """D-13: start_state may be an np.ndarray initial distribution."""
     from core.simulation import monte_carlo_simulate
@@ -52,7 +47,6 @@ def test_monte_carlo_accepts_distribution_start():
     assert 0.4 < state_0_frac < 0.6
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_monte_carlo_no_drift_to_zero_for_last_state():
     """D-12 regression: cum_matrix[:, -1] = 1.0 fix must keep last state reachable."""
     from core.simulation import monte_carlo_simulate
@@ -69,7 +63,6 @@ def test_monte_carlo_no_drift_to_zero_for_last_state():
     assert state_2_frac > 0.15
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_calibrate_anchor_points():
     from core.simulation import calibrate_probability
     assert calibrate_probability(0.05) == pytest.approx(0.0418, abs=1e-6)
@@ -77,21 +70,19 @@ def test_calibrate_anchor_points():
     assert calibrate_probability(0.95) == pytest.approx(0.958, abs=1e-6)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_calibrate_interpolates():
     from core.simulation import calibrate_probability
-    midpoint = calibrate_probability(0.025)
+    # 0.03 is the midpoint of key interval [0.01, 0.05] -> output is midpoint of their values
+    midpoint = calibrate_probability(0.03)
     assert midpoint == pytest.approx((0.0043 + 0.0418) / 2, abs=1e-3)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_calibrate_boundary_clamps():
     from core.simulation import calibrate_probability
     assert calibrate_probability(0.0) == pytest.approx(0.0043, abs=1e-6)
     assert calibrate_probability(1.0) == pytest.approx(0.958, abs=1e-6)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_quantile_bands_shape():
     from core.simulation import compute_quantile_bands
     paths = np.random.default_rng(42).integers(0, 4, size=(1000, 13))
@@ -100,7 +91,6 @@ def test_quantile_bands_shape():
     assert bands[0.50].shape == (13,)
 
 
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_quantile_bands_target_extractor_applied():
     """ENG-07: target_extractor must be applied BEFORE percentile, not after."""
     from core.simulation import compute_quantile_bands
