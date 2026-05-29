@@ -77,7 +77,6 @@ def test_build_transition_matrix_filters_dataset(temp_duckdb_path: Path):
 
 
 @pytest.mark.integration
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_seed_idempotency(temp_duckdb_path: Path, monkeypatch):
     """DATA-02: running seed twice produces identical row counts (D-23)."""
     monkeypatch.setenv("DUCKDB_PATH", str(temp_duckdb_path))
@@ -108,7 +107,6 @@ def test_seed_idempotency(temp_duckdb_path: Path, monkeypatch):
 
 
 @pytest.mark.integration
-@pytest.mark.skip(reason="Wave 0 stub — implementation in later wave")
 def test_seed_produces_reference_forecasts(temp_duckdb_path: Path, monkeypatch):
     """DATA-02: forecasts table populated with >= 5 rows after seed (cold-start KPI requirement)."""
     monkeypatch.setenv("DUCKDB_PATH", str(temp_duckdb_path))
