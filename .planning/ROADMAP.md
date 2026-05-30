@@ -47,8 +47,8 @@
   4. The model comparison table shows MAPE, Brier score, and log-loss for m1, m2, and m3 side-by-side, with the best value per metric bolded, followed by a plain-language interpretation paragraph
   5. The stationary distribution panel shows a bar chart labeled "Long-run equilibrium (if these rates persist…)" with values that sum to 1.0
 **Plans**: 4 plans
-- [ ] 02-01-PLAN.md — Plotly theme template + theme.css port (UI-01) + compute_stationary helper (BS-05)
-- [ ] 02-02-PLAN.md — Component library: transition_heatmap (BS-02), monte_carlo_fan (BS-03), kpi_card + empty_state (UI-02)
+- [x] 02-01-PLAN.md — Plotly theme template + theme.css port (UI-01) + compute_stationary helper (BS-05)
+- [x] 02-02-PLAN.md — Component library: transition_heatmap (BS-02), monte_carlo_fan (BS-03), kpi_card + empty_state (UI-02)
 - [ ] 02-03-PLAN.md — brand_share service rewrite: NumPy-only result + run_forecast pipeline (BS-01) + model comparison (BS-04)
 - [ ] 02-04-PLAN.md — Brand Share page: control strip + KPI strip + 4 tabs + states (BS-06)
 **UI hint**: yes
@@ -93,7 +93,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 01. Markov Engine | 6/6 | Complete    | 2026-05-29 |
-| 02. Design System + Brand Share | 1/4 | In Progress | - |
+| 02. Design System + Brand Share | 2/4 | In Progress|  |
 | 03. Churn Domain | 0/TBD | Not started | - |
 | 04. Home, Export & Settings | 0/TBD | Not started | - |
 | 05. Quality Assurance & Deployment | 0/TBD | Not started | - |

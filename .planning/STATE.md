@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 02
 status: unknown
-last_updated: "2026-05-30T00:13:19.863Z"
+last_updated: "2026-05-30T00:55:43.289Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 10
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # GSD State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 | Phase | Name | Status |
 |-------|------|--------|
 | 01 | Markov Engine | Complete |
-| 02 | Design System + Brand Share | In Progress (1/4 plans complete) |
+| 02 | Design System + Brand Share | In Progress (2/4 plans complete) |
 | 03 | Churn Domain | Not Started |
 | 04 | Home, Export & Settings | Not Started |
 | 05 | Quality Assurance & Deployment | Not Started |
@@ -37,7 +37,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 
 ## Current Focus
 
-Phase 02 in progress. Plan 02-01 (Design System Foundation) complete. Next: Plan 02-02 (Components).
+Phase 02 in progress. Plans 02-01 and 02-02 complete. Next: Plan 02-03 (Brand Share Service) or 02-04.
 
 ---
 
@@ -45,7 +45,7 @@ Phase 02 in progress. Plan 02-01 (Design System Foundation) complete. Next: Plan
 
 ```
 Phase 01 [##########] 100% (6/6 plans complete)
-Phase 02 [##        ] 25% (1/4 plans complete)
+Phase 02 [####      ] 50% (2/4 plans complete)
 Phase 03 [          ] 0%
 Phase 04 [          ] 0%
 Phase 05 [          ] 0%
@@ -74,6 +74,7 @@ Overall  [##        ] 13/33 requirements complete (ENG-01..10, DATA-01..03)
 | Phase 01 P05 | 12min | 3 tasks | 8 files |
 | Phase 01 P06 | 25min | 3 tasks | 17 files |
 | Phase 02 P01 | 17min | 3 tasks | 6 files |
+| Phase 02 P02 | 11min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,8 @@ Overall  [##        ] 13/33 requirements complete (ENG-01..10, DATA-01..03)
 - Phase 01 quality gate confirmed: 90.76% coverage (>80%), 40/40 tests pass, ruff clean, mypy clean
 - Phase 02 Plan 01: compute_stationary placed in core/models.py (pure, no streamlit import); register_theme() must run after import streamlit for Plotly template composition; dict literals over dict() calls per ruff C408
 - Phase 02 Plan 01: 46/46 tests pass after foundation layer added (UI-01 + BS-05)
+- Phase 02 Plan 02: _build_*_figure helpers for testable Plotly components; tonexty trace order for fan chart fill; SPARSE_OBS_THRESHOLD=20 constant avoids magic numbers
+- Phase 02 Plan 02: 54/54 tests pass after component library added (UI-02, BS-02, BS-03, D-06/D-07)
 
 ### Active Blockers
 
@@ -96,7 +99,7 @@ None.
 
 ### Todos
 
-- Continue Phase 02: run Plan 02-02 (Components)
+- Continue Phase 02: run Plan 02-03 (Brand Share Service) and 02-04 (Brand Share Page)
 
 ---
 
@@ -104,12 +107,12 @@ None.
 
 ### Last Action
 
-2026-05-30 — Phase 02 Plan 01 complete: Plotly theme template (UI-01), full CSS token port, compute_stationary() (BS-05); 46 tests pass
+2026-05-30 — Phase 02 Plan 02 complete: transition_heatmap (BS-02), monte_carlo_fan (BS-03), kpi_card + empty_state custom HTML (D-06/D-07); 54/54 tests pass
 
 ### Resume Point
 
-Phase 02 Plan 02: Components (transition_heatmap, monte_carlo_fan, kpi_card, empty_state)
+Phase 02 Plan 03 (Brand Share Service) or Plan 04 (Brand Share Page)
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-05-30 after Phase 02 Plan 01 completion*
+*Last updated: 2026-05-30 after Phase 02 Plan 02 completion*
