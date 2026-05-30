@@ -4,6 +4,106 @@
 
 ---
 
+## 2026-05-31 — sys.path manipulation in Streamlit entry scripts
+
+**Context:** Brand Share page crashed at runtime with `ModuleNotFoundError: No module named 'app'` on the line `from app.components.empty_state import empty_state`. Pytest passed all imports fine; the failure was Streamlit-runtime-specific. Investigation revealed that Streamlit adds the **entry script's directory** (`app/`) to `sys.path`, not the project root — so `from app.X`, `from core.X`, `from domains.X` all fail at runtime even though they resolve correctly under pytest (where project root is the rootdir).
+
+**Decision:** Every Streamlit entry script (`app/Home.py` and every `app/pages/*.py`) prepends the project root to `sys.path` at the top of the file, before any local imports. Pattern:
+
+```python
+import sys
+from pathlib import Path
+
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]  # parents[1] for Home.py
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+```
+
+**Why:**
+- Project-root-on-sys.path makes import style uniform across runtime and tests (`from app.X`, `from core.X`, `from domains.X` all work in both contexts)
+- Adding the hack at the top of each entry script is reliable — runs before any local import is attempted
+- `parents[2]` works from `app/pages/X.py` (3 levels up); `parents[1]` from `app/Home.py` (2 levels up)
+- Idempotent — the `if not in sys.path` check prevents duplicate insertion across reloads
+
+**Impact:**
+- `app/Home.py` has the hack with `parents[1]`
+- `app/pages/1_Brand_Share.py` has the hack with `parents[2]`
+- **Every future page file (e.g., Phase 03 `2_Churn.py`, Phase 04 settings pages) MUST include this hack at the top** before any local import
+- No changes needed to `core/`, `domains/`, or test setup
+- pytest behavior unchanged (project root already in sys.path via rootdir)
+
+**Alternatives considered:**
+- Change all `from app.X` imports to `from X` (relying on Streamlit's `app/` injection) — rejected because it breaks pytest (which needs `from app.X`) and creates inconsistency with `from core.X` / `from domains.X` which still need project root
+- Use a `conftest.py`-style early-loading module — doesn't apply to Streamlit runtime, only pytest
+- Configure Streamlit to set PYTHONPATH — Streamlit has no such config option
+- Use `__init__.py` in `app/` to manipulate sys.path — runs only when `app` is imported as a package, but Streamlit treats `Home.py` as a script, so `app/__init__.py` doesn't execute
+
+---
+
+## 2026-05-31 — Phase 02 scope creep on app/Home.py; reaffirm no separate Reports page
+
+**Context:** Phase 02 execution (Design System + Brand Share) modified `app/Home.py` and added `st.page_link` references to `pages/2_Churn.py` (Phase 03 deliverable) and `pages/3_Reports.py` (which was explicitly excluded from v1 per earlier scope decision — CSV export is embedded in domain pages, no separate Reports page in v1). This caused `StreamlitPageNotFoundError` at runtime because the referenced files don't exist. `app/Home.py` is properly a **Phase 04** deliverable (HOME-01 in requirements).
+
+**Decision:** Apply minimal quick fix now without expanding Phase 02 scope further:
+1. Make the Churn page link **conditional** on file existence (will activate automatically when Phase 03 ships `pages/2_Churn.py`)
+2. **Remove** the Reports page link entirely (no separate Reports page in v1 per scope decision; CSV export will be embedded in Brand Share and Churn pages)
+3. Update the "Recent Forecasts" empty-state copy to reference only Brand Share (since Churn isn't available yet)
+
+Defer the proper, complete Home.py rebuild to Phase 04 (HOME-01: wired KPIs from real DB, populated recent forecasts list, etc.).
+
+**Why:**
+- Quick fix unblocks Phase 02 verification (Brand Share page must be reachable to manually QA the design system)
+- Reaffirming the "no separate Reports page" decision prevents future scope drift — Phase 06 was originally planned for Reports but was folded into per-domain CSV exports during requirements review
+- Conditional page link pattern is forward-compatible — no re-edit needed when Phase 03 ships
+- Full Home.py rebuild belongs in Phase 04 where KPI strip wiring + recent forecasts integration with the `forecasts` table can be done together
+
+**Impact:**
+- `app/Home.py`: conditional Churn link (file-exists check), Reports link removed, intro copy updated
+- Phase 04 PLAN.md (when generated) must:
+  - Replace the conditional Churn link with an unconditional one
+  - Wire real KPIs from DuckDB (dataset count, last forecast timestamp, total runs, average MAPE)
+  - Populate "Recent Forecasts" from the `forecasts` table
+  - Verify pre-seed forecast count satisfies cold-start UX (per Phase 01 criterion #5)
+- Planner agents should respect phase boundaries even when "convenient" forward-references seem helpful — flag as lesson learned for future plan reviews
+
+**Alternatives considered:**
+- Full Home.py rebuild now — rejected because it expands Phase 02 scope further (compounding the original creep), and Phase 04 has the proper context to do it right (real DB integration, KPI wiring)
+- Remove all page_links including Brand Share — rejected because Brand Share IS deliverable in Phase 02 and the link is functional
+- Add a Phase 06 for separate Reports page — already rejected during requirements review; this just reaffirms
+
+---
+
+## 2026-05-29 — Streamlit page filenames exempt from ruff N999
+
+**Context:** During Phase 01 verification, `uv run ruff check .` flagged `app/Home.py` with `N999 Invalid module name: 'Home'` (rule requires lowercase module names). However, Streamlit **mandates** PascalCase filenames for multi-page apps — `Home.py` is the entry script convention, and `pages/1_Brand_Share.py`, `pages/2_Churn.py`, etc. follow the `N_Title_Case.py` pattern that Streamlit uses for sidebar ordering and labeling. The two conventions conflict directly.
+
+**Decision:** Add a scoped exception in `pyproject.toml` to ignore N999 for all files under `app/`:
+
+```toml
+[tool.ruff.lint.per-file-ignores]
+"app/**/*.py" = ["N999"]
+```
+
+**Why:**
+- Streamlit's PascalCase requirement is non-negotiable (auto-discovery + sidebar label depend on it)
+- Renaming to lowercase would break the Streamlit multi-page app contract
+- Per-file inline `# noqa: N999` would scatter the suppression across many files and is fragile
+- The scope is bounded — N999 still applies to `core/`, `domains/`, `scripts/`, `tests/` where Python's lowercase convention is appropriate
+- This is a known and well-documented convention conflict in the Streamlit community
+
+**Impact:**
+- `pyproject.toml` per-file-ignores updated
+- `uv run ruff check .` now passes cleanly across the whole project
+- Future Streamlit pages (`pages/2_Churn.py`, etc.) inherit the exception automatically
+- No code changes needed to existing or future page files
+
+**Alternatives considered:**
+- Rename all Streamlit files to lowercase — breaks Streamlit conventions, sidebar labels become ugly (`home`, `1_brand_share`)
+- Inline `# noqa: N999` on each file — fragile, easy to forget for new pages, scatters concerns
+- Disable N999 project-wide — rejected because the rule is still valuable for `core/`, `domains/`, `scripts/`, `tests/`
+
+---
+
 ## 2026-05-28 — Use Streamlit + streamlit-shadcn-ui as web framework
 
 **Context:** Need to pick a UI framework for BA/BI portfolio piece. Target audience is recruiters and data analysts. Solo developer, 4-week timeline.

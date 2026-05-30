@@ -3,11 +3,19 @@ from __future__ import annotations
 
 # stdlib
 import random
+import sys
+from pathlib import Path
+
+# Ensure project root is on sys.path so `from app.X`, `from core.X`, `from domains.X` resolve.
+# Streamlit adds the entry-script dir (app/) to sys.path, not the project root.
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 # third-party
-import numpy as np
-import plotly.graph_objects as go
-import streamlit as st
+import numpy as np  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
 # ── Page Config (first Streamlit call — must precede all other st.* calls) ─
 st.set_page_config(

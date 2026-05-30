@@ -26,7 +26,7 @@ register_theme()
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture()
+@pytest.fixture
 def matrix_3x3() -> np.ndarray:
     """Valid 3x3 transition matrix (rows sum to 1)."""
     P = np.array([
@@ -37,13 +37,13 @@ def matrix_3x3() -> np.ndarray:
     return P
 
 
-@pytest.fixture()
+@pytest.fixture
 def obs_counts_dense() -> np.ndarray:
     """Observation counts — all cells well above sparsity threshold."""
     return np.full((3, 3), 50, dtype=int)
 
 
-@pytest.fixture()
+@pytest.fixture
 def obs_counts_sparse() -> np.ndarray:
     """Observation counts — one cell below the 20-observation threshold."""
     counts = np.full((3, 3), 50, dtype=int)
@@ -51,12 +51,12 @@ def obs_counts_sparse() -> np.ndarray:
     return counts
 
 
-@pytest.fixture()
+@pytest.fixture
 def state_labels_3() -> list[str]:
     return ["Alpha", "Beta", "Gamma"]
 
 
-@pytest.fixture()
+@pytest.fixture
 def fan_arrays():
     """Monotone P10/P50/P90 arrays and a short history."""
     n = 12
@@ -108,7 +108,8 @@ class TestTransitionHeatmap:
             state_labels_3,
         )
         annotations = fig.layout.annotations
-        assert annotations is not None and len(annotations) > 0
+        assert annotations is not None
+        assert len(annotations) > 0
 
         # Count percent-value annotations (one per cell = n*n)
         value_annotations = [a for a in annotations if "%" in str(a.text)]

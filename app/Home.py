@@ -1,7 +1,18 @@
 """MarkovLens — Home / Landing page."""
 from __future__ import annotations
 
-import streamlit as st
+import sys
+from pathlib import Path
+
+# Ensure project root is on sys.path so `from app.X`, `from core.X`, `from domains.X` resolve.
+# Streamlit adds the entry-script dir (app/) to sys.path, not the project root.
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
+import streamlit as st  # noqa: E402
+
+_PAGES_DIR = Path(__file__).parent / "pages"
 
 st.set_page_config(
     page_title="MarkovLens — Multi-Domain Forecasting Workbench",
@@ -42,14 +53,16 @@ with left:
 with right:
     st.subheader("Quick Actions")
     st.page_link("pages/1_Brand_Share.py", label="📈 Run Brand Share Forecast", use_container_width=True)
-    st.page_link("pages/2_Churn.py", label="🔁 Analyze Customer Churn", use_container_width=True)
-    st.page_link("pages/3_Reports.py", label="📄 Generate Report", use_container_width=True)
+    if (_PAGES_DIR / "2_Churn.py").exists():
+        st.page_link("pages/2_Churn.py", label="🔁 Analyze Customer Churn", use_container_width=True)
+    else:
+        st.markdown("🔁 *Customer Churn — coming in Phase 03*")
 
 st.markdown("---")
 
 # ── Recent Forecasts (placeholder) ──────────────────────────
 st.subheader("Recent Forecasts")
-st.info("No forecasts yet. Click **Run Brand Share Forecast** or **Analyze Customer Churn** above to generate your first projection.")
+st.info("No forecasts yet. Click **Run Brand Share Forecast** above to generate your first projection.")
 
 # ── Methodology card ────────────────────────────────────────
 with st.expander("Methodology — how MarkovLens works"):

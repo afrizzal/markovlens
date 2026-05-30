@@ -85,7 +85,8 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --tb=short --strict-markers"
+# --basetemp uses project-local dir instead of system %TEMP% (Windows permission/AV interference resilient)
+addopts = "-v --tb=short --strict-markers --basetemp=.pytest_tmp"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: integration tests requiring DuckDB",

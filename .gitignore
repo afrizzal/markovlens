@@ -59,6 +59,7 @@ reports/exports/*
 
 # Testing
 .pytest_cache/
+.pytest_tmp/
 .coverage
 .coverage.*
 htmlcov/
