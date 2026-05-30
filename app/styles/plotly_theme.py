@@ -26,24 +26,24 @@ def register_theme() -> None:
     t.layout.colorway = CATEGORICAL_COLORWAY
     t.layout.paper_bgcolor = "#FFFFFF"
     t.layout.plot_bgcolor = "#FFFFFF"
-    t.layout.font = dict(family="Geist, Inter, -apple-system, sans-serif", size=13, color="#52525B")
-    t.layout.xaxis = dict(
-        gridcolor="#E4E4E7",
-        linecolor="#D4D4D8",
-        tickfont=dict(family="JetBrains Mono, Geist Mono, monospace", size=11),
-    )
-    t.layout.yaxis = dict(
-        gridcolor="#E4E4E7",
-        linecolor="#D4D4D8",
-        tickfont=dict(family="JetBrains Mono, Geist Mono, monospace", size=11),
-    )
-    t.layout.legend = dict(
-        bgcolor="rgba(255,255,255,0.9)",
-        bordercolor="#E4E4E7",
-        borderwidth=1,
-        font=dict(size=12),
-    )
-    t.layout.margin = dict(l=48, r=16, t=16, b=28)
+    t.layout.font = {"family": "Geist, Inter, -apple-system, sans-serif", "size": 13, "color": "#52525B"}
+    t.layout.xaxis = {
+        "gridcolor": "#E4E4E7",
+        "linecolor": "#D4D4D8",
+        "tickfont": {"family": "JetBrains Mono, Geist Mono, monospace", "size": 11},
+    }
+    t.layout.yaxis = {
+        "gridcolor": "#E4E4E7",
+        "linecolor": "#D4D4D8",
+        "tickfont": {"family": "JetBrains Mono, Geist Mono, monospace", "size": 11},
+    }
+    t.layout.legend = {
+        "bgcolor": "rgba(255,255,255,0.9)",
+        "bordercolor": "#E4E4E7",
+        "borderwidth": 1,
+        "font": {"size": 12},
+    }
+    t.layout.margin = {"l": 48, "r": 16, "t": 16, "b": 28}
     t.data.heatmap = [go.Heatmap(colorscale=HEATMAP_COLORSCALE)]
     pio.templates["markovlens"] = t
     pio.templates.default = "streamlit+markovlens"
