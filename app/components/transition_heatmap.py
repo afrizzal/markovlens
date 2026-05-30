@@ -109,7 +109,7 @@ def _build_heatmap_figure(
         annotations=annotations,
         height=height,
         yaxis={"autorange": "reversed"},
-        # Square aspect for n × n grid
+        # Square aspect for n x n grid
         xaxis={"scaleanchor": "y", "constrain": "domain"},
     )
 

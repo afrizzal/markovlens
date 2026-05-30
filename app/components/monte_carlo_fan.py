@@ -94,7 +94,7 @@ def _build_fan_figure(
         )
     )
 
-    # Trace 2: P10 with tonexty fill → creates the P10–P90 band
+    # Trace 2: P10 with tonexty fill -> creates the P10-P90 band
     traces.append(
         go.Scatter(
             x=forecast_x,
@@ -103,7 +103,7 @@ def _build_fan_figure(
             fill="tonexty",
             fillcolor=BAND_FILL_OUTER,
             line={"color": BAND_LINE_COLOR, "width": 0},
-            name="P10–P90 range",
+            name="P10-P90 range",
             showlegend=True,
             hoverinfo="skip",
         )
