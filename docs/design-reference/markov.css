@@ -1,4 +1,10 @@
-/* MarkovLens — Design Token Layer (ported from docs/design-reference/markov.css) */
+/* ============================================================================
+   MarkovLens — Design Token Layer
+   ----------------------------------------------------------------------------
+   Single source of truth for color, type, spacing, radius, shadow & motion.
+   Ports 1:1 to Tailwind v4 @theme and to Streamlit CSS injection.
+   Light mode is :root (default). Dark mode is [data-theme="dark"].
+   ========================================================================== */
 
 :root {
   /* ---- Color · Light (default) ---- */
@@ -322,20 +328,3 @@ a { color: inherit; text-decoration: none; }
 /* fade-in for page transitions */
 .page-enter { animation: pageIn var(--dur-page) var(--ease); }
 @keyframes pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ============================================================================
-   Streamlit native overrides
-   ========================================================================== */
-.stApp {
-  background-color: var(--color-bg);
-}
-
-[data-testid="stMetricValue"] {
-  font-feature-settings: "tnum";
-  font-variant-numeric: tabular-nums;
-}
-
-[data-testid="stExpander"] {
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-}

@@ -26,16 +26,16 @@
 
 ### Design System
 
-- [ ] **UI-01**: `app/styles/theme.css` complete + `app/styles/plotly_theme.py` Plotly 6.x template (`pio.templates.default = "streamlit+markovlens"`); smoke-tested before any chart code is written
-- [ ] **UI-02**: Reusable component library — `kpi_card.py` (value + delta + sparkline), `transition_heatmap.py` (annotated, fixed [0,1] scale, sparsity flags), `monte_carlo_fan.py` (10th/50th/90th bands + separator), `empty_state.py` (icon + title + description + optional CTA)
+- [x] **UI-01**: `app/styles/theme.css` complete + `app/styles/plotly_theme.py` Plotly 6.x template (`pio.templates.default = "streamlit+markovlens"`); smoke-tested before any chart code is written
+- [x] **UI-02**: Reusable component library — `kpi_card.py` (value + delta + sparkline), `transition_heatmap.py` (annotated, fixed [0,1] scale, sparsity flags), `monte_carlo_fan.py` (10th/50th/90th bands + separator), `empty_state.py` (icon + title + description + optional CTA)
 
 ### Brand Share
 
 - [ ] **BS-01**: `domains/brand_share/service.py` orchestrates m1/m2/m3 forecast pipeline; returns `BrandShareForecastResult` with structured NumPy arrays (no Plotly coupling in domain layer)
-- [ ] **BS-02**: Transition matrix heatmap via `transition_heatmap` component — annotated cells, fixed [0,1] color scale, sparse cell warning flags
-- [ ] **BS-03**: Monte Carlo fan chart via `monte_carlo_fan` component — 10th/50th/90th bands, historical/forecast separator line, explicit legend
+- [x] **BS-02**: Transition matrix heatmap via `transition_heatmap` component — annotated cells, fixed [0,1] color scale, sparse cell warning flags
+- [x] **BS-03**: Monte Carlo fan chart via `monte_carlo_fan` component — 10th/50th/90th bands, historical/forecast separator line, explicit legend
 - [ ] **BS-04**: Model comparison view — metrics table (bold winning value per column, not per row) + overlaid forecast lines; plain-language interpretation block below table
-- [ ] **BS-05**: Stationary distribution panel — dominant eigenvector of P^T as bar chart, labeled "Long-run equilibrium (if these rates persist…)"
+- [x] **BS-05**: Stationary distribution panel — dominant eigenvector of P^T as bar chart, labeled "Long-run equilibrium (if these rates persist…)"
 - [ ] **BS-06**: `app/pages/1_Brand_Share.py` — full page with designed loading, empty, and error states; all computation gated behind `st.button()` or `@st.cache_data`
 
 ### Churn
@@ -116,13 +116,13 @@
 | DATA-01 | Phase 01 | Complete |
 | DATA-02 | Phase 01 | Complete |
 | DATA-03 | Phase 01 | Complete |
-| UI-01 | Phase 02 | Pending |
-| UI-02 | Phase 02 | Pending |
+| UI-01 | Phase 02 | Complete |
+| UI-02 | Phase 02 | Complete |
 | BS-01 | Phase 02 | Pending |
-| BS-02 | Phase 02 | Pending |
-| BS-03 | Phase 02 | Pending |
+| BS-02 | Phase 02 | Complete |
+| BS-03 | Phase 02 | Complete |
 | BS-04 | Phase 02 | Pending |
-| BS-05 | Phase 02 | Pending |
+| BS-05 | Phase 02 | Complete |
 | BS-06 | Phase 02 | Pending |
 | CH-01 | Phase 03 | Pending |
 | CH-02 | Phase 03 | Pending |
