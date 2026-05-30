@@ -5,6 +5,10 @@ from pathlib import Path
 
 import streamlit as st
 
+from app.styles.plotly_theme import register_theme
+
+__all__ = ["inject_theme", "register_theme"]
+
 _THEME_CSS = Path(__file__).parent / "theme.css"
 
 
