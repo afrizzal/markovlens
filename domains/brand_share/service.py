@@ -327,7 +327,8 @@ def _compute_share_vector(
             vec[state_idx[state]] = float(count)
     total = vec.sum()
     if total > 1e-12:
-        return vec / total
+        normalized: np.ndarray = vec / total
+        return normalized.astype(np.float64)
     vec[0] = 1.0
     return vec
 
@@ -398,7 +399,7 @@ def _compute_confidence_bands(
     )
     b = int(np.argmax(Y_1))
     # 2-D extractor per Pitfall 4 — must return (n_sims, n_steps+1)
-    target_extractor = lambda p, b=b: (p == b).astype(float)  # noqa: E731
+    target_extractor = lambda p, b=b: (p == b).astype(float)
     return compute_quantile_bands(paths, target_extractor)
 
 
@@ -453,8 +454,9 @@ def _m3_one_step_share(
     Q_{t+1} = (G ⊙ Q_t) · P_t — Chan (2015) Eq.(3). Normalizes to shares
     for metric comparison with m1/m2.
     """
-    Q_next = (G * Q) @ P_t  # Chan 2015 Eq.(3)
+    Q_next: np.ndarray = (G * Q) @ P_t  # Chan 2015 Eq.(3)
     total = Q_next.sum()
     if total > 1e-12:
-        return Q_next / total
-    return Q_next
+        normalized: np.ndarray = Q_next / total
+        return normalized.astype(np.float64)
+    return Q_next.astype(np.float64)
