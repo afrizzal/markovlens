@@ -10,7 +10,7 @@
 
 - [x] **Phase 01: Markov Engine** — Implement and validate the complete core engine: all three model classes, Monte Carlo simulation, calibration, metrics, and data layer
 - [x] **Phase 02: Design System + Brand Share** — Establish the Plotly/CSS design system and deliver the fully wired Brand Share domain page (completed 2026-05-30)
-- [ ] **Phase 03: Churn Domain** — Deliver the fully wired Customer Churn domain page reusing Phase 02 design system
+- [x] **Phase 03: Churn Domain** — Deliver the fully wired Customer Churn domain page reusing Phase 02 design system (completed 2026-05-30)
 - [ ] **Phase 04: Home, Export & Settings** — Wire the Home dashboard to real data, add CSV export, and complete the Settings page
 - [ ] **Phase 05: Quality Assurance & Deployment** — Achieve test coverage targets and deploy a verified, cold-start-clean app to Streamlit Cloud
 
@@ -93,7 +93,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 01. Markov Engine | 6/6 | Complete    | 2026-05-29 |
-| 02. Design System + Brand Share | 4/4 | Complete   | 2026-05-30 |
+| 02. Design System + Brand Share | 4/4 | Complete    | 2026-05-30 |
 | 03. Churn Domain | 0/TBD | Not started | - |
 | 04. Home, Export & Settings | 0/TBD | Not started | - |
 | 05. Quality Assurance & Deployment | 0/TBD | Not started | - |
