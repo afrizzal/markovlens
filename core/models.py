@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import TypeAlias
 
 import numpy as np
+import scipy.linalg as la
 
 from core.exceptions import InvalidTransitionMatrixError
 
@@ -16,6 +17,9 @@ PopulationVector: TypeAlias = np.ndarray
 
 MIN_OBSERVATIONS_PER_CELL: int = 20
 PROBABILITY_TOLERANCE: float = 1e-9
+STATIONARY_MAX_ITER: int = 10_000
+STATIONARY_TOL: float = 1e-12
+EIGENVALUE_TARGET: float = 1.0
 
 
 def validate_transition_matrix(
@@ -79,6 +83,55 @@ def validate_transition_matrix(
                 min_obs,
                 sparse_cells[:5],
             )
+
+
+def compute_stationary(P: TransitionMatrix) -> StateVector | None:
+    """Dominant left eigenvector of P (right eigenvector of P^T).
+
+    Returns a normalized probability vector summing to 1.0, or None if neither
+    the eigenvector method nor power-iteration yields a valid distribution.
+    Used by the Brand Share long-run-equilibrium panel (BS-05); always computed
+    from the m1 constant matrix (CONTEXT.md D-13).
+
+    Parameters
+    ----------
+    P : np.ndarray
+        Valid transition matrix, shape (n_states, n_states).
+
+    Returns
+    -------
+    np.ndarray | None
+        Stationary distribution vector of shape (n_states,) summing to 1.0,
+        or None if both computation methods fail.
+    """
+    # fallback chain — return None contract (BS-05)
+    try:
+        vals, vecs = la.eig(P.T)
+        idx = int(np.argmin(np.abs(vals - EIGENVALUE_TARGET)))
+        stat = np.real(vecs[:, idx])
+        if np.all(stat >= -PROBABILITY_TOLERANCE) and stat.sum() > 1e-10:
+            clipped = np.clip(stat, 0, None)
+            result: np.ndarray = (clipped / clipped.sum()).astype(np.float64)
+            return result
+    except Exception:  # fallback chain — return None contract (BS-05)
+        pass
+    # fallback chain — return None contract (BS-05)
+    try:
+        Pn = P.astype(np.float64)
+        for _ in range(STATIONARY_MAX_ITER):
+            Pn_next = Pn @ P
+            if np.max(np.abs(Pn_next - Pn)) < STATIONARY_TOL:
+                break
+            Pn = Pn_next
+        row = Pn[0]
+        if np.all(row >= -PROBABILITY_TOLERANCE):
+            row = np.clip(row, 0, None)
+            if row.sum() > 1e-10:
+                result2: np.ndarray = (row / row.sum()).astype(np.float64)
+                return result2
+    except Exception:  # fallback chain — return None contract (BS-05)
+        pass
+    return None
 
 
 @dataclass(frozen=True)
