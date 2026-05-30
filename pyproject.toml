@@ -71,6 +71,8 @@ ignore = ["E501", "B008"]
 "tests/unit/test_models.py" = ["N806"]
 "tests/unit/test_simulation.py" = ["N806", "PT018"]
 "tests/integration/test_queries.py" = ["RUF059"]
+# Streamlit mandates PascalCase page filenames (Home.py, 1_Brand_Share.py) — N999 not applicable
+"app/**/*.py" = ["N999"]
 
 [tool.mypy]
 python_version = "3.12"
