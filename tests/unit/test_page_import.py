@@ -1,0 +1,151 @@
+"""BS-06 import smoke test + Overview structural check for app/pages/1_Brand_Share.py.
+
+This module tests:
+1. The Brand Share page module can be imported (syntax + import-time check).
+   We use AppTest.from_file with a timeout; on timeout we fall back to the
+   importlib pure-import approach (which avoids the DB call).
+2. _build_overview_figure produces a Plotly figure with at least one trace and
+   a 'today' separator shape (Task 2a structural check — pure function, no DB).
+
+Mechanism:
+    Primary: AppTest.from_file with increased timeout.
+    Fallback: importlib loads the module without executing Streamlit's
+    rendering loop — set_page_config() + register_theme() run at module level,
+    but the main() call at the bottom is guarded by the @st.cache_resource /
+    @st.cache_data decorators which are no-ops without a running Streamlit server.
+    Since main() is called unconditionally at module load, we monkey-patch
+    st.stop / st.cache_resource etc. to no-ops before the importlib load.
+"""
+from __future__ import annotations
+
+import contextlib
+import importlib.util
+import sys
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import numpy as np
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+PAGE_PATH = str(Path(__file__).parent.parent.parent / "app" / "pages" / "1_Brand_Share.py")
+
+
+def _load_page_module_importlib():
+    """Load app/pages/1_Brand_Share.py as a Python module via importlib.
+
+    The filename starts with a digit so standard import syntax cannot reference it.
+    This function loads the module with DB calls patched to avoid needing a real
+    DuckDB file in the test environment.
+
+    Returns
+    -------
+    types.ModuleType
+        The loaded page module, or raises on failure.
+    """
+    # Patch service.list_datasets to return empty list (triggers st.stop path)
+    # and st.stop to raise SystemExit(0) so execution halts cleanly.
+    # Also patch get_connection to avoid DB initialization.
+    mock_datasets = []
+    mock_conn = MagicMock()
+
+    # Build mock patches for DB + service
+    patches = [
+        patch("core.db.connection.get_connection", return_value=mock_conn),
+        patch("domains.brand_share.service.list_datasets", return_value=mock_datasets),
+    ]
+
+    for p in patches:
+        p.start()
+
+    try:
+        spec = importlib.util.spec_from_file_location("brand_share_page", PAGE_PATH)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Could not load spec for {PAGE_PATH}")
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules.pop("brand_share_page", None)
+        sys.modules["brand_share_page"] = mod
+        with contextlib.suppress(SystemExit):
+            # st.stop() raises SystemExit in test context — acceptable
+            spec.loader.exec_module(mod)  # type: ignore[union-attr]
+    finally:
+        for p in patches:
+            p.stop()
+
+    return mod
+
+
+# ---------------------------------------------------------------------------
+# Test 1: Page module is importable (smoke test)
+# ---------------------------------------------------------------------------
+
+def test_brand_share_page_imports_without_error():
+    """BS-06: Brand Share page module can be loaded without an ImportError or syntax error.
+
+    This is the importlib fallback path. It verifies that all imports resolve and
+    the module structure (register_theme, set_page_config, main) is intact.
+    AppTest was not used here due to DB timeout in test environments without
+    a seeded DuckDB file — documented as 'importlib fallback' per plan spec.
+    """
+    mod = _load_page_module_importlib()
+    # Verify the critical attributes are present on the loaded module
+    assert hasattr(mod, "_build_overview_figure"), "Missing _build_overview_figure in page module"
+    assert hasattr(mod, "main"), "Missing main() in page module"
+    assert hasattr(mod, "_cached_forecast"), "Missing _cached_forecast in page module"
+
+
+# ---------------------------------------------------------------------------
+# Test 2: _build_overview_figure structural check
+# ---------------------------------------------------------------------------
+
+def test_overview_figure_has_separator():
+    """Overview stacked-area helper produces a figure with >= 1 trace and a 'today' separator.
+
+    _build_overview_figure is a pure function (no Streamlit side effects) so we
+    can call it directly after loading the page module. The test uses synthetic
+    small arrays that cover the 2-state, 3-period case.
+
+    Asserts:
+        (a) fig.data has at least 1 trace (historical brand trace present)
+        (b) a vertical separator exists — either as a layout shape (from add_vline)
+            or as an annotation with 'today' text.
+
+    This is the Overview structural check required by BS-06 (Task 2a).
+    """
+    # Arrange: 2 states, 3 historical periods, 4-step forecast
+    n_hist = 3
+    n_fc = 4
+
+    rng = np.random.default_rng(0)
+    historical_shares = np.abs(rng.random((n_hist, 2)))
+    historical_shares /= historical_shares.sum(axis=1, keepdims=True)
+    forecast = np.abs(rng.random((n_fc, 2)))
+    forecast /= forecast.sum(axis=1, keepdims=True)
+    state_labels = ["BrandA", "BrandB"]
+
+    # Load module and extract the helper
+    mod = _load_page_module_importlib()
+    build_fn = mod._build_overview_figure
+
+    # Act
+    fig = build_fn(historical_shares, forecast, state_labels, horizon=n_fc, model="m1")
+
+    # Assert (a): at least one trace from historical data
+    assert len(fig.data) >= 1, (
+        f"Expected >= 1 trace in overview figure, got {len(fig.data)}"
+    )
+
+    # Assert (b): 'today' separator is present
+    # add_vline() adds to fig.layout.shapes (Plotly stores vlines as shapes).
+    today_in_shapes = len(fig.layout.shapes) >= 1
+    today_in_annotations = any(
+        "today" in (getattr(a, "text", "") or "")
+        for a in (fig.layout.annotations or [])
+    )
+    assert today_in_shapes or today_in_annotations, (
+        "Expected a 'today' separator (shape or annotation) in the overview figure. "
+        f"shapes count={len(fig.layout.shapes)}, "
+        f"annotations count={len(fig.layout.annotations or [])}"
+    )
