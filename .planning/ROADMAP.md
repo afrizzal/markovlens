@@ -9,8 +9,8 @@
 ## Phases
 
 - [x] **Phase 01: Markov Engine** — Implement and validate the complete core engine: all three model classes, Monte Carlo simulation, calibration, metrics, and data layer
-- [x] **Phase 02: Design System + Brand Share** — Establish the Plotly/CSS design system and deliver the fully wired Brand Share domain page (completed 2026-05-30)
-- [x] **Phase 03: Churn Domain** — Deliver the fully wired Customer Churn domain page reusing Phase 02 design system (completed 2026-05-30)
+- [x] **Phase 02: Design System + Brand Share** — Establish the Plotly/CSS design system and deliver the fully wired Brand Share domain page (completed 2026-05-30)
+- [ ] **Phase 03: Churn Domain** — Deliver the fully wired Customer Churn domain page reusing Phase 02 design system
 - [ ] **Phase 04: Home, Export & Settings** — Wire the Home dashboard to real data, add CSV export, and complete the Settings page
 - [ ] **Phase 05: Quality Assurance & Deployment** — Achieve test coverage targets and deploy a verified, cold-start-clean app to Streamlit Cloud
 
@@ -61,7 +61,11 @@
   1. Navigating to `/Churn` shows a Sankey diagram where link widths are proportional to raw transition counts (not probabilities), node colors match from-state, and the absorbing "Churned" node is rendered in red at the bottom
   2. The what-if simulator renders a slider for a selected transition row; adjusting the slider re-normalizes the row to sum to 1.0 and immediately updates a side-by-side before/after forecast comparison without reloading the page
   3. `domains/churn/service.py` can be imported and called from a plain Python script (no Streamlit import); `ChurnAnalysisResult` contains structured NumPy arrays, not serialized Plotly JSON
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 03-01-PLAN.md — Wave 0 churn test stubs (unit + integration + seeded_churn_conn fixture) + ruff per-file-ignore
+- [ ] 03-02-PLAN.md — churn service rewrite: NumPy-only ChurnAnalysisResult + run_analysis + simulate_scenario + fundamental-matrix KPIs (CH-01)
+- [ ] 03-03-PLAN.md — sankey_flow component: temporal ribbon Sankey (CH-02) + what-if stacked-area chart + impact narrative (CH-03)
+- [ ] 03-04-PLAN.md — 2_Churn.py page: 2 tabs, 4-KPI strip, Sankey + scrubber, accordion what-if + live before/after (CH-04)
 **UI hint**: yes
 
 ### Phase 04: Home, Export & Settings
@@ -94,7 +98,7 @@
 |-------|----------------|--------|-----------|
 | 01. Markov Engine | 6/6 | Complete    | 2026-05-29 |
 | 02. Design System + Brand Share | 4/4 | Complete    | 2026-05-30 |
-| 03. Churn Domain | 0/TBD | Not started | - |
+| 03. Churn Domain | 0/4 | Planned | - |
 | 04. Home, Export & Settings | 0/TBD | Not started | - |
 | 05. Quality Assurance & Deployment | 0/TBD | Not started | - |
 
@@ -142,4 +146,4 @@
 
 ---
 *Roadmap created: 2026-05-29*
-*Last updated: 2026-05-30 after Phase 02 Plan 01 completion*
+*Last updated: 2026-05-31 after Phase 03 planning — 4 plans created*
