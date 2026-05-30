@@ -54,5 +54,5 @@ def test_stationary_returns_none_when_undefined() -> None:
             # Must be None or a valid probability vector
             if outcome is not None:
                 assert abs(outcome.sum() - 1.0) < 1e-4
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             pytest.fail(f"compute_stationary raised unexpectedly: {exc}")

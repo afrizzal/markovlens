@@ -7,8 +7,8 @@ because the 'streamlit' base template is registered by Streamlit at import time
 """
 from __future__ import annotations
 
-import streamlit  # noqa: F401  — registers 'streamlit' Plotly template (Pitfall 1)
 import plotly.io as pio
+import streamlit  # noqa: F401  — registers 'streamlit' Plotly template (Pitfall 1)
 
 from app.styles.plotly_theme import register_theme
 
