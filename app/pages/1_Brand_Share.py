@@ -18,11 +18,10 @@ st.set_page_config(
 )
 
 # local — imported after streamlit so register_theme() can compose the template
-from app.components.monte_carlo_fan import monte_carlo_fan  # noqa: E402
-from app.components.transition_heatmap import transition_heatmap  # noqa: E402
-
 from app.components.empty_state import empty_state  # noqa: E402
 from app.components.kpi_card import kpi_card  # noqa: E402
+from app.components.monte_carlo_fan import monte_carlo_fan  # noqa: E402
+from app.components.transition_heatmap import transition_heatmap  # noqa: E402
 from app.styles import inject_theme, register_theme  # noqa: E402
 from core.db.connection import get_connection  # noqa: E402
 from core.db.queries import build_transition_matrix, load_transitions  # noqa: E402
