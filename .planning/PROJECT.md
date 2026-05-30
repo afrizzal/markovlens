@@ -43,17 +43,27 @@ A GitHub repo that convinces a senior BA/BI recruiter that the developer can thi
 - ✓ DATA-02: scripts/seed_data.py — download Kaggle CSVs → process → populate DuckDB
 - ✓ DATA-03: build_transition_matrix() — DuckDB GROUP BY → normalized NumPy matrix
 
+### Validated — Phase 02 (Design System + Brand Share, complete 2026-05-30)
+
+**Design System**
+- ✓ UI-01: app/styles/plotly_theme.py — `register_theme()` + `app/styles/theme.css` full CSS design-token port (sequential heatmap ramp, categorical palette, churn state colors, utility classes)
+- ✓ UI-02: Component library — `transition_heatmap` (BS-02), `monte_carlo_fan` (BS-03), `kpi_card` + `empty_state` with custom-HTML (D-06/D-07)
+- ✓ BS-05: `compute_stationary()` in core/models.py — dominant left eigenvector via `scipy.linalg.eig(P.T)` with power-iteration fallback
+
+**Brand Share Domain**
+- ✓ BS-01: `domains/brand_share/service.py` — NumPy-only `BrandShareForecastResult` (14 fields), `run_forecast()` full m1/m2/m3 pipeline, `list_datasets()` brand_share-filtered
+- ✓ BS-02: `transition_heatmap` component — annotated cells, fixed [0,1] colorscale, `⚠` sparsity markers at < 20 observations
+- ✓ BS-03: `monte_carlo_fan` component — P10/P50/P90 bands (tonexty fill), `add_vline` historical/forecast separator, named legend
+- ✓ BS-04: Model comparison — MAPE/Brier/log-loss for m1/m2/m3, `best_model` derived from measured accuracy (never hardcoded), interpretation paragraph
+- ✓ BS-06: `app/pages/1_Brand_Share.py` — 4-tab forecaster (Overview, Transition Matrix, Monte Carlo, Model Comparison), control strip, KPI strip, loading/empty/error states; `@st.cache_data` gated
+
 ### Active
 
 **Domain Services**
-- [ ] SVC-01: domains/brand_share/service.py — orchestrate m1/m2/m3 for market share data
-- [ ] SVC-02: domains/churn/service.py — orchestrate churn state modelling
-- [ ] SVC-03: Model comparison: run all three models, return accuracy metrics side-by-side
+- [ ] SVC-02: domains/churn/service.py — orchestrate churn state modelling with Sankey + what-if
 
 **UI (app/)**
-- [ ] UI-01: app/styles/plotly_theme.py — Plotly template matching #4338CA design system
-- [ ] UI-02: app/Home.py — wired dashboard with KPIs from real forecasts/simulation_runs tables
-- [ ] UI-03: app/pages/1_Brand_Share.py — transition matrix heatmap + MC fan chart + model comparison
+- [ ] UI-03: app/Home.py — wired dashboard with KPIs from real forecasts/simulation_runs tables
 - [ ] UI-04: app/pages/2_Churn.py — Sankey flow diagram + what-if state simulator
 - [ ] UI-05: app/pages/3_Reports.py — PDF/CSV export of forecast results
 - [ ] UI-06: app/pages/4_Settings.py — dataset management + upload interface
@@ -74,7 +84,7 @@ A GitHub repo that convinces a senior BA/BI recruiter that the developer can thi
 
 ## Context
 
-**Codebase state (as of Phase 01 completion, 2026-05-29):** Markov engine complete — all ENG-01..ENG-10 + DATA-01..DATA-03 implemented and test-gated (90.76% coverage). Two Kaggle datasets seeded into DuckDB (synthetic FMCG brand share + IBM Telco churn). Domain services are empty stubs. No Streamlit pages beyond `app/Home.py` placeholder. The project is ~30% complete (engine + data layer done, UI + domain services pending).
+**Codebase state (as of Phase 02 completion, 2026-05-30):** Markov engine + design system + Brand Share domain complete. 61/61 tests pass. `app/pages/1_Brand_Share.py` is fully wired — 4-tab forecaster with Plotly theme, all 3 model types, Monte Carlo fan chart, transition heatmap, model comparison, stationary distribution panel. Domain service is NumPy-only (no Plotly coupling). Churn domain service is still a stub; `2_Churn.py` not yet created. The project is ~55% complete.
 
 **Mathematical foundation:** Chan (2015) *Market Share Modelling and Forecasting Using Markov Chains and Alternative Models*, IJICIC Vol.11 No.4. All model implementations must cite specific equations.
 
@@ -124,4 +134,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-29 after initialization*
+*Last updated: 2026-05-30 after Phase 02 completion*
