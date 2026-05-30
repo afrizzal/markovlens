@@ -36,7 +36,7 @@
 - [x] **BS-03**: Monte Carlo fan chart via `monte_carlo_fan` component — 10th/50th/90th bands, historical/forecast separator line, explicit legend
 - [ ] **BS-04**: Model comparison view — metrics table (bold winning value per column, not per row) + overlaid forecast lines; plain-language interpretation block below table
 - [x] **BS-05**: Stationary distribution panel — dominant eigenvector of P^T as bar chart, labeled "Long-run equilibrium (if these rates persist…)"
-- [ ] **BS-06**: `app/pages/1_Brand_Share.py` — full page with designed loading, empty, and error states; all computation gated behind `st.button()` or `@st.cache_data`
+- [x] **BS-06**: `app/pages/1_Brand_Share.py` — full page with designed loading, empty, and error states; all computation gated behind `st.button()` or `@st.cache_data`
 
 ### Churn
 
@@ -123,7 +123,7 @@
 | BS-03 | Phase 02 | Complete |
 | BS-04 | Phase 02 | Pending |
 | BS-05 | Phase 02 | Complete |
-| BS-06 | Phase 02 | Pending |
+| BS-06 | Phase 02 | Complete |
 | CH-01 | Phase 03 | Pending |
 | CH-02 | Phase 03 | Pending |
 | CH-03 | Phase 03 | Pending |

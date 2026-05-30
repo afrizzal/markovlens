@@ -9,7 +9,7 @@
 ## Phases
 
 - [x] **Phase 01: Markov Engine** — Implement and validate the complete core engine: all three model classes, Monte Carlo simulation, calibration, metrics, and data layer
-- [ ] **Phase 02: Design System + Brand Share** — Establish the Plotly/CSS design system and deliver the fully wired Brand Share domain page
+- [x] **Phase 02: Design System + Brand Share** — Establish the Plotly/CSS design system and deliver the fully wired Brand Share domain page (completed 2026-05-30)
 - [ ] **Phase 03: Churn Domain** — Deliver the fully wired Customer Churn domain page reusing Phase 02 design system
 - [ ] **Phase 04: Home, Export & Settings** — Wire the Home dashboard to real data, add CSV export, and complete the Settings page
 - [ ] **Phase 05: Quality Assurance & Deployment** — Achieve test coverage targets and deploy a verified, cold-start-clean app to Streamlit Cloud
@@ -49,8 +49,8 @@
 **Plans**: 4 plans
 - [x] 02-01-PLAN.md — Plotly theme template + theme.css port (UI-01) + compute_stationary helper (BS-05)
 - [x] 02-02-PLAN.md — Component library: transition_heatmap (BS-02), monte_carlo_fan (BS-03), kpi_card + empty_state (UI-02)
-- [ ] 02-03-PLAN.md — brand_share service rewrite: NumPy-only result + run_forecast pipeline (BS-01) + model comparison (BS-04)
-- [ ] 02-04-PLAN.md — Brand Share page: control strip + KPI strip + 4 tabs + states (BS-06)
+- [x] 02-03-PLAN.md — brand_share service rewrite: NumPy-only result + run_forecast pipeline (BS-01) + model comparison (BS-04)
+- [x] 02-04-PLAN.md — Brand Share page: control strip + KPI strip + 4 tabs + states (BS-06)
 **UI hint**: yes
 
 ### Phase 03: Churn Domain
@@ -93,7 +93,7 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 01. Markov Engine | 6/6 | Complete    | 2026-05-29 |
-| 02. Design System + Brand Share | 2/4 | In Progress|  |
+| 02. Design System + Brand Share | 4/4 | Complete   | 2026-05-30 |
 | 03. Churn Domain | 0/TBD | Not started | - |
 | 04. Home, Export & Settings | 0/TBD | Not started | - |
 | 05. Quality Assurance & Deployment | 0/TBD | Not started | - |
