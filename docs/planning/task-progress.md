@@ -75,6 +75,17 @@
 
 ---
 
+## Quick Task ikw — Churn UI-Review Visual Fixes ✅ Complete
+
+| Task | Status | Commit | Notes |
+|---|---|---|---|
+| `impact_summary()` + `state_legend_html()` pure helpers in sankey_flow.py | ✅ Done | e915523 | ImpactSummary dataclass, STATE_HEX dict, 4 behavior tests |
+| Wire 4 fixes into 2_Churn.py (KPI accents, legend, impact card) | ✅ Done | 60f196b | Issues 1-4 from Phase 03 UI review |
+| Human visual verification | ⏭ Skipped (manual) | — | User to verify live at localhost:8501 |
+| 85 tests passing, ruff clean | ✅ Done | 60f196b | No regressions from Phase 03 baseline |
+
+---
+
 ## Phase 04 — Home Dashboard + Export + Settings 🔲 Not Started
 
 | Task | Status | Notes |
