@@ -47,15 +47,15 @@
 
 ### Export
 
-- [ ] **RPT-01**: CSV export — download forecast results and transition matrix for current session via `st.download_button`
+- [x] **RPT-01**: CSV export — download forecast results and transition matrix for current session via `st.download_button`
 
 ### Home Dashboard
 
-- [ ] **HOME-01**: `app/Home.py` wired to real data — KPI strip showing dataset count, last forecast timestamp, total simulation runs, overall model accuracy (MAPE) from `forecasts` table
+- [x] **HOME-01**: `app/Home.py` wired to real data — KPI strip showing dataset count, last forecast timestamp, total simulation runs, overall model accuracy (MAPE) from `forecasts` table
 
 ### Settings
 
-- [ ] **SET-01**: `app/pages/4_Settings.py` — list registered datasets with row count, state count, domain, and last-seeded timestamp; allow re-running seed script
+- [x] **SET-01**: `app/pages/4_Settings.py` — list registered datasets with row count, state count, domain, and last-seeded timestamp; allow re-running seed script
 
 ### Deployment
 
@@ -128,9 +128,9 @@
 | CH-02 | Phase 03 | Pending |
 | CH-03 | Phase 03 | Pending |
 | CH-04 | Phase 03 | Pending |
-| HOME-01 | Phase 04 | Pending |
-| RPT-01 | Phase 04 | Pending |
-| SET-01 | Phase 04 | Pending |
+| HOME-01 | Phase 04 | Complete |
+| RPT-01 | Phase 04 | Complete |
+| SET-01 | Phase 04 | Complete |
 | QA-01 | Phase 05 | Pending |
 | QA-02 | Phase 05 | Pending |
 | QA-03 | Phase 05 | Pending |
