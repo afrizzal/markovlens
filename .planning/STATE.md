@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 03
-status: unknown
-last_updated: "2026-05-31T00:45:35.860Z"
+current_phase: 04
+status: ready
+last_updated: "2026-05-31T12:00:00.000Z"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # GSD State
@@ -19,7 +19,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-29)
 
 **Core value:** A GitHub repo that convinces a senior BA/BI recruiter that the developer can think quantitatively AND ship a production-quality Python data product — two live domains, correct Markov math, clean 3-layer architecture.
-**Current phase:** 03
+**Current phase:** 04
 
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 |-------|------|--------|
 | 01 | Markov Engine | Complete |
 | 02 | Design System + Brand Share | Complete (4/4 plans complete) |
-| 03 | Churn Domain | In Progress (3/4 plans complete) |
+| 03 | Churn Domain | Complete (4/4 plans complete) |
 | 04 | Home, Export & Settings | Not Started |
 | 05 | Quality Assurance & Deployment | Not Started |
 
@@ -37,7 +37,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 
 ## Current Focus
 
-Phase 03 in progress. Plans 03-01, 03-02, and 03-03 complete. Next: Plan 03-04 (Churn page — 2_Churn.py).
+Phase 03 complete (4/4 plans). Next: Phase 04 — Home dashboard KPIs + CSV export + Settings page.
 
 ---
 
@@ -46,11 +46,11 @@ Phase 03 in progress. Plans 03-01, 03-02, and 03-03 complete. Next: Plan 03-04 (
 ```
 Phase 01 [##########] 100% (6/6 plans complete)
 Phase 02 [##########] 100% (4/4 plans complete)
-Phase 03 [######    ] 75% (3/4 plans complete)
+Phase 03 [##########] 100% (4/4 plans complete)
 Phase 04 [          ] 0%
 Phase 05 [          ] 0%
 
-Overall  [█████████░] 93% (13/14 plans complete) — requirements: CH-01, CH-02, CH-03 complete
+Overall  [██████████] 100% (14/14 plans complete) — Phase 03 complete: CH-01..CH-04
 ```
 
 ---
@@ -121,12 +121,12 @@ None.
 
 ### Last Action
 
-2026-05-31 — Phase 03 Plan 03 complete: app/components/sankey_flow.py created with build_sankey_figure (SVG bezier Sankey, CH-02), build_whatif_chart (stacked-area baseline/modified, CH-03), impact_narrative (largest-delta sentence, CH-03). Re-exported from __init__.py. 76 passed.
+2026-05-31 — Phase 03 complete (4/4 plans). Plan 04: app/pages/2_Churn.py shipped — 2-tab Churn page (Overview + What-If Simulator), 4-KPI strip, Sankey + period scrubber, accordion sliders + live before/after chart + impact narrative. Root-cause bug fixed in _apply_overrides (lock modified cells at target, redistribute remaining proportionally). 4 new tests. 81/81 pass. CLAUDE.md + README.md updated.
 
 ### Resume Point
 
-Phase 03 Plan 04: Churn page (app/pages/2_Churn.py)
+Phase 04: Home dashboard KPIs + CSV export + Settings page.
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-05-31 after Phase 03 Plan 03 completion — Sankey + what-if component (CH-02, CH-03)*
+*Last updated: 2026-05-31 after Phase 03 Plan 04 completion — Churn page (CH-04) + _apply_overrides root-cause fix*
