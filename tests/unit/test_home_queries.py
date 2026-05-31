@@ -1,8 +1,6 @@
 """Unit tests for Home dashboard query helpers (HOME-01)."""
 from __future__ import annotations
 
-import pytest
-
 
 def test_home_kpis_dataclass_fields() -> None:
     """HomeKpis has the required 4 fields."""
