@@ -316,3 +316,56 @@ def build_transition_matrix(
 
     validate_transition_matrix(matrix, transition_counts=counts)
     return matrix, counts
+
+
+@dataclass(frozen=True)
+class HomeKpis:
+    """Aggregate KPIs for the Home dashboard."""
+
+    dataset_count: int
+    sim_run_count: int
+    last_forecast_at: datetime | None
+    avg_mape: float | None
+
+
+def get_home_kpis(conn: duckdb.DuckDBPyConnection) -> HomeKpis:
+    """Fetch aggregate KPIs for the Home dashboard.
+
+    Parameters
+    ----------
+    conn : duckdb.DuckDBPyConnection
+        Open DuckDB connection.
+
+    Returns
+    -------
+    HomeKpis
+        dataset_count, sim_run_count, last_forecast_at, avg_mape.
+        last_forecast_at and avg_mape are None if forecasts table is empty.
+    """
+    counts = conn.execute(
+        "SELECT COUNT(*) AS n_datasets FROM datasets"
+    ).fetchone()
+    sim_counts = conn.execute(
+        "SELECT COUNT(*) AS n_sims FROM simulation_runs"
+    ).fetchone()
+    forecast_row = conn.execute(
+        "SELECT MAX(created_at) AS last_at FROM forecasts"
+    ).fetchone()
+
+    # avg_mape: parse JSON field — only include rows where mape key exists
+    mape_row = conn.execute(
+        """
+        SELECT AVG(TRY_CAST(
+            json_extract_string(accuracy_metrics_json, '$.mape') AS DOUBLE
+        )) AS avg_mape
+        FROM forecasts
+        WHERE accuracy_metrics_json IS NOT NULL
+        """
+    ).fetchone()
+
+    return HomeKpis(
+        dataset_count=int(counts[0] if counts else 0),
+        sim_run_count=int(sim_counts[0] if sim_counts else 0),
+        last_forecast_at=forecast_row[0] if forecast_row and forecast_row[0] else None,
+        avg_mape=float(mape_row[0]) if mape_row and mape_row[0] is not None else None,
+    )
