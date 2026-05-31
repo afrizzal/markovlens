@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 04
 status: ready
-last_updated: "2026-05-31T12:00:00.000Z"
+last_updated: "2026-05-31T13:00:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 3
@@ -112,6 +112,8 @@ Overall  [██████████] 100% (14/14 plans complete) — Phase 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260531-ikw | Fix 4 visual issues from Phase 03 UI review | 2026-05-31 | e04277e | [260531-ikw-fix-4-visual-issues-from-phase-03-ui-rev](.planning/quick/260531-ikw-fix-4-visual-issues-from-phase-03-ui-rev/) |
+| 260531-p03 | Churn polish — 6 prototype fidelity gaps (scrubber, slider %, KPI deltas+icons, bar labels) | 2026-05-31 | 5462f9b | [260531-p03-churn-polish-6-gaps](.planning/quick/260531-p03-churn-polish-6-gaps/) |
+| 260531-knp | Stack What-If charts vertically + fix Scenario Impact / chart-title overlap | 2026-05-31 | 8f81ce7, 1d26846 | [260531-knp-stack-what-if-charts-vertically-and-fix-](.planning/quick/260531-knp-stack-what-if-charts-vertically-and-fix-/) |
 
 ### Active Blockers
 
@@ -127,7 +129,7 @@ None.
 
 ### Last Action
 
-2026-05-31 — Phase 03 complete (4/4 plans). Plan 04: app/pages/2_Churn.py shipped — 2-tab Churn page (Overview + What-If Simulator), 4-KPI strip, Sankey + period scrubber, accordion sliders + live before/after chart + impact narrative. Root-cause bug fixed in _apply_overrides (lock modified cells at target, redistribute remaining proportionally). 4 new tests. 81/81 pass. CLAUDE.md + README.md updated.
+2026-05-31 — Quick task 260531-knp: Churn What-If layout polish. `build_whatif_chart` now uses `make_subplots(rows=2, cols=1, shared_xaxes=True)` (was 1x2 side-by-side); `WHATIF_HEIGHT` 360→640; 20px spacer added between SCENARIO IMPACT card and chart in `app/pages/2_Churn.py`. Commits 8f81ce7, 1d26846. 86/86 pass. Awaiting human visual verification.
 
 ### Resume Point
 
@@ -135,4 +137,4 @@ Phase 04: Home dashboard KPIs + CSV export + Settings page.
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-05-31 - Completed quick task 260531-ikw: Fix 4 visual issues from Phase 03 UI review*
+*Last updated: 2026-05-31 - Completed quick task 260531-knp: Churn What-If vertical stacking + spacer fix*
