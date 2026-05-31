@@ -180,3 +180,39 @@ def test_build_sankey_figure() -> None:
     assert len(fig.layout.shapes) >= 1, (
         f"Expected at least 1 shape (ribbon/node), got {len(fig.layout.shapes)}"
     )
+
+
+def test_build_whatif_chart_has_two_stackgroups() -> None:
+    """CH-03: build_whatif_chart returns a stacked-area figure with baseline and modified groups."""
+    from app.components.sankey_flow import build_whatif_chart
+
+    base = np.tile([0.6, 0.2, 0.2], (13, 1)).astype(float)
+    mod = np.tile([0.5, 0.2, 0.3], (13, 1)).astype(float)
+    fig = build_whatif_chart(base, mod, ["active", "atrisk", "churned"])
+    groups = {getattr(t, "stackgroup", None) for t in fig.data}
+    assert "baseline" in groups and "modified" in groups
+    assert len(fig.data) >= 2
+
+
+def test_impact_narrative_largest_delta() -> None:
+    """CH-03: impact_narrative produces correct sentence for the largest delta transition."""
+    from app.components.sankey_flow import impact_narrative
+
+    P = np.array([[0.6, 0.2, 0.2], [0.1, 0.7, 0.2], [0.0, 0.0, 1.0]])
+    base = np.tile([0.6, 0.2, 0.2], (13, 1)).astype(float)
+    mod = np.tile([0.4, 0.2, 0.4], (13, 1)).astype(float)
+    text = impact_narrative({(0, 2): 0.4}, P, base, mod, ["active", "atrisk", "churned"], 1000)
+    assert "pp" in text
+    assert text.startswith("Increasing") or text.startswith("Reducing")
+
+
+def test_impact_narrative_empty_overrides() -> None:
+    """CH-03: impact_narrative returns prompt string when no overrides are set."""
+    from app.components.sankey_flow import impact_narrative
+
+    P = np.eye(3)
+    z = np.tile([0.33, 0.34, 0.33], (13, 1)).astype(float)
+    assert (
+        impact_narrative({}, P, z, z, ["active", "atrisk", "churned"], 100)
+        == "Adjust a slider to model a retention scenario."
+    )

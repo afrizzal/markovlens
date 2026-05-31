@@ -199,14 +199,14 @@ def build_sankey_figure(
                 )
                 prefix = _color_prefix(state_labels[i], state_colors)
                 shapes.append(
-                    dict(
-                        type="path",
-                        path=path,
-                        fillcolor=f"{prefix}{RIBBON_ALPHA}",
-                        line=dict(width=0),
-                        xref="x",
-                        yref="y",
-                    )
+                    {
+                        "type": "path",
+                        "path": path,
+                        "fillcolor": f"{prefix}{RIBBON_ALPHA}",
+                        "line": {"width": 0},
+                        "xref": "x",
+                        "yref": "y",
+                    }
                 )
 
     # --- Node rectangles ---
@@ -214,17 +214,17 @@ def build_sankey_figure(
         for i, nd in nodes.items():
             prefix = _color_prefix(state_labels[i], state_colors)
             shapes.append(
-                dict(
-                    type="rect",
-                    x0=x_col(c),
-                    y0=nd["y0"],
-                    x1=x_col(c) + col_w,
-                    y1=nd["y1"],
-                    fillcolor=f"{prefix}{NODE_ALPHA}",
-                    line=dict(width=0),
-                    xref="x",
-                    yref="y",
-                )
+                {
+                    "type": "rect",
+                    "x0": x_col(c),
+                    "y0": nd["y0"],
+                    "x1": x_col(c) + col_w,
+                    "y1": nd["y1"],
+                    "fillcolor": f"{prefix}{NODE_ALPHA}",
+                    "line": {"width": 0},
+                    "xref": "x",
+                    "yref": "y",
+                }
             )
 
     fig = go.Figure()
@@ -234,26 +234,26 @@ def build_sankey_figure(
             x=[],
             y=[],
             mode="markers",
-            marker=dict(opacity=0),
+            marker={"opacity": 0},
             showlegend=False,
         )
     )
     fig.update_layout(
         shapes=shapes,
-        xaxis=dict(
-            range=[0, W],
-            showgrid=False,
-            zeroline=False,
-            showticklabels=False,
-        ),
-        yaxis=dict(
-            range=[0, H],
-            showgrid=False,
-            zeroline=False,
-            showticklabels=False,
-        ),
+        xaxis={
+            "range": [0, W],
+            "showgrid": False,
+            "zeroline": False,
+            "showticklabels": False,
+        },
+        yaxis={
+            "range": [0, H],
+            "showgrid": False,
+            "zeroline": False,
+            "showticklabels": False,
+        },
         height=H,
-        margin=dict(l=0, r=0, t=8, b=24),
+        margin={"l": 0, "r": 0, "t": 8, "b": 24},
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
     )
@@ -306,7 +306,7 @@ def build_whatif_chart(
                 stackgroup="baseline",
                 name=label,
                 fillcolor=faint,
-                line=dict(color="rgba(0,0,0,0)", width=0),
+                line={"color": "rgba(0,0,0,0)", "width": 0},
                 showlegend=False,
             )
         )
@@ -317,7 +317,7 @@ def build_whatif_chart(
                 stackgroup="modified",
                 name=label,
                 fillcolor=solid,
-                line=dict(color="rgba(0,0,0,0)", width=0),
+                line={"color": "rgba(0,0,0,0)", "width": 0},
                 showlegend=True,
                 legendgroup=label,
             )
