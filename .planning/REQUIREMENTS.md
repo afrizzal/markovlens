@@ -47,7 +47,7 @@
 
 ### Export
 
-- [ ] **RPT-01**: CSV export — download forecast results and transition matrix for current session via `st.download_button`
+- [x] **RPT-01**: CSV export — download forecast results and transition matrix for current session via `st.download_button`
 
 ### Home Dashboard
 
@@ -129,7 +129,7 @@
 | CH-03 | Phase 03 | Pending |
 | CH-04 | Phase 03 | Pending |
 | HOME-01 | Phase 04 | Pending |
-| RPT-01 | Phase 04 | Pending |
+| RPT-01 | Phase 04 | Complete |
 | SET-01 | Phase 04 | Pending |
 | QA-01 | Phase 05 | Pending |
 | QA-02 | Phase 05 | Pending |

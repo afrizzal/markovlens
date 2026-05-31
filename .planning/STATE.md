@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 04
-status: ready
-last_updated: "2026-05-31T13:00:00.000Z"
+status: unknown
+last_updated: "2026-05-31T19:39:15.268Z"
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 14
-  completed_plans: 14
+  completed_plans: 15
 ---
 
 # GSD State
@@ -80,11 +80,13 @@ Overall  [██████████] 100% (14/14 plans complete) — Phase 
 | Phase 03 P01 | 18min | 3 tasks | 3 files |
 | Phase 03 P02 | 18 | 2 tasks | 1 files |
 | Phase 03 P03 | 5 | 2 tasks | 4 files |
+| Phase 04 P03 | 438 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
 ### Key Decisions
 
+- Phase 04 Plan 03: CSV bytes built via io.StringIO + csv.writer (stdlib only, D-08); BrandShareForecastResult uses forecasts dict (not m1_forecast fields) — adapted CSV helper to use result.forecasts[result.best_model]; emoji removed from button labels per project-rules.md Rule 17; 74/74 unit tests pass after adding 5 CSV export tests
 - Phase 01 build order was strictly sequential: `validate_transition_matrix` → M1 → M2 → M3 → Monte Carlo → `calibrate_probability` → `compute_quantile_bands` → `build_transition_matrix()` → `core/io/loaders.py` → `core/metrics.py`
 - `BrandShareForecastResult` and `ChurnAnalysisResult` must use structured NumPy arrays — no Plotly coupling in domain layer
 - Phase 02 must open with a Plotly 6.x smoke test (template registration) before any chart code
@@ -129,11 +131,11 @@ None.
 
 ### Last Action
 
-2026-05-31 — Quick task 260531-knp: Churn What-If layout polish. `build_whatif_chart` now uses `make_subplots(rows=2, cols=1, shared_xaxes=True)` (was 1x2 side-by-side); `WHATIF_HEIGHT` 360→640; 20px spacer added between SCENARIO IMPACT card and chart in `app/pages/2_Churn.py`. Commits 8f81ce7, 1d26846. 86/86 pass. Awaiting human visual verification.
+2026-06-01 — Phase 04 Plan 03 complete: CSV export (RPT-01) added to Brand Share and Churn pages. _brand_share_csv_bytes() and _churn_csv_bytes() helpers; st.download_button after KPI strips; 5 unit tests in test_csv_export.py. 74/74 unit tests pass. Commits: f44a1d1, aba5b71, 9b1d6ed.
 
 ### Resume Point
 
-Phase 04: Home dashboard KPIs + CSV export + Settings page.
+Phase 04: Execute Plan 04-04 — Settings page (dataset listing + re-run seed button).
 
 ---
 *State initialized: 2026-05-29*
