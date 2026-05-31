@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 03
 status: unknown
-last_updated: "2026-05-30T05:10:13.066Z"
+last_updated: "2026-05-31T00:27:05.164Z"
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 14
+  completed_plans: 11
 ---
 
 # GSD State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 |-------|------|--------|
 | 01 | Markov Engine | Complete |
 | 02 | Design System + Brand Share | Complete (4/4 plans complete) |
-| 03 | Churn Domain | Not Started |
+| 03 | Churn Domain | In Progress (1/4 plans complete) |
 | 04 | Home, Export & Settings | Not Started |
 | 05 | Quality Assurance & Deployment | Not Started |
 
@@ -37,7 +37,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 
 ## Current Focus
 
-Phase 02 complete. All 4 plans done: 02-01 (design system foundation), 02-02 (component library), 02-03 (brand share service), 02-04 (Brand Share page). Next: Phase 03 (Churn Domain).
+Phase 03 in progress. Plan 03-01 (Wave 0 test scaffold) complete. Next: Plan 03-02 (churn service implementation — rewrite domains/churn/service.py to turn 12 Wave 0 tests green).
 
 ---
 
@@ -77,6 +77,7 @@ Overall  [####      ] 14/33 requirements complete (ENG-01..10, DATA-01..03, BS-0
 | Phase 02 P02 | 11min | 2 tasks | 6 files |
 | Phase 02 P03 | 24min | 2 tasks | 4 files |
 | Phase 02-design-system-brand-share P04 | 25 | 4 tasks | 2 files |
+| Phase 03 P01 | 18min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,7 @@ Overall  [####      ] 14/33 requirements complete (ENG-01..10, DATA-01..03, BS-0
 - Phase 02 Plan 04: _dataset_period_count helper needed because Dataset dataclass has no n_periods field; derived from load_transitions().nunique() cached per dataset_id
 - Phase 02 Plan 04: 51/51 tests pass after Brand Share page + smoke test added (BS-06 complete)
 - BS-06 requirement marked complete
+- Phase 03 Plan 01: Wave 0 guard uses importorskip + hasattr + inspect.signature checks — old churn stub imports fine, signature conn-param check is the reliable discriminator; seeded_churn_conn yields conn only (not tuple); 61 passed, 12 skipped after scaffold added
 
 ### Active Blockers
 
@@ -115,12 +117,12 @@ None.
 
 ### Last Action
 
-2026-05-30 — Phase 02 Plan 04 complete: 1_Brand_Share.py fully wired (4-tab forecaster), BS-06 smoke test + Overview structural check, 51/51 tests pass
+2026-05-31 — Phase 03 Plan 01 complete: Wave 0 test scaffold (12 importorskip-guarded stubs), ruff per-file-ignore for churn service, seeded_churn_conn fixture. 61 passed, 12 skipped.
 
 ### Resume Point
 
-Phase 03: Churn Domain — 2_Churn.py
+Phase 03 Plan 02: Churn service implementation — rewrite domains/churn/service.py
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-05-30 after Phase 02 Plan 04 completion — Phase 02 complete*
+*Last updated: 2026-05-31 after Phase 03 Plan 01 completion — Churn Wave 0 scaffold*
