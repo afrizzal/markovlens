@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 03
 status: unknown
-last_updated: "2026-05-31T00:35:13.171Z"
+last_updated: "2026-05-31T00:45:35.860Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 14
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # GSD State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 |-------|------|--------|
 | 01 | Markov Engine | Complete |
 | 02 | Design System + Brand Share | Complete (4/4 plans complete) |
-| 03 | Churn Domain | In Progress (2/4 plans complete) |
+| 03 | Churn Domain | In Progress (3/4 plans complete) |
 | 04 | Home, Export & Settings | Not Started |
 | 05 | Quality Assurance & Deployment | Not Started |
 
@@ -37,7 +37,7 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 
 ## Current Focus
 
-Phase 03 in progress. Plans 03-01 and 03-02 complete. Next: Plan 03-03 (Sankey component) and Plan 03-04 (Churn page).
+Phase 03 in progress. Plans 03-01, 03-02, and 03-03 complete. Next: Plan 03-04 (Churn page — 2_Churn.py).
 
 ---
 
@@ -46,11 +46,11 @@ Phase 03 in progress. Plans 03-01 and 03-02 complete. Next: Plan 03-03 (Sankey c
 ```
 Phase 01 [##########] 100% (6/6 plans complete)
 Phase 02 [##########] 100% (4/4 plans complete)
-Phase 03 [####      ] 50% (2/4 plans complete)
+Phase 03 [######    ] 75% (3/4 plans complete)
 Phase 04 [          ] 0%
 Phase 05 [          ] 0%
 
-Overall  [████░     ] 86% (12/14 plans complete) — requirements: CH-01 complete
+Overall  [█████████░] 93% (13/14 plans complete) — requirements: CH-01, CH-02, CH-03 complete
 ```
 
 ---
@@ -79,6 +79,7 @@ Overall  [████░     ] 86% (12/14 plans complete) — requirements: CH-
 | Phase 02-design-system-brand-share P04 | 25 | 4 tasks | 2 files |
 | Phase 03 P01 | 18min | 3 tasks | 3 files |
 | Phase 03 P02 | 18 | 2 tasks | 1 files |
+| Phase 03 P03 | 5 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,7 @@ Overall  [████░     ] 86% (12/14 plans complete) — requirements: CH-
 - BS-06 requirement marked complete
 - Phase 03 Plan 01: Wave 0 guard uses importorskip + hasattr + inspect.signature checks — old churn stub imports fine, signature conn-param check is the reliable discriminator; seeded_churn_conn yields conn only (not tuple); 61 passed, 12 skipped after scaffold added
 - Phase 03 Plan 02: ABSORBING_THRESHOLD=0.95 for near-absorbing state detection (real Churned state P[i,i]~0.98, not 1.0 exactly); state_distribution_over_time uses iterative Y_t @ P loop (not M1 forecast); n_customers = df["entity_id"].nunique(); simulate_scenario returns np.ndarray not full ChurnAnalysisResult; 72 passed, 1 skipped after service rewrite
+- Phase 03 Plan 03: SVG bezier path shapes used for temporal Sankey (not go.Sankey per D-01); N803/N806 suppressed for sankey_flow.py (W/H/PT/PB/sH/tH JSX-port layout vars); ASCII -> used in impact_narrative for Windows console encoding safety; stackgroup opacity via rgba alpha in fillcolor (not trace opacity); 76 passed after component added
 
 ### Active Blockers
 
@@ -119,12 +121,12 @@ None.
 
 ### Last Action
 
-2026-05-31 — Phase 03 Plan 02 complete: domains/churn/service.py rewritten with full CH-01 implementation. ChurnAnalysisResult (9 fields), run_analysis, simulate_scenario, list_datasets, compute_fundamental_matrix, compute_avg_lifetime, _compute_kpis. 72 passed, 1 skipped.
+2026-05-31 — Phase 03 Plan 03 complete: app/components/sankey_flow.py created with build_sankey_figure (SVG bezier Sankey, CH-02), build_whatif_chart (stacked-area baseline/modified, CH-03), impact_narrative (largest-delta sentence, CH-03). Re-exported from __init__.py. 76 passed.
 
 ### Resume Point
 
-Phase 03 Plan 03: Sankey component (app/components/sankey_flow.py)
+Phase 03 Plan 04: Churn page (app/pages/2_Churn.py)
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-05-31 after Phase 03 Plan 02 completion — Churn service implementation (CH-01)*
+*Last updated: 2026-05-31 after Phase 03 Plan 03 completion — Sankey + what-if component (CH-02, CH-03)*

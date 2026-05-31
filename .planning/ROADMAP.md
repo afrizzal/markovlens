@@ -64,7 +64,7 @@
 **Plans**: 4 plans
 - [x] 03-01-PLAN.md — Wave 0 churn test stubs (unit + integration + seeded_churn_conn fixture) + ruff per-file-ignore
 - [x] 03-02-PLAN.md — churn service rewrite: NumPy-only ChurnAnalysisResult + run_analysis + simulate_scenario + fundamental-matrix KPIs (CH-01)
-- [ ] 03-03-PLAN.md — sankey_flow component: temporal ribbon Sankey (CH-02) + what-if stacked-area chart + impact narrative (CH-03)
+- [x] 03-03-PLAN.md — sankey_flow component: temporal ribbon Sankey (CH-02) + what-if stacked-area chart + impact narrative (CH-03)
 - [ ] 03-04-PLAN.md — 2_Churn.py page: 2 tabs, 4-KPI strip, Sankey + scrubber, accordion what-if + live before/after (CH-04)
 **UI hint**: yes
 
