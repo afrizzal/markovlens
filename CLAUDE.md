@@ -96,13 +96,21 @@ All persistent data lives in **DuckDB** (`data/markovlens.duckdb`). See [docs/DA
 
 ## App Pages
 
-| Page | Path | Description |
-|---|---|---|
-| Home | `/` | Dashboard with KPIs, recent forecasts, quick actions |
-| Brand Share | `/Brand_Share` | Market share forecasting (3 models) + transition matrix explorer + Monte Carlo |
-| Customer Churn | `/Churn` | State-based churn modelling (Sankey flow + what-if simulator) |
-| Reports | `/Reports` | Report builder + PDF/CSV/notebook export |
-| Settings | `/Settings` | Dataset management, theme, preferences |
+| Page | Path | Status | Description |
+|---|---|---|---|
+| Home | `/` | Scaffold (Phase 04 will wire real KPIs) | Landing + project intro + Quick Actions (conditional page links). Full KPI wiring to real DB pending Phase 04. |
+| Brand Share | `/Brand_Share` | ✅ Implemented (Phase 02) | 4-tab forecaster: Overview (+ stationary panel) / Transition Matrix / Monte Carlo / Model Comparison. Runs m1/m2/m3 together, primary-pick drives heatmap+overview, walk-forward backtest table. |
+| Customer Churn | `/Churn` | ✅ Implemented (Phase 03) | 2-tab page: Overview (temporal Sankey state-flow + period scrubber + 4-KPI strip) / What-If Simulator (accordion sliders by from-state + live before/after stacked-area + impact narrative). m1 absorbing chain. |
+| Settings | `/Settings` | Pending (Phase 04) | Dataset listing with row/state counts + "Re-run seed" button. |
+
+**Note on Reports page**: v1 scope intentionally has **no separate Reports page**. CSV export is embedded as a download button inside Brand Share and Churn pages (RPT-01). PDF/notebook export is deferred to v0.2 backlog. See [docs/planning/decisions.md](docs/planning/decisions.md) `2026-05-31 — Phase 02 scope creep on app/Home.py; reaffirm no separate Reports page`.
+
+### Streamlit Page Conventions
+
+- **Filename**: `N_Title_Case.py` (Streamlit auto-discovery + sidebar label)
+- **Ruff N999** is exempted for `app/**/*.py` per pyproject.toml — Streamlit mandates PascalCase
+- **sys.path prelude**: every page file MUST start with the sys.path manipulation pattern documented in [docs/planning/decisions.md](docs/planning/decisions.md) `2026-05-31 — sys.path manipulation`. Without it, `from app.X` / `from core.X` / `from domains.X` fail at Streamlit runtime (entry-script dir is on sys.path, not project root).
+- **Layered design**: pages call `domains/X/service.py` which returns NumPy-only dataclasses. Pages own the Plotly Figure construction. `core/` and `domains/` must NEVER import streamlit or plotly.
 
 ---
 
