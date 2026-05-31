@@ -2,7 +2,7 @@
 
 > Living document. Updated after every coding session.
 >
-> Last updated: 2026-05-31
+> Last updated: 2026-05-31 (quick task knp — What-If vertical stack)
 >
 > **Note:** Phase numbering follows the GSD workflow (`.planning/STATE.md`). Authoritative live state is in `.planning/STATE.md` + `.planning/phases/NN-*/`.
 
@@ -83,6 +83,17 @@
 | Wire 4 fixes into 2_Churn.py (KPI accents, legend, impact card) | ✅ Done | 60f196b | Issues 1-4 from Phase 03 UI review |
 | Human visual verification | ⏭ Skipped (manual) | — | User to verify live at localhost:8501 |
 | 85 tests passing, ruff clean | ✅ Done | 60f196b | No regressions from Phase 03 baseline |
+
+---
+
+## Quick Task knp — What-If Vertical Stack + Impact Card Spacer ✅ Complete
+
+| Task | Status | Commit | Notes |
+|---|---|---|---|
+| Rewire `build_whatif_chart` to vertically stacked subplots (rows=2, cols=1, shared_xaxes, 640px) | ✅ Done | 8f81ce7 | app/components/sankey_flow.py — Baseline top / Scenario bottom; legend y retuned to -0.18 |
+| Add 20px spacer between SCENARIO IMPACT card and what-if chart in 2_Churn.py | ✅ Done | 1d26846 | Inline `<div style="height:var(--space-5,20px);">` — avoids touching shared `.card.accent-card` |
+| Human visual verification | ✅ Approved | — | User confirmed layout fix at localhost:8501 |
+| 86 tests passing, ruff clean | ✅ Done | 8f81ce7 | `test_build_whatif_chart_has_two_stackgroups` still passes after row swap |
 
 ---
 
