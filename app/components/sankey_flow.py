@@ -7,6 +7,8 @@ See D-01 in CONTEXT.md: do NOT use the built-in Sankey trace (loses temporal dim
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -52,6 +54,44 @@ STATE_COLORS_FAINT: dict[str, str] = {k: v.replace("0.8)", "0.18)") for k, v in 
 DEFAULT_SOLID: str = "rgba(100,100,100,0.8)"
 DEFAULT_FAINT: str = "rgba(100,100,100,0.18)"
 WHATIF_HEIGHT: int = 360
+
+# ---------------------------------------------------------------------------
+# Solid hex color map — mirrors CSS --state-* tokens for legend swatches.
+# Keys are normalized state labels (lower-case, no hyphens/spaces).
+# ---------------------------------------------------------------------------
+STATE_HEX: dict[str, str] = {
+    "active":      "#059669",   # --state-active
+    "atrisk":      "#D97706",   # --state-atrisk
+    "inactive":    "#A1A1AA",   # --state-inactive
+    "reactivated": "#0891B2",   # --state-reactivated
+    "churned":     "#DC2626",   # --state-churned
+}
+DEFAULT_HEX: str = "#646464"
+
+# ---------------------------------------------------------------------------
+# ImpactSummary — structured return from impact_summary()
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class ImpactSummary:
+    """Structured impact result for the scenario card in the What-If tab.
+
+    Parameters
+    ----------
+    applied : bool
+        True when at least one slider override is active.
+    direction : str
+        ``"improving"`` | ``"worsening"`` | ``"neutral"``.
+    accent_token : str
+        CSS variable string for the card accent bar color.
+    html : str
+        Ready-to-render inner HTML for the impact card body.
+    """
+
+    applied: bool
+    direction: str
+    accent_token: str
+    html: str
 
 
 # ---------------------------------------------------------------------------
@@ -425,3 +465,160 @@ def impact_narrative(
         )
 
     return f"{direction} {state_labels[i]} -> {state_labels[j]} by {abs(delta_pp):.0f}pp."
+
+
+# ---------------------------------------------------------------------------
+# CH-03 UI helpers: impact_summary + state_legend_html
+# ---------------------------------------------------------------------------
+
+def _impact_parts(
+    overrides: dict[tuple[int, int], float],
+    baseline_P: np.ndarray,
+    baseline_dist: np.ndarray,
+    modified_dist: np.ndarray,
+    state_labels: list[str],
+    n_customers: int,
+) -> tuple[str, str, float, float, str, str]:
+    """Extract shared direction/sign data used by both impact_narrative and impact_summary.
+
+    Returns
+    -------
+    tuple of (from_label, to_label, delta_pp, churn_delta, direction_word, sign)
+        ``direction_word`` is "Reducing" or "Increasing".
+        ``sign`` is "saves" or "costs".
+        ``churn_delta`` is positive when churn improves (saves customers).
+    """
+    best_key = max(overrides, key=lambda k: abs(overrides[k] - baseline_P[k[0], k[1]]))
+    i, j = best_key
+    delta_pp = (overrides[best_key] - baseline_P[i, j]) * 100
+    direction_word = "Reducing" if delta_pp < 0 else "Increasing"
+
+    churned_idx = next(
+        (k for k, s in enumerate(state_labels) if _norm_label(s) == "churned"), -1
+    )
+    churn_delta = (
+        (baseline_dist[-1, churned_idx] - modified_dist[-1, churned_idx]) * n_customers
+        if churned_idx >= 0
+        else 0.0
+    )
+    sign = "saves" if churn_delta > 0 else "costs"
+    return state_labels[i], state_labels[j], delta_pp, churn_delta, direction_word, sign
+
+
+def impact_summary(
+    overrides: dict[tuple[int, int], float],
+    baseline_P: np.ndarray,
+    baseline_dist: np.ndarray,
+    modified_dist: np.ndarray,
+    state_labels: list[str],
+    n_customers: int,
+) -> ImpactSummary:
+    """Return a structured ImpactSummary for the SCENARIO IMPACT card.
+
+    Parameters
+    ----------
+    overrides : dict[tuple[int, int], float]
+        Slider overrides keyed on (from_state_idx, to_state_idx). Empty dict
+        returns a neutral summary with the default prompt HTML.
+    baseline_P : np.ndarray
+        Shape (n_states, n_states) — baseline transition matrix.
+    baseline_dist : np.ndarray
+        Shape (horizon+1, n_states) — baseline state distribution over time.
+    modified_dist : np.ndarray
+        Shape (horizon+1, n_states) — modified scenario state distribution.
+    state_labels : list[str]
+        Ordered state labels.
+    n_customers : int
+        Total customer count for headcount conversion.
+
+    Returns
+    -------
+    ImpactSummary
+        Frozen dataclass with applied, direction, accent_token, and html fields.
+    """
+    if not overrides:
+        return ImpactSummary(
+            applied=False,
+            direction="neutral",
+            accent_token="var(--color-text-tertiary)",
+            html='<p class="t-h3 t-sec" style="font-weight:400;">Adjust a slider to model a retention scenario.</p>',
+        )
+
+    from_lbl, to_lbl, delta_pp, churn_delta, direction_word, sign = _impact_parts(
+        overrides, baseline_P, baseline_dist, modified_dist, state_labels, n_customers
+    )
+
+    if churn_delta > 0:
+        direction = "improving"
+        accent_token = "var(--color-success)"
+        customers_color = "var(--color-success)"
+    else:
+        direction = "worsening"
+        accent_token = "var(--color-warning)"
+        customers_color = "var(--color-danger)"
+
+    pp_span = (
+        f'<span class="mono" style="color:var(--color-primary);">'
+        f"{abs(delta_pp):.0f}pp</span>"
+    )
+    customers_span = (
+        f'<span class="mono" style="color:{customers_color};">'
+        f"{abs(churn_delta):.0f} customers</span>"
+    )
+    # ASCII -> avoids Windows console encoding issues
+    html = (
+        f'<p class="t-h2" style="font-weight:600;line-height:1.3;">'
+        f"{direction_word} {from_lbl} -> {to_lbl} by {pp_span} "
+        f"{sign} {customers_span}."
+        f"</p>"
+    )
+
+    return ImpactSummary(
+        applied=True,
+        direction=direction,
+        accent_token=accent_token,
+        html=html,
+    )
+
+
+def state_legend_html(
+    state_labels: list[str],
+    *,
+    state_colors: dict[str, str] | None = None,
+) -> str:
+    """Build a horizontal flex legend row with a colored swatch + label per state.
+
+    Parameters
+    ----------
+    state_labels : list[str]
+        Ordered state labels. Each appears as one item in the legend.
+    state_colors : dict[str, str] | None
+        Optional override map (normalized label -> hex color string).
+        Falls back to STATE_HEX, then DEFAULT_HEX.
+
+    Returns
+    -------
+    str
+        HTML string — a flex div row, one item per state (swatch + label).
+        No ``st.*`` calls — pure string output, safe for ``unsafe_allow_html=True``.
+    """
+    items: list[str] = []
+    for label in state_labels:
+        key = _norm_label(label)
+        if state_colors and key in state_colors:
+            color = state_colors[key]
+        else:
+            color = STATE_HEX.get(key, DEFAULT_HEX)
+        swatch = (
+            f'<div style="width:10px;height:10px;border-radius:50%;'
+            f'background:{color};flex-shrink:0;"></div>'
+        )
+        text = f'<span class="t-xs" style="margin-left:4px;">{label}</span>'
+        items.append(
+            f'<div style="display:flex;align-items:center;gap:2px;">{swatch}{text}</div>'
+        )
+    inner = "".join(items)
+    return (
+        f'<div style="display:flex;flex-wrap:wrap;gap:var(--space-4,16px);'
+        f'margin-bottom:var(--space-4,16px);">{inner}</div>'
+    )

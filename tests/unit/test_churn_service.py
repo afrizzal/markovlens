@@ -314,3 +314,88 @@ def test_impact_narrative_empty_overrides() -> None:
         impact_narrative({}, P, z, z, ["active", "atrisk", "churned"], 100)
         == "Adjust a slider to model a retention scenario."
     )
+
+
+# ---------------------------------------------------------------------------
+# Tests for new helpers: ImpactSummary, impact_summary, state_legend_html
+# ---------------------------------------------------------------------------
+
+def test_impact_summary_empty_overrides_is_neutral() -> None:
+    """Test 1 (empty): impact_summary with empty overrides -> applied=False, neutral."""
+    from app.components.sankey_flow import ImpactSummary, impact_summary
+
+    P = np.eye(3, dtype=np.float64)
+    z = np.tile([0.33, 0.34, 0.33], (13, 1)).astype(np.float64)
+    result = impact_summary({}, P, z, z, ["active", "atrisk", "churned"], 100)
+
+    assert isinstance(result, ImpactSummary)
+    assert result.applied is False
+    assert result.direction == "neutral"
+    assert result.accent_token == "var(--color-text-tertiary)"
+    assert "Adjust a slider" in result.html
+
+
+def test_impact_summary_improving_scenario() -> None:
+    """Test 2 (improving): override that reduces churn -> direction='improving'."""
+    from app.components.sankey_flow import impact_summary
+
+    P = np.array(
+        [[0.6, 0.2, 0.2], [0.1, 0.7, 0.2], [0.0, 0.0, 1.0]], dtype=np.float64
+    )
+    # Baseline: churned column at 0.2; modified: churned at 0.1 => improvement
+    base = np.tile([0.6, 0.2, 0.2], (13, 1)).astype(np.float64)
+    mod = np.tile([0.7, 0.2, 0.1], (13, 1)).astype(np.float64)
+
+    result = impact_summary(
+        {(0, 2): 0.1},   # reduce active->churned from 0.2 to 0.1
+        P,
+        base,
+        mod,
+        ["active", "atrisk", "churned"],
+        1000,
+    )
+
+    assert result.applied is True
+    assert result.direction == "improving"
+    assert result.accent_token == "var(--color-success)"
+    assert "t-h2" in result.html
+    assert "saves" in result.html
+
+
+def test_impact_summary_worsening_scenario() -> None:
+    """Test 3 (worsening): override that raises churn -> direction='worsening'."""
+    from app.components.sankey_flow import impact_summary
+
+    P = np.array(
+        [[0.6, 0.2, 0.2], [0.1, 0.7, 0.2], [0.0, 0.0, 1.0]], dtype=np.float64
+    )
+    # Baseline: churned at 0.2; modified: churned at 0.4 => worsening
+    base = np.tile([0.6, 0.2, 0.2], (13, 1)).astype(np.float64)
+    mod = np.tile([0.4, 0.2, 0.4], (13, 1)).astype(np.float64)
+
+    result = impact_summary(
+        {(0, 2): 0.4},   # increase active->churned from 0.2 to 0.4
+        P,
+        base,
+        mod,
+        ["active", "atrisk", "churned"],
+        1000,
+    )
+
+    assert result.applied is True
+    assert result.direction == "worsening"
+    assert result.accent_token == "var(--color-warning)"
+    assert "costs" in result.html
+
+
+def test_state_legend_html_swatch_count() -> None:
+    """Test 4 (legend): state_legend_html returns correct swatch count."""
+    from app.components.sankey_flow import state_legend_html
+
+    html = state_legend_html(["Active", "At-Risk", "Churned"])
+
+    assert "Active" in html
+    assert "At-Risk" in html
+    assert "Churned" in html
+    # Each swatch is a circle div — assert exactly 3 swatch elements
+    assert html.count("border-radius:50%") == 3
