@@ -69,6 +69,8 @@ ignore = ["E501", "B008"]
 "core/simulation.py" = ["N803", "N806", "UP040"]
 # service.py uses Chan 2015 math variable names (P, Y_1, Q_t, G) and a lambda extractor
 "domains/brand_share/service.py" = ["N803", "N806", "E731"]
+# churn service.py uses Chan 2015 math variable names (P, Q, Y_1) and a lambda extractor
+"domains/churn/service.py" = ["N803", "N806", "E731"]
 "scripts/seed_data.py" = ["N806"]
 "tests/unit/test_models.py" = ["N806"]
 "tests/unit/test_simulation.py" = ["N806", "PT018"]
