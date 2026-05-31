@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 04
 status: unknown
-last_updated: "2026-05-31T19:22:21.284Z"
+last_updated: "2026-05-31T19:41:17.632Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 14
-  completed_plans: 15
+  total_plans: 18
+  completed_plans: 16
 ---
 
 # GSD State
@@ -30,14 +30,14 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 | 01 | Markov Engine | Complete |
 | 02 | Design System + Brand Share | Complete (4/4 plans complete) |
 | 03 | Churn Domain | Complete (4/4 plans complete) |
-| 04 | Home, Export & Settings | In Progress (1/4 plans complete) |
+| 04 | Home, Export & Settings | In Progress (2/4 plans complete) |
 | 05 | Quality Assurance & Deployment | Not Started |
 
 ---
 
 ## Current Focus
 
-Phase 04 in progress (1/4 plans complete). Plan 04-01 done: query helpers layer complete. Next: Plan 04-02 — wire Home.py to use get_home_kpis().
+Phase 04 in progress (2/4 plans complete). Plan 04-02 done: Home.py wired to real KPIs + Recent Forecasts, smoke test added. Next: Plan 04-03.
 
 ---
 
@@ -50,7 +50,7 @@ Phase 03 [##########] 100% (4/4 plans complete)
 Phase 04 [##        ] 25% (1/4 plans complete)
 Phase 05 [          ] 0%
 
-Overall  [██████████] 100% (15/18 plans complete) — Phase 04 in progress: P01 done
+Overall  [█████████░] 89% (16/18 plans complete) — Phase 04 in progress: P02 done
 ```
 
 ---
@@ -81,6 +81,7 @@ Overall  [██████████] 100% (15/18 plans complete) — Phase 
 | Phase 03 P02 | 18 | 2 tasks | 1 files |
 | Phase 03 P03 | 5 | 2 tasks | 4 files |
 | Phase 04 P01 | 9 | 5 tasks | 3 files |
+| Phase 04 P02 | 9min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,7 @@ Overall  [██████████] 100% (15/18 plans complete) — Phase 
 - Phase 03 Plan 02: ABSORBING_THRESHOLD=0.95 for near-absorbing state detection (real Churned state P[i,i]~0.98, not 1.0 exactly); state_distribution_over_time uses iterative Y_t @ P loop (not M1 forecast); n_customers = df["entity_id"].nunique(); simulate_scenario returns np.ndarray not full ChurnAnalysisResult; 72 passed, 1 skipped after service rewrite
 - Phase 03 Plan 03: SVG bezier path shapes used for temporal Sankey (not go.Sankey per D-01); N803/N806 suppressed for sankey_flow.py (W/H/PT/PB/sH/tH JSX-port layout vars); ASCII -> used in impact_narrative for Windows console encoding safety; stackgroup opacity via rgba alpha in fillcolor (not trace opacity); 76 passed after component added
 - Phase 04 Plan 01: seeded_conn fixture defined in test_queries.py (not conftest.py) — integration-only scope; TRY_CAST for JSON mape extraction in get_home_kpis/list_recent_forecasts — NULL on malformed rows vs raise; Dataset.created_at added as last field (backward-compatible); 94 tests pass
+- Phase 04 Plan 02: Home.py smoke test mocks get_home_kpis at core.db.queries level; importlib exec_module pattern consistent with BS-06 and CH-04; pandas import inside else-branch (no noqa needed — PLC0415 not in ruff's enabled rule set); 95 tests pass
 
 ### Quick Tasks Completed
 
@@ -131,12 +133,12 @@ None.
 
 ### Last Action
 
-2026-06-01 — Phase 04 Plan 01 complete: extended core/db/queries.py with HomeKpis/RecentForecast dataclasses + get_home_kpis/list_recent_forecasts functions; Dataset.created_at added; 8 new tests (5 unit + 3 integration) all pass. 94/94 tests. Commits: 2481e9a, 6ac57ef, b15748d, 915be67, 120b490, 03175d0.
+2026-06-01 — Phase 04 Plan 02 complete: app/Home.py rewritten with real KPI strip (get_home_kpis()) and Recent Forecasts list (list_recent_forecasts()); register_theme()/inject_theme() added; unconditional Churn page_link; empty_state fallback; Home page smoke test added (test_home_page_imports_without_error). 95/95 tests. Commits: e1eaabd, 885d325.
 
 ### Resume Point
 
-Phase 04: Execute Plan 04-02 — wire Home.py to use get_home_kpis() and list_recent_forecasts().
+Phase 04: Execute Plan 04-03 — next plan in phase 04.
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-06-01 - Completed Phase 04 Plan 01: query helpers + wave 0 tests*
+*Last updated: 2026-06-01 - Completed Phase 04 Plan 02: Home.py wired to real KPIs + Recent Forecasts*
