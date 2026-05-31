@@ -2,7 +2,9 @@
 
 > Living document. Updated after every coding session.
 >
-> Last updated: 2026-05-29
+> Last updated: 2026-05-31
+>
+> **Note:** Phase numbering follows the GSD workflow (`.planning/STATE.md`). Authoritative live state is in `.planning/STATE.md` + `.planning/phases/NN-*/`.
 
 ## Conventions
 
@@ -11,132 +13,90 @@
 - **Pending** — planned, not started
 - **Blocked** — has a blocker (note what + who)
 
-Format per row: `<task>` — `<status>` — `<commit hash if Done>` — `<notes>`
-
 ---
 
-## Phase 00 — Scaffold + Foundation
+## Phase 01 — Markov Engine Core ✅ Complete
 
 | Task | Status | Commit | Notes |
 |---|---|---|---|
-| Create directory structure | ✅ Done | _scaffold_ | core/, domains/, app/, tests/, docs/, .claude/, data/ |
-| pyproject.toml + uv config | ✅ Done | _scaffold_ | Python 3.12, all deps declared |
-| .gitignore | ✅ Done | _scaffold_ | Python + UV + Streamlit + data/ + reports/ |
-| LICENSE (MIT) | ✅ Done | _scaffold_ | |
-| .mcp.json (context7) | ✅ Done | _scaffold_ | Same key as social-media-ai |
-| .streamlit/config.toml | ✅ Done | _scaffold_ | Light theme, primary #4338CA |
-| README.md (hero + quickstart) | ✅ Done | _scaffold_ | Includes badges, roadmap, ack |
-| CLAUDE.md | ✅ Done | _scaffold_ | Full Claude Code guide |
-| CONTRIBUTING.md | ✅ Done | _scaffold_ | uv setup, branching, commits |
-| manual-book.md (bilingual) | ✅ Done | _scaffold_ | English + Bahasa Indonesia |
-| 8 .claude/rules/ files | ✅ Done | _scaffold_ | python, markov, streamlit, data, coding, context7, workflow, project |
-| 3 .claude/commands/ files | ✅ Done | _scaffold_ | prime, create-plan, implement |
-| 4 .claude/skills/ scaffolds | ✅ Done | _scaffold_ | markov-validator, monte-carlo-runner, streamlit-page-scaffolder, dataset-prepper |
-| .claude/memory/MEMORY.md + 6 entries | ✅ Done | _scaffold_ | User, workflow, decisions |
-| .claude/settings.local.json | ✅ Done | _scaffold_ | Bash allowlist for uv/rtk/git |
-| docs/planning/ — all 4 files | ✅ Done | _scaffold_ | README, master-plan, task-progress, decisions |
-| docs/ technical refs | 🚧 In Progress | — | DATABASE, MARKOV-MODELS substantive; others skeleton |
-| Code skeleton (core/, app/, tests/) | 🟡 Pending | — | Stubs with TODO |
-| git init + initial commit | 🟡 Pending | — | User runs manually |
-| Run `uv sync` | 🟡 Pending | — | User runs manually after uv install |
-| Run `/gsd:new-project` | 🟡 Pending | — | User runs manually in Sonnet terminal |
+| `validate_transition_matrix()` — rows sum 1.0, non-negative, square | ✅ Done | Phase 01 | core/models.py |
+| `M1Homogeneous` — constant-P forecast | ✅ Done | Phase 01 | Chan 2015 Eq.(1) |
+| `M2TimeVarying` — time-varying P_t forecast | ✅ Done | Phase 01 | Chan 2015 Eq.(2) |
+| `M3Extended` — P_t + growth multiplier G | ✅ Done | Phase 01 | Chan 2015 Eq.(3) |
+| `monte_carlo_simulate()` — 10k-path simulation, seed, quantile bands | ✅ Done | Phase 01 | core/simulation.py |
+| `calibrate_probability()` — Becker 2026 longshot-bias table | ✅ Done | Phase 01 | core/simulation.py |
+| `compute_stationary()` — stationary distribution via eigenvector | ✅ Done | Phase 01 | core/models.py |
+| `build_transition_matrix()` — from raw transitions DataFrame | ✅ Done | Phase 01 | core/models.py |
+| `core/io/loaders.py` — CSV/Parquet → validated DataFrame | ✅ Done | Phase 01 | |
+| `core/metrics.py` — MAPE, Brier score, log-loss | ✅ Done | Phase 01 | |
+| DuckDB schema (`core/db/schema.sql`) — 6 tables | ✅ Done | abb74af | datasets, transitions, matrices, sim_runs, forecasts, scenarios |
+| Connection singleton (`core/db/connection.py`) | ✅ Done | abb74af | get_connection() + init_schema() |
+| Query helpers (`core/db/queries.py`) | ✅ Done | 2eb18b0 | register_dataset, list_datasets, load_transitions, build_transition_matrix |
+| Synthetic FMCG brand-share seed (5 brands × 24 periods) | ✅ Done | Phase 01 | scripts/seed_data.py |
+| IBM Telco churn seed (4 states, 7032 rows) | ✅ Done | Phase 01 | scripts/seed_data.py |
+| Unit tests — 40 tests, 90.76% coverage on core/ | ✅ Done | Phase 01 | tests/unit/ |
+| Integration tests — 3 DuckDB round-trip tests | ✅ Done | Phase 01 | tests/integration/test_queries.py |
 
 ---
 
-## Phase 01 — Markov Engine Core
-
-> Plan via `/gsd:plan-phase 01` after Phase 00 completes.
+## Phase 02 — Design System + Brand Share Domain ✅ Complete
 
 | Task | Status | Commit | Notes |
 |---|---|---|---|
-| Implement m1 (Homogeneous Markov) | 🟡 Pending | — | core/models.py |
-| Implement m2 (Time-varying Markov) | 🟡 Pending | — | core/models.py |
-| Implement m3 (Extended time-varying) | 🟡 Pending | — | core/models.py |
-| Implement Monte Carlo simulator | 🟡 Pending | — | core/simulation.py |
-| Implement longshot calibration | 🟡 Pending | — | core/simulation.py |
-| Implement validation (rows sum, sparsity) | 🟡 Pending | — | core/models.py |
-| Implement metrics (MAPE, Brier) | 🟡 Pending | — | core/metrics.py |
-| Implement walk-forward validation | 🟡 Pending | — | core/validation.py |
-| Unit tests for all of above | 🟡 Pending | — | tests/unit/ |
+| Design system — `app/styles/theme.css` (CSS variables) | ✅ Done | Phase 02 | Extracted from Claude Design prototype (markov.css tokens) |
+| Plotly theme template — `app/styles/plotly_theme.py` | ✅ Done | Phase 02 | register_theme() / inject_theme() pattern |
+| Shared components — `kpi_card`, `empty_state`, `section_header` | ✅ Done | Phase 02 | app/components/ |
+| `transition_heatmap.py` — annotated probability heatmap component | ✅ Done | Phase 02 | app/components/ |
+| `monte_carlo_fan.py` — fan chart component with confidence bands | ✅ Done | Phase 02 | app/components/ |
+| `domains/brand_share/service.py` — `BrandShareForecastResult` dataclass | ✅ Done | Phase 02 | NumPy-only, 14 fields |
+| `app/pages/1_Brand_Share.py` — 4-tab forecaster | ✅ Done | Phase 02 | Overview + Transition Matrix + Monte Carlo + Model Comparison |
+| BS smoke test — importlib + mock.patch avoids DB in test env | ✅ Done | Phase 02 | tests/unit/test_page_import.py |
+| Walk-forward backtest table | ✅ Done | Phase 02 | Wired to service layer |
+| 61 tests passing | ✅ Done | Phase 02 | Includes all Phase 01 + Phase 02 tests |
 
 ---
 
-## Phase 02 — Storage + Data Ingestion
+## Phase 03 — Customer Churn Domain ✅ Complete
 
 | Task | Status | Commit | Notes |
 |---|---|---|---|
-| DuckDB schema (schema.sql) | ✅ Done | abb74af | datasets, transitions, matrices, sim_runs, forecasts, scenarios |
-| Connection singleton | ✅ Done | abb74af | core/db/connection.py — get_connection() + init_schema() |
-| Query helpers | ✅ Done | — | register_dataset, list_datasets, get_dataset, load_transitions, bulk_insert_transitions, build_transition_matrix |
-| Dataset registration | ✅ Done | 2eb18b0 | validate_transitions_df in core/io/loaders.py |
-| Kaggle e-commerce brand-share seed | ✅ Done | — | Synthetic FMCG DGP — 5 brands × 24 periods, 600 rows |
-| Kaggle Telco churn seed | ✅ Done | — | IBM Telco CSV → 4 states (active/at_risk/inactive/churned), 7032 rows |
-| Integration tests | ✅ Done | — | tests/integration/test_queries.py — 3 pass |
+| Wave 0 test scaffolds — CH-01/02/03 unit + integration stubs | ✅ Done | 58a5c68 | tests/unit/test_churn_service.py, tests/integration/test_churn_service.py |
+| `domains/churn/service.py` — `ChurnAnalysisResult` dataclass + full service | ✅ Done | 90d5d3b | absorbing-chain detection, fundamental matrix, KPIs, state_distribution_over_time |
+| `compute_avg_lifetime()` — fundamental matrix approach | ✅ Done | 90d5d3b | Returns None if no transient states |
+| `simulate_scenario()` + `_apply_overrides()` — lock-target redistribution fix | ✅ Done | 4f9e471 | Bug: old code renormalized overrides away; fix: lock modified cells, redistribute remaining proportionally |
+| `app/components/sankey_flow.py` — SVG bezier Sankey (CH-02) | ✅ Done | 7b94bf3 | go.Figure with shape-based ribbons (not go.Sankey per D-01) |
+| `build_whatif_chart()` — side-by-side subplots, before/after stacked-area (CH-03) | ✅ Done | 3af795e | Two separate y-axes (shared_yaxes=False) |
+| `impact_narrative()` — largest-delta sentence (CH-03) | ✅ Done | 3af795e | ASCII "->" for Windows console encoding safety |
+| `app/pages/2_Churn.py` — 2-tab Churn page (CH-04) | ✅ Done | 655c22b | Overview (Sankey + scrubber + 4-KPI) + What-If (accordion + live chart + impact card) |
+| Churn page smoke test | ✅ Done | 1efb8e9 | tests/unit/test_page_import.py |
+| 4 unit tests locking `_apply_overrides` locked-cell behavior | ✅ Done | 4f9e471 | Regression protection for the root-cause bug |
+| 81 tests passing, 89% overall coverage | ✅ Done | Phase 03 | core/ ~92%, brand_share ~81%, churn ~86% |
+| CLAUDE.md + README.md updated for /Churn | ✅ Done | 54a118d | App Pages table, roadmap, project tree |
 
 ---
 
-## Phase 03 — Brand Share Domain
+## Phase 04 — Home Dashboard + Export + Settings 🔲 Not Started
 
-| Task | Status | Commit | Notes |
-|---|---|---|---|
-| Service layer | 🟡 Pending | — | domains/brand_share/service.py |
-| Transforms | 🟡 Pending | — | domains/brand_share/transforms.py |
-| Streamlit page | 🟡 Pending | — | app/pages/1_Brand_Share.py |
-| Transition heatmap | 🟡 Pending | — | app/components/transition_heatmap.py |
-| Monte Carlo fan chart | 🟡 Pending | — | app/components/monte_carlo_fan.py |
-| Model comparison view | 🟡 Pending | — | tabs within page |
-| Companion notebook | 🟡 Pending | — | notebooks/brand_share_case_study.ipynb |
+| Task | Status | Notes |
+|---|---|---|
+| Home KPI wiring — real DB counts (models, forecasts, accuracy) | 🟡 Pending | app/Home.py (currently scaffold) |
+| CSV export — download button inside Brand Share + Churn pages | 🟡 Pending | RPT-01 |
+| Settings page (`4_Settings.py`) — dataset listing + "Re-run seed" button | 🟡 Pending | |
+| Phase plan via `/gsd:plan-phase 04` | 🟡 Pending | |
 
 ---
 
-## Phase 04 — Customer Churn Domain
+## Phase 05 — QA + Deploy 🔲 Not Started
 
-| Task | Status | Commit | Notes |
-|---|---|---|---|
-| State design (Active, At-Risk, etc.) | 🟡 Pending | — | docs/MARKOV-MODELS.md update |
-| Service layer | 🟡 Pending | — | domains/churn/service.py |
-| Sankey component | 🟡 Pending | — | app/components/sankey.py |
-| Streamlit page | 🟡 Pending | — | app/pages/2_Churn.py |
-| What-if simulator | 🟡 Pending | — | sub-tab on Churn page |
-| Companion notebook | 🟡 Pending | — | notebooks/churn_case_study.ipynb |
-
----
-
-## Phase 05 — UI Polish
-
-| Task | Status | Commit | Notes |
-|---|---|---|---|
-| Claude Design mockup → tokens | 🟡 Pending | — | Extract from React artifact |
-| theme.css (CSS variables) | 🟡 Pending | — | app/styles/theme.css |
-| Plotly theme template | 🟡 Pending | — | app/styles/plotly_theme.py |
-| Custom components (KPI, etc.) | 🟡 Pending | — | app/components/ |
-| Empty states + loading states | 🟡 Pending | — | All pages |
-
----
-
-## Phase 06 — Reports & Export
-
-| Task | Status | Commit | Notes |
-|---|---|---|---|
-| PDF report builder | 🟡 Pending | — | core/io/exporters.py (ReportLab) |
-| Reports page | 🟡 Pending | — | app/pages/3_Reports.py |
-| Notebook export | 🟡 Pending | — | Generate reproducible .ipynb |
-| CSV/PNG individual exports | 🟡 Pending | — | |
-
----
-
-## Phase 07 — Deploy
-
-| Task | Status | Commit | Notes |
-|---|---|---|---|
-| Streamlit Cloud account setup | 🟡 Pending | — | User manual step |
-| GitHub repo + push | 🟡 Pending | — | User manual step |
-| Connect Streamlit Cloud → repo | 🟡 Pending | — | User manual step |
-| Secrets configuration | 🟡 Pending | — | If any env vars needed |
-| Smoke test live URL | 🟡 Pending | — | All pages load, charts render |
-| Custom domain (optional) | 🟡 Pending | — | markovlens.app or similar |
-| Update README with live URL | 🟡 Pending | — | |
-| Demo video + LinkedIn post | 🟡 Pending | — | User shipping motion |
+| Task | Status | Notes |
+|---|---|---|
+| Coverage gate enforcement (CI or pre-push hook) | 🟡 Pending | core/ ≥ 80%, domains/ ≥ 60% |
+| GitHub Actions CI (lint + test) | 🟡 Pending | |
+| Streamlit Cloud account + repo connect | 🟡 Pending | User manual step |
+| Seed script runs on cold deploy (DuckDB ephemeral) | 🟡 Pending | |
+| Production smoke check (all pages load, charts render) | 🟡 Pending | |
+| README live demo URL + badge | 🟡 Pending | |
+| Phase plan via `/gsd:plan-phase 05` | 🟡 Pending | |
 
 ---
 

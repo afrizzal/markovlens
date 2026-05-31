@@ -2,7 +2,7 @@
 
 > Living document. Updated when architecture, vision, or patterns evolve.
 >
-> Last updated: 2026-05-28
+> Last updated: 2026-05-31
 
 ## 1. Vision
 
@@ -128,16 +128,15 @@ After every coding session, update (in this order):
 
 | Phase | Goal | Status |
 |---|---|---|
-| **00** | Scaffold + documentation foundation | Done (2026-05-28) |
-| **01** | Markov engine core (m1, m2, m3) + tests | Pending |
-| **02** | DuckDB schema + dataset ingestion + seed data | Pending |
-| **03** | Brand Share domain — service + Streamlit page + Plotly viz | Pending |
-| **04** | Customer Churn domain — service + Streamlit page + Sankey + what-if simulator | Pending |
-| **05** | Polish — design system implementation, theme CSS, custom components | Pending |
-| **06** | Reports module — PDF export, notebook export | Pending |
-| **07** | Deploy to Streamlit Cloud + custom domain + monitoring | Pending |
+| **01** | Markov engine core (m1/m2/m3 + Monte Carlo + calibration + walk-forward validation) | ✅ Done — 90.76% coverage, 40 tests |
+| **02** | Design system + Brand Share domain (heatmap, fan chart, model comparison, stationary) | ✅ Done — 61 tests, live at /Brand_Share |
+| **03** | Customer Churn domain (absorbing chain, Sankey state flow, what-if simulator) | ✅ Done — 81 tests, live at /Churn |
+| **04** | Home dashboard wired to real KPIs + CSV export + Settings page | 🔲 Next |
+| **05** | Coverage gate + deploy to Streamlit Cloud + production smoke check | 🔲 Pending |
 
 Detailed phase plans in `.planning/phases/NN-*/` (created via `/gsd:plan-phase N`).
+
+> **Note on phase numbering:** The GSD workflow system (`.planning/`) uses 01-05 numbering. Earlier drafts of this document used a different 00-07 numbering. The GSD numbering is authoritative — see `.planning/STATE.md` for live status.
 
 ## 6. Non-Goals (Explicit)
 

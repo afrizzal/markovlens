@@ -106,17 +106,11 @@ This is the number you bring to your CFO.
 
 ## Generating Reports
 
-1. Click **Reports** in the sidebar
-2. Choose a template:
-   - **Executive Summary** — 1-page PDF with key metrics
-   - **Technical Deep-Dive** — full methodology + appendix
-   - **Comparison Report** — m1 vs m2 vs m3 side-by-side
-3. Click **Generate PDF** — download starts immediately
+> **Note (v0.1):** The dedicated Reports page is not yet available. CSV export will be added to the Brand Share and Churn pages in Phase 04. PDF export is planned for v0.2.
 
-Alternative exports:
-- **PNG** — individual chart images
-- **CSV** — raw forecast data
-- **Notebook (.ipynb)** — reproducible Jupyter notebook with all calculations
+Currently available exports:
+- **CSV** — coming in Phase 04 as a download button inside each domain page
+- **Notebook (.ipynb)** — companion case-study notebooks in `notebooks/` (run locally with `uv run jupyter lab`)
 
 ## Glossary
 
@@ -248,17 +242,11 @@ Inilah angka yang Anda bawa ke CFO.
 
 ## Membuat Laporan
 
-1. Klik **Reports** di sidebar
-2. Pilih template:
-   - **Executive Summary** — PDF 1 halaman dengan KPI utama
-   - **Technical Deep-Dive** — metodologi lengkap + lampiran
-   - **Comparison Report** — m1 vs m2 vs m3 berdampingan
-3. Klik **Generate PDF** — download otomatis
+> **Catatan (v0.1):** Halaman Reports belum tersedia. Export CSV akan ditambahkan ke halaman Brand Share dan Churn di Phase 04. Export PDF direncanakan untuk v0.2.
 
-Format export alternatif:
-- **PNG** — gambar chart individual
-- **CSV** — raw forecast data
-- **Notebook (.ipynb)** — Jupyter notebook reproducible
+Export yang tersedia saat ini:
+- **CSV** — akan hadir di Phase 04 sebagai tombol download di tiap halaman domain
+- **Notebook (.ipynb)** — notebook case study ada di folder `notebooks/` (jalankan secara lokal dengan `uv run jupyter lab`)
 
 ## Glosarium
 

@@ -87,13 +87,13 @@ Expected output: `Seed complete — datasets=2, transitions=7632, matrices=26, f
 uv run streamlit run app/Home.py
 ```
 
-Open [http://localhost:8501](http://localhost:8501) in your browser. Navigate to **Brand Share** from the sidebar to run forecasts.
+Open [http://localhost:8501](http://localhost:8501) in your browser. Navigate to **Brand Share** or **Customer Churn** from the sidebar to run forecasts.
 
 ### 5. Run Tests
 
 ```bash
-uv run pytest                                    # Full suite (61 tests, ~7s)
-uv run pytest --cov=core --cov=domains           # With coverage report
+uv run pytest                                    # Full suite (81 tests, ~15s)
+uv run pytest --cov=core --cov=domains           # With coverage report (89% overall)
 uv run pytest tests/unit/                        # Unit tests only (faster)
 uv run pytest tests/integration/ -m integration  # Integration tests against temp DuckDB
 ```
