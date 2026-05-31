@@ -271,31 +271,64 @@ def _apply_overrides(
     P: np.ndarray,
     transition_overrides: dict[tuple[int, int], float],
 ) -> np.ndarray:
-    """Copy P, apply cell overrides, renormalize each touched row.
+    """Copy P, apply cell overrides, redistribute remaining mass to unmodified cells.
+
+    Modified cells are LOCKED at their target values. The remaining probability mass
+    (1 - sum_of_modified_cells) is redistributed to unmodified cells proportional to
+    their baseline weights, preserving the relative ratios among untouched transitions.
 
     Parameters
     ----------
     P : np.ndarray
         Row-stochastic baseline matrix, shape (n, n).
     transition_overrides : dict[tuple[int, int], float]
-        Keys are (from_state_idx, to_state_idx); values are new probabilities.
-        Each affected row is renormalized after all overrides for that row are applied.
+        Keys are (from_state_idx, to_state_idx); values are target probabilities.
 
     Returns
     -------
     np.ndarray
-        Modified copy of P with all touched rows renormalized to sum to 1.0.
+        Modified copy of P. All touched rows sum to 1.0.
     """
     P_mod = P.copy()
     rows_to_fix: dict[int, dict[int, float]] = {}
     for (i, j), val in transition_overrides.items():
         rows_to_fix.setdefault(i, {})[j] = val
+
     for i, changes in rows_to_fix.items():
-        for j, val in changes.items():
-            P_mod[i, j] = float(np.clip(val, 0.0, 1.0))
-        row_sum = P_mod[i].sum()
-        if row_sum > 1e-12:
-            P_mod[i] /= row_sum
+        modified_cells = set(changes.keys())
+        clipped = {j: float(np.clip(val, 0.0, 1.0)) for j, val in changes.items()}
+        modified_sum = sum(clipped.values())
+
+        if modified_sum > 1.0:
+            # Over-specified: scale modified cells to sum to 1.0, unmodified get 0
+            scale = 1.0 / modified_sum
+            for j, val in clipped.items():
+                P_mod[i, j] = val * scale
+            for k in range(P.shape[1]):
+                if k not in modified_cells:
+                    P_mod[i, k] = 0.0
+        else:
+            remaining = 1.0 - modified_sum
+            # Lock modified cells at their target values
+            for j, val in clipped.items():
+                P_mod[i, j] = val
+            # Redistribute remaining to unmodified cells proportional to baseline weights
+            unmodified_baseline_sum = sum(
+                float(P[i, k]) for k in range(P.shape[1]) if k not in modified_cells
+            )
+            if unmodified_baseline_sum > 1e-12:
+                for k in range(P.shape[1]):
+                    if k not in modified_cells:
+                        P_mod[i, k] = float(P[i, k]) * remaining / unmodified_baseline_sum
+            else:
+                # Edge case: all baseline mass was on modified cells; distribute equally
+                n_unmodified = P.shape[1] - len(modified_cells)
+                if n_unmodified > 0:
+                    share = remaining / n_unmodified
+                    for k in range(P.shape[1]):
+                        if k not in modified_cells:
+                            P_mod[i, k] = share
+
     return P_mod
 
 
