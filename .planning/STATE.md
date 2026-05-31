@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 04
 status: unknown
-last_updated: "2026-05-31T19:41:17.632Z"
+last_updated: "2026-05-31T20:18:17.863Z"
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 18
-  completed_plans: 16
+  completed_plans: 18
 ---
 
 # GSD State
@@ -30,14 +30,14 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 | 01 | Markov Engine | Complete |
 | 02 | Design System + Brand Share | Complete (4/4 plans complete) |
 | 03 | Churn Domain | Complete (4/4 plans complete) |
-| 04 | Home, Export & Settings | In Progress (2/4 plans complete) |
+| 04 | Home, Export & Settings | Complete (4/4 plans complete) |
 | 05 | Quality Assurance & Deployment | Not Started |
 
 ---
 
 ## Current Focus
 
-Phase 04 in progress (2/4 plans complete). Plan 04-02 done: Home.py wired to real KPIs + Recent Forecasts, smoke test added. Next: Plan 04-03.
+Phase 04 complete (4/4 plans complete). All three requirements delivered: HOME-01 (KPI wiring), RPT-01 (CSV export), SET-01 (Settings page). Next phase: Phase 05 — Quality Assurance & Deployment.
 
 ---
 
@@ -47,10 +47,10 @@ Phase 04 in progress (2/4 plans complete). Plan 04-02 done: Home.py wired to rea
 Phase 01 [##########] 100% (6/6 plans complete)
 Phase 02 [##########] 100% (4/4 plans complete)
 Phase 03 [##########] 100% (4/4 plans complete)
-Phase 04 [##        ] 25% (1/4 plans complete)
+Phase 04 [##########] 100% (4/4 plans complete)
 Phase 05 [          ] 0%
 
-Overall  [█████████░] 89% (16/18 plans complete) — Phase 04 in progress: P02 done
+Overall  [██████████] 100% (18/18 plans complete) — Phase 04 complete; Phase 05 next
 ```
 
 ---
@@ -82,6 +82,7 @@ Overall  [█████████░] 89% (16/18 plans complete) — Phase 0
 | Phase 03 P03 | 5 | 2 tasks | 4 files |
 | Phase 04 P01 | 9 | 5 tasks | 3 files |
 | Phase 04 P02 | 9min | 2 tasks | 2 files |
+| Phase 04 P04 | 17 | 4 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -110,6 +111,7 @@ Overall  [█████████░] 89% (16/18 plans complete) — Phase 0
 - Phase 03 Plan 03: SVG bezier path shapes used for temporal Sankey (not go.Sankey per D-01); N803/N806 suppressed for sankey_flow.py (W/H/PT/PB/sH/tH JSX-port layout vars); ASCII -> used in impact_narrative for Windows console encoding safety; stackgroup opacity via rgba alpha in fillcolor (not trace opacity); 76 passed after component added
 - Phase 04 Plan 01: seeded_conn fixture defined in test_queries.py (not conftest.py) — integration-only scope; TRY_CAST for JSON mape extraction in get_home_kpis/list_recent_forecasts — NULL on malformed rows vs raise; Dataset.created_at added as last field (backward-compatible); 94 tests pass
 - Phase 04 Plan 02: Home.py smoke test mocks get_home_kpis at core.db.queries level; importlib exec_module pattern consistent with BS-06 and CH-04; pandas import inside else-branch (no noqa needed — PLC0415 not in ruff's enabled rule set); 95 tests pass
+- Phase 04 Plan 04: Settings page Re-run seed in st.expander(Advanced) prevents accidental clicks; subprocess.run(["uv","run","python",...]) avoids shell=True; importlib+mock.patch smoke test matches BS-06/CH-04/HOME-01 convention; merged master to bring in Plans 01-03 (worktree was branched before those commits); 101 tests pass
 
 ### Quick Tasks Completed
 
@@ -133,12 +135,12 @@ None.
 
 ### Last Action
 
-2026-06-01 — Phase 04 Plan 02 complete: app/Home.py rewritten with real KPI strip (get_home_kpis()) and Recent Forecasts list (list_recent_forecasts()); register_theme()/inject_theme() added; unconditional Churn page_link; empty_state fallback; Home page smoke test added (test_home_page_imports_without_error). 95/95 tests. Commits: e1eaabd, 885d325.
+2026-06-01 — Phase 04 Plan 04 complete: app/pages/4_Settings.py created with 4-tab layout (Datasets/Preferences/Appearance/About); Re-run seed button in Advanced expander; Settings smoke test added to test_page_import.py; docs updated (task-progress.md, CLAUDE.md); master merged to bring Plans 01-03 code; 101/101 tests pass. Commits: 039b373, 8a379fb, 01a0302, 34f5e20.
 
 ### Resume Point
 
-Phase 04: Execute Plan 04-03 — next plan in phase 04.
+Phase 04 complete. Next: Phase 05 — Quality Assurance & Deployment.
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-06-01 - Completed Phase 04 Plan 02: Home.py wired to real KPIs + Recent Forecasts*
+*Last updated: 2026-06-01 - Completed Phase 04 Plan 04: Settings page + Phase 04 complete*

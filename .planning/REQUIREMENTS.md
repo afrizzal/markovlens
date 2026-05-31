@@ -130,7 +130,7 @@
 | CH-04 | Phase 03 | Pending |
 | HOME-01 | Phase 04 | Complete |
 | RPT-01 | Phase 04 | Complete |
-| SET-01 | Phase 04 | Pending |
+| SET-01 | Phase 04 | Complete |
 | QA-01 | Phase 05 | Pending |
 | QA-02 | Phase 05 | Pending |
 | QA-03 | Phase 05 | Pending |

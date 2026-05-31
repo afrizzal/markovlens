@@ -79,8 +79,8 @@
 **Plans**: 4 plans
 - [x] 04-01-PLAN.md — Query helpers: HomeKpis/RecentForecast dataclasses + get_home_kpis/list_recent_forecasts + Dataset.created_at + wave 0 tests
 - [x] 04-02-PLAN.md — Wire Home.py to real data (KPI strip + recent forecasts table)
-- [ ] 04-03-PLAN.md — CSV export embedded in Brand Share + Churn pages (RPT-01)
-- [ ] 04-04-PLAN.md — Settings page: dataset listing + re-run seed button (SET-01)
+- [x] 04-03-PLAN.md — CSV export embedded in Brand Share + Churn pages (RPT-01)
+- [x] 04-04-PLAN.md — Settings page: dataset listing + re-run seed button (SET-01)
 **UI hint**: yes
 
 ### Phase 05: Quality Assurance & Deployment
