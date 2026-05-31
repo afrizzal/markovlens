@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import numpy as np
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 # ---------------------------------------------------------------------------
 # Color constants — rgba prefixes (alpha appended by caller).
@@ -269,12 +270,14 @@ def build_whatif_chart(
     modified_dist: np.ndarray,
     state_labels: list[str],
 ) -> go.Figure:
-    """Build a stacked-area before/after chart for the what-if simulator.
+    """Build a side-by-side stacked-area comparison chart for the what-if simulator.
 
-    Renders two stacked-area groups on the same figure:
-    - ``stackgroup="baseline"`` — faint (opacity ~0.18) to show the baseline forecast.
-    - ``stackgroup="modified"`` — solid (opacity ~0.8) to show the modified scenario.
+    Renders two adjacent stacked-area panels:
+    - Left panel (``stackgroup="baseline"``) — baseline forecast distribution.
+    - Right panel (``stackgroup="modified"``) — scenario after overrides applied.
 
+    Side-by-side panels are required because single-panel overlapping stackgroups
+    make the baseline invisible under the solid modified traces (both occupy y=0..1).
     Opacity is set via the rgba alpha in ``fillcolor`` only — NOT via the
     trace-level ``opacity`` parameter (Plotly 6.x anti-pattern per RESEARCH).
 
@@ -290,15 +293,23 @@ def build_whatif_chart(
     Returns
     -------
     go.Figure
-        Plotly figure with ``stackgroup="baseline"`` and ``stackgroup="modified"``
-        Scatter traces. Ready for ``st.plotly_chart``.
+        Plotly figure with two subplots: ``stackgroup="baseline"`` (left) and
+        ``stackgroup="modified"`` (right). Ready for ``st.plotly_chart``.
     """
-    fig = go.Figure()
+    fig = make_subplots(
+        rows=1,
+        cols=2,
+        subplot_titles=("Baseline", "Scenario"),
+        shared_yaxes=True,
+        horizontal_spacing=0.04,
+    )
     periods = list(range(len(baseline_dist)))
     for i, label in enumerate(state_labels):
         key = _norm_label(label)
         faint = STATE_COLORS_FAINT.get(key, DEFAULT_FAINT)
         solid = STATE_COLORS_SOLID.get(key, DEFAULT_SOLID)
+        # Baseline panel (left) — faint fill so the distribution is visible without
+        # competing with the scenario panel for visual weight.
         fig.add_trace(
             go.Scatter(
                 x=periods,
@@ -308,8 +319,11 @@ def build_whatif_chart(
                 fillcolor=faint,
                 line={"color": "rgba(0,0,0,0)", "width": 0},
                 showlegend=False,
-            )
+            ),
+            row=1,
+            col=1,
         )
+        # Scenario panel (right) — solid fill for the modified distribution.
         fig.add_trace(
             go.Scatter(
                 x=periods,
@@ -320,19 +334,24 @@ def build_whatif_chart(
                 line={"color": "rgba(0,0,0,0)", "width": 0},
                 showlegend=True,
                 legendgroup=label,
-            )
+            ),
+            row=1,
+            col=2,
         )
+    fig.update_yaxes(tickformat=".0%", range=[0, 1.05])
+    fig.update_xaxes(title_text="Period")
     fig.update_layout(
         height=WHATIF_HEIGHT,
-        yaxis={"tickformat": ".0%", "range": [0, 1.05]},
         title="Baseline vs. scenario — state mix over horizon",
         legend={
             "orientation": "h",
             "yanchor": "bottom",
-            "y": -0.3,
+            "y": -0.35,
             "xanchor": "center",
             "x": 0.5,
         },
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
     )
     return fig
 
