@@ -131,6 +131,20 @@ None — this plan adds only data-access layer code. No UI rendering or page wir
 - `Dataset.created_at` is available for Plan 04 (Settings page) to display dataset age
 - Full test suite at 94/94 pass (previously 76/76 — added 18 net tests including prior integration suite)
 
+## Self-Check: PASSED
+
+- FOUND: core/db/queries.py
+- FOUND: tests/unit/test_home_queries.py
+- FOUND: tests/integration/test_queries.py
+- FOUND: .planning/phases/04-home-export-settings/04-01-SUMMARY.md
+- FOUND: commit 2481e9a (Task 1)
+- FOUND: commit 6ac57ef (Task 2)
+- FOUND: commit b15748d (Task 3)
+- FOUND: commit 915be67 (Task 4)
+- FOUND: commit 120b490 (Task 5)
+- FOUND: commit 03175d0 (auto-fix)
+- FOUND: commit 89e744f (metadata)
+
 ---
 *Phase: 04-home-export-settings*
 *Completed: 2026-06-01*
