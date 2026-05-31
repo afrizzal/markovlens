@@ -369,3 +369,67 @@ def get_home_kpis(conn: duckdb.DuckDBPyConnection) -> HomeKpis:
         last_forecast_at=forecast_row[0] if forecast_row and forecast_row[0] else None,
         avg_mape=float(mape_row[0]) if mape_row and mape_row[0] is not None else None,
     )
+
+
+@dataclass(frozen=True)
+class RecentForecast:
+    """Summary row for the Home Recent Forecasts list."""
+
+    forecast_id: str
+    dataset_name: str
+    domain: str
+    model_type: str
+    created_at: datetime
+    mape: float | None
+
+
+def list_recent_forecasts(
+    conn: duckdb.DuckDBPyConnection,
+    n: int = 5,
+) -> list[RecentForecast]:
+    """List the most recent n forecasts with dataset metadata.
+
+    Parameters
+    ----------
+    conn : duckdb.DuckDBPyConnection
+        Open DuckDB connection.
+    n : int
+        Maximum number of forecasts to return (default 5).
+
+    Returns
+    -------
+    list[RecentForecast]
+        Ordered by created_at descending (newest first).
+    """
+    df = conn.execute(
+        """
+        SELECT
+            f.id              AS forecast_id,
+            d.name            AS dataset_name,
+            d.domain          AS domain,
+            f.model_type      AS model_type,
+            f.created_at      AS created_at,
+            TRY_CAST(
+                json_extract_string(f.accuracy_metrics_json, '$.mape') AS DOUBLE
+            )                 AS mape
+        FROM forecasts f
+        LEFT JOIN datasets d ON f.dataset_id = d.id
+        ORDER BY f.created_at DESC
+        LIMIT ?
+        """,
+        [n],
+    ).df()
+
+    results: list[RecentForecast] = []
+    for _, row in df.iterrows():
+        results.append(
+            RecentForecast(
+                forecast_id=str(row["forecast_id"]),
+                dataset_name=str(row["dataset_name"]) if row["dataset_name"] else "Unknown",
+                domain=str(row["domain"]) if row["domain"] else "unknown",
+                model_type=str(row["model_type"]),
+                created_at=row["created_at"],
+                mape=float(row["mape"]) if row["mape"] is not None else None,
+            )
+        )
+    return results
