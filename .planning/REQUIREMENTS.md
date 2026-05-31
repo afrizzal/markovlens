@@ -40,9 +40,9 @@
 
 ### Churn
 
-- [ ] **CH-01**: `domains/churn/service.py` orchestrates Markov churn pipeline; returns `ChurnAnalysisResult` with structured NumPy arrays (no Plotly coupling in domain layer)
-- [ ] **CH-02**: Sankey state flow diagram — link width proportional to raw counts (not probabilities), colored by from-state, absorbing "Churned" node at bottom in red
-- [ ] **CH-03**: What-if state simulator — slider to edit one row of P, live forecast update showing before/after comparison; row re-normalized on adjustment
+- [x] **CH-01**: `domains/churn/service.py` orchestrates Markov churn pipeline; returns `ChurnAnalysisResult` with structured NumPy arrays (no Plotly coupling in domain layer)
+- [x] **CH-02**: Sankey state flow diagram — link width proportional to raw counts (not probabilities), colored by from-state, absorbing "Churned" node at bottom in red
+- [x] **CH-03**: What-if state simulator — slider to edit one row of P, live forecast update showing before/after comparison; row re-normalized on adjustment
 - [ ] **CH-04**: `app/pages/2_Churn.py` — full page with designed loading, empty, and error states
 
 ### Export
@@ -124,9 +124,9 @@
 | BS-04 | Phase 02 | Complete |
 | BS-05 | Phase 02 | Complete |
 | BS-06 | Phase 02 | Complete |
-| CH-01 | Phase 03 | Pending |
-| CH-02 | Phase 03 | Pending |
-| CH-03 | Phase 03 | Pending |
+| CH-01 | Phase 03 | Complete |
+| CH-02 | Phase 03 | Complete |
+| CH-03 | Phase 03 | Complete |
 | CH-04 | Phase 03 | Pending |
 | HOME-01 | Phase 04 | Complete |
 | RPT-01 | Phase 04 | Complete |
