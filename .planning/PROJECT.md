@@ -57,21 +57,40 @@ A GitHub repo that convinces a senior BA/BI recruiter that the developer can thi
 - ✓ BS-04: Model comparison — MAPE/Brier/log-loss for m1/m2/m3, `best_model` derived from measured accuracy (never hardcoded), interpretation paragraph
 - ✓ BS-06: `app/pages/1_Brand_Share.py` — 4-tab forecaster (Overview, Transition Matrix, Monte Carlo, Model Comparison), control strip, KPI strip, loading/empty/error states; `@st.cache_data` gated
 
+### Validated — Phase 03 (Churn Domain, complete 2026-05-31)
+
+**Churn Domain**
+- ✓ CH-01: `domains/churn/service.py` — NumPy-only `ChurnAnalysisResult`, full m1 absorbing-chain pipeline
+- ✓ CH-02: Temporal Sankey state-flow diagram (SVG bezier paths) with period scrubber
+- ✓ CH-03: What-if simulator — accordion sliders per from-state, live before/after stacked-area, impact narrative
+- ✓ CH-04: `app/pages/2_Churn.py` — 2-tab page (Overview + What-If), KPI strip, loading/empty/error states
+
+### Validated — Phase 04 (Home, Export & Settings, complete 2026-06-01)
+
+**Home Dashboard**
+- ✓ HOME-01: `app/Home.py` wired to real DuckDB — KPI strip reads dataset_count, sim_run_count, avg_mape from `get_home_kpis()`; Recent Forecasts via `list_recent_forecasts()` with empty-state fallback
+
+**Export**
+- ✓ RPT-01: CSV export — `st.download_button` in Brand Share + Churn pages; two-section CSV (forecast + transition matrix); 5 unit tests verify format
+
+**Settings**
+- ✓ SET-01: `app/pages/4_Settings.py` — Datasets tab with real DuckDB list (name, domain, rows, states, created_at) + Re-run seed button in Advanced expander; Preferences/Appearance/About read-only tabs
+
+**Query Layer**
+- ✓ `HomeKpis` + `get_home_kpis()` — 4 aggregate KPIs from DB (count, sims, mape, last_forecast_at)
+- ✓ `RecentForecast` + `list_recent_forecasts()` — last N forecasts with JOIN to datasets
+- ✓ `Dataset.created_at` — added to existing dataclass + list_datasets/get_dataset queries
+
 ### Active
-
-**Domain Services**
-- [ ] SVC-02: domains/churn/service.py — orchestrate churn state modelling with Sankey + what-if
-
-**UI (app/)**
-- [ ] UI-03: app/Home.py — wired dashboard with KPIs from real forecasts/simulation_runs tables
-- [ ] UI-04: app/pages/2_Churn.py — Sankey flow diagram + what-if state simulator
-- [ ] UI-05: app/pages/3_Reports.py — PDF/CSV export of forecast results
-- [ ] UI-06: app/pages/4_Settings.py — dataset management + upload interface
 
 **Quality**
 - [ ] TEST-01: Unit tests for ENG-01..ENG-10 (> 80% coverage for core/)
 - [ ] TEST-02: Integration tests for data layer + DuckDB queries
 - [ ] TEST-03: UI smoke tests — each page renders without error
+
+**Deployment**
+- [ ] DEPLOY-01: App deployed to Streamlit Cloud; cold start verified
+- [ ] DEPLOY-02: Production smoke check documented in docs/DEPLOYMENT.md
 
 ### Out of Scope
 
