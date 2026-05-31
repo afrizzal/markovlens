@@ -454,6 +454,12 @@ def main() -> None:
                     unsafe_allow_html=True,
                 )
 
+                # Spacer — prevents the chart title from overlapping the SCENARIO IMPACT card above
+                st.markdown(
+                    '<div style="height:var(--space-5,20px);"></div>',
+                    unsafe_allow_html=True,
+                )
+
                 fig_whatif = build_whatif_chart(baseline_dist, modified_dist, result.state_labels)
                 st.plotly_chart(fig_whatif, use_container_width=True)
 
