@@ -98,10 +98,10 @@ All persistent data lives in **DuckDB** (`data/markovlens.duckdb`). See [docs/DA
 
 | Page | Path | Status | Description |
 |---|---|---|---|
-| Home | `/` | Scaffold (Phase 04 will wire real KPIs) | Landing + project intro + Quick Actions (conditional page links). Full KPI wiring to real DB pending Phase 04. |
+| Home | `/` | ✅ Implemented (Phase 04) | Landing + KPI strip (dataset count, sim runs, last forecast, avg MAPE) wired to DuckDB via get_home_kpis(). Recent Forecasts list. Quick Actions page links. |
 | Brand Share | `/Brand_Share` | ✅ Implemented (Phase 02) | 4-tab forecaster: Overview (+ stationary panel) / Transition Matrix / Monte Carlo / Model Comparison. Runs m1/m2/m3 together, primary-pick drives heatmap+overview, walk-forward backtest table. |
 | Customer Churn | `/Churn` | ✅ Implemented (Phase 03) | 2-tab page: Overview (temporal Sankey state-flow + period scrubber + 4-KPI strip) / What-If Simulator (accordion sliders by from-state + live before/after stacked-area + impact narrative). m1 absorbing chain. |
-| Settings | `/Settings` | Pending (Phase 04) | Dataset listing with row/state counts + "Re-run seed" button. |
+| Settings | `/Settings` | ✅ Implemented (Phase 04) | Dataset listing (name, domain, rows, states, created_at) + Re-run seed button (Advanced expander). Read-only Preferences, Appearance (light-locked v1), About tabs. |
 
 **Note on Reports page**: v1 scope intentionally has **no separate Reports page**. CSV export is embedded as a download button inside Brand Share and Churn pages (RPT-01). PDF/notebook export is deferred to v0.2 backlog. See [docs/planning/decisions.md](docs/planning/decisions.md) `2026-05-31 — Phase 02 scope creep on app/Home.py; reaffirm no separate Reports page`.
 

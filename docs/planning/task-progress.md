@@ -2,7 +2,7 @@
 
 > Living document. Updated after every coding session.
 >
-> Last updated: 2026-05-31 (quick task knp — What-If vertical stack)
+> Last updated: 2026-06-01 (Phase 04 complete — Home KPI + CSV export + Settings page)
 >
 > **Note:** Phase numbering follows the GSD workflow (`.planning/STATE.md`). Authoritative live state is in `.planning/STATE.md` + `.planning/phases/NN-*/`.
 
@@ -97,14 +97,14 @@
 
 ---
 
-## Phase 04 — Home Dashboard + Export + Settings 🔲 Not Started
+## Phase 04 — Home Dashboard + Export + Settings ✅ Complete
 
-| Task | Status | Notes |
-|---|---|---|
-| Home KPI wiring — real DB counts (models, forecasts, accuracy) | 🟡 Pending | app/Home.py (currently scaffold) |
-| CSV export — download button inside Brand Share + Churn pages | 🟡 Pending | RPT-01 |
-| Settings page (`4_Settings.py`) — dataset listing + "Re-run seed" button | 🟡 Pending | |
-| Phase plan via `/gsd:plan-phase 04` | 🟡 Pending | |
+| Task | Status | Commit | Notes |
+|---|---|---|---|
+| Phase plan via `/gsd:plan-phase 04` | ✅ Done | — | Phase 04 |
+| Home KPI wiring — real DB counts (models, forecasts, accuracy) | ✅ Done | e1eaabd | app/Home.py — Phase 04 Plan 02 |
+| CSV export — download button inside Brand Share + Churn pages | ✅ Done | — | RPT-01 — Phase 04 Plan 03 |
+| Settings page (`4_Settings.py`) — dataset listing + "Re-run seed" button | ✅ Done | 039b373 | SET-01 — Phase 04 Plan 04 |
 
 ---
 
