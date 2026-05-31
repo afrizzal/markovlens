@@ -296,12 +296,14 @@ def build_whatif_chart(
         Plotly figure with two subplots: ``stackgroup="baseline"`` (left) and
         ``stackgroup="modified"`` (right). Ready for ``st.plotly_chart``.
     """
+    # shared_yaxes=False: independent axes per panel so stackgroups don't bleed
+    # across subplots (shared_yaxes=True causes Plotly to merge the stacks).
     fig = make_subplots(
         rows=1,
         cols=2,
         subplot_titles=("Baseline", "Scenario"),
-        shared_yaxes=True,
-        horizontal_spacing=0.04,
+        shared_yaxes=False,
+        horizontal_spacing=0.06,
     )
     periods = list(range(len(baseline_dist)))
     for i, label in enumerate(state_labels):
@@ -338,8 +340,10 @@ def build_whatif_chart(
             row=1,
             col=2,
         )
-    fig.update_yaxes(tickformat=".0%", range=[0, 1.05])
+    fig.update_yaxes(tickformat=".0%", range=[0, 1.05])   # applies to both panels
     fig.update_xaxes(title_text="Period")
+    # Ensure right panel y-axis is NOT hidden (shared_yaxes=False leaves it visible by default)
+    fig.update_yaxes(showticklabels=True, row=1, col=2)
     fig.update_layout(
         height=WHATIF_HEIGHT,
         title="Baseline vs. scenario — state mix over horizon",
