@@ -107,6 +107,12 @@ Overall  [██████████] 100% (14/14 plans complete) — Phase 
 - Phase 03 Plan 02: ABSORBING_THRESHOLD=0.95 for near-absorbing state detection (real Churned state P[i,i]~0.98, not 1.0 exactly); state_distribution_over_time uses iterative Y_t @ P loop (not M1 forecast); n_customers = df["entity_id"].nunique(); simulate_scenario returns np.ndarray not full ChurnAnalysisResult; 72 passed, 1 skipped after service rewrite
 - Phase 03 Plan 03: SVG bezier path shapes used for temporal Sankey (not go.Sankey per D-01); N803/N806 suppressed for sankey_flow.py (W/H/PT/PB/sH/tH JSX-port layout vars); ASCII -> used in impact_narrative for Windows console encoding safety; stackgroup opacity via rgba alpha in fillcolor (not trace opacity); 76 passed after component added
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260531-ikw | Fix 4 visual issues from Phase 03 UI review | 2026-05-31 | e04277e | [260531-ikw-fix-4-visual-issues-from-phase-03-ui-rev](.planning/quick/260531-ikw-fix-4-visual-issues-from-phase-03-ui-rev/) |
+
 ### Active Blockers
 
 None.
@@ -129,4 +135,4 @@ Phase 04: Home dashboard KPIs + CSV export + Settings page.
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-05-31 after Phase 03 Plan 04 completion — Churn page (CH-04) + _apply_overrides root-cause fix*
+*Last updated: 2026-05-31 - Completed quick task 260531-ikw: Fix 4 visual issues from Phase 03 UI review*
