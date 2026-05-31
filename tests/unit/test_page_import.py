@@ -31,6 +31,7 @@ import numpy as np
 # ---------------------------------------------------------------------------
 
 PAGE_PATH = str(Path(__file__).parent.parent.parent / "app" / "pages" / "1_Brand_Share.py")
+CHURN_PAGE_PATH = str(Path(__file__).parent.parent.parent / "app" / "pages" / "2_Churn.py")
 
 
 def _load_page_module_importlib():
@@ -149,3 +150,59 @@ def test_overview_figure_has_separator():
         f"shapes count={len(fig.layout.shapes)}, "
         f"annotations count={len(fig.layout.annotations or [])}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Churn page (2_Churn.py) smoke test — CH-04
+# ---------------------------------------------------------------------------
+
+def _load_churn_page_module_importlib():
+    """Load app/pages/2_Churn.py as a Python module via importlib.
+
+    The filename starts with a digit so standard import syntax cannot reference it.
+    Patches DB connection and churn service.list_datasets to return empty list,
+    which triggers the st.stop() path — a clean exit from the module.
+
+    Returns
+    -------
+    types.ModuleType
+        The loaded page module, or raises on failure.
+    """
+    mock_conn = MagicMock()
+    mock_datasets: list = []
+
+    patches = [
+        patch("core.db.connection.get_connection", return_value=mock_conn),
+        patch("domains.churn.service.list_datasets", return_value=mock_datasets),
+    ]
+
+    for p in patches:
+        p.start()
+
+    try:
+        spec = importlib.util.spec_from_file_location("churn_page", CHURN_PAGE_PATH)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Could not load spec for {CHURN_PAGE_PATH}")
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules.pop("churn_page", None)
+        sys.modules["churn_page"] = mod
+        with contextlib.suppress(SystemExit):
+            # st.stop() raises SystemExit in test context — acceptable
+            spec.loader.exec_module(mod)  # type: ignore[union-attr]
+    finally:
+        for p in patches:
+            p.stop()
+
+    return mod
+
+
+def test_churn_page_imports_without_error():
+    """CH-04: Churn page module can be loaded without an ImportError or syntax error.
+
+    Mirrors the brand-share importlib smoke-test (BS-06). Verifies that all imports
+    resolve and the module structure (main, _cached_analysis) is intact.
+    Uses importlib fallback with mock.patch to avoid a real DuckDB connection.
+    """
+    mod = _load_churn_page_module_importlib()
+    assert hasattr(mod, "main"), "Missing main() in churn page module"
+    assert hasattr(mod, "_cached_analysis"), "Missing _cached_analysis in churn page module"

@@ -13,7 +13,6 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 # third-party
 import numpy as np  # noqa: E402
-import plotly.graph_objects as go  # noqa: E402
 import streamlit as st  # noqa: E402
 
 # ── Page Config (first Streamlit call — must precede all other st.* calls) ─
@@ -321,7 +320,7 @@ def main() -> None:
             left, right = st.columns([0.5, 0.5], gap="large")
 
             # LEFT — accordion sliders (Pattern 5, D-03)
-            baseline_P = result.transition_matrix
+            baseline_P = result.transition_matrix  # noqa: N806 (Chan 2015 math notation)
             overrides: dict[tuple[int, int], float] = {}
             any_changed = False
 
@@ -337,7 +336,8 @@ def main() -> None:
                     with st.expander(f"From {from_label}", expanded=(i == 0)):
                         for j, to_label in enumerate(result.state_labels):
                             baseline_val = float(baseline_P[i, j])
-                            key = f"{PAGE_NS}.what_if.{i}_{j}"  # namespaced (Pitfall 3)
+                            # Key pattern: churn.what_if.{i}_{j} (namespaced, Pitfall 3)
+                            key = f"{PAGE_NS}.what_if.{i}_{j}"
                             # Initialize session state to baseline on first run
                             # Do NOT pass value= when key is already set (Pitfall 3)
                             if key not in st.session_state:
@@ -354,12 +354,11 @@ def main() -> None:
                                 overrides[(i, j)] = current
                                 any_changed = True
 
-                if any_changed:
-                    if st.button("Reset all", key=f"{PAGE_NS}.reset"):
-                        for i_r in range(len(result.state_labels)):
-                            for j_r in range(len(result.state_labels)):
-                                st.session_state.pop(f"{PAGE_NS}.what_if.{i_r}_{j_r}", None)
-                        st.rerun()
+                if any_changed and st.button("Reset all", key=f"{PAGE_NS}.reset"):
+                    for i_r in range(len(result.state_labels)):
+                        for j_r in range(len(result.state_labels)):
+                            st.session_state.pop(f"{PAGE_NS}.what_if.{i_r}_{j_r}", None)
+                    st.rerun()
 
             # RIGHT — live impact card + before/after chart (D-04)
             with right:
