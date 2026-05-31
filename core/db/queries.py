@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import uuid
 from dataclasses import dataclass
+from datetime import datetime
 
 import duckdb
 import numpy as np
@@ -25,6 +26,7 @@ class Dataset:
     source_path: str
     row_count: int
     n_states: int
+    created_at: datetime | None
 
 
 def register_dataset(
@@ -94,12 +96,12 @@ def list_datasets(
     """
     if domain is None:
         df = conn.execute(
-            "SELECT id, domain, name, source_path, row_count, n_states "
+            "SELECT id, domain, name, source_path, row_count, n_states, created_at "
             "FROM datasets ORDER BY created_at DESC"
         ).df()
     else:
         df = conn.execute(
-            "SELECT id, domain, name, source_path, row_count, n_states "
+            "SELECT id, domain, name, source_path, row_count, n_states, created_at "
             "FROM datasets WHERE domain = ? ORDER BY created_at DESC",
             [domain],
         ).df()
@@ -112,6 +114,7 @@ def list_datasets(
             source_path=row["source_path"],
             row_count=int(row["row_count"] or 0),
             n_states=int(row["n_states"] or 0),
+            created_at=row["created_at"] if row["created_at"] is not None else None,
         )
         for _, row in df.iterrows()
     ]
@@ -138,7 +141,7 @@ def get_dataset(conn: duckdb.DuckDBPyConnection, dataset_id: str) -> Dataset:
         If no dataset with the given id exists.
     """
     df = conn.execute(
-        "SELECT id, domain, name, source_path, row_count, n_states FROM datasets WHERE id = ?",
+        "SELECT id, domain, name, source_path, row_count, n_states, created_at FROM datasets WHERE id = ?",
         [dataset_id],
     ).df()
     if df.empty:
@@ -154,6 +157,7 @@ def get_dataset(conn: duckdb.DuckDBPyConnection, dataset_id: str) -> Dataset:
         source_path=row["source_path"],
         row_count=int(row["row_count"] or 0),
         n_states=int(row["n_states"] or 0),
+        created_at=row["created_at"] if row["created_at"] is not None else None,
     )
 
 
