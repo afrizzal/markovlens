@@ -29,7 +29,8 @@ from app.components.kpi_card import kpi_card  # noqa: E402
 from app.components.sankey_flow import (  # noqa: E402
     build_sankey_figure,
     build_whatif_chart,
-    impact_narrative,
+    impact_summary,
+    state_legend_html,
 )
 from app.styles import inject_theme, register_theme  # noqa: E402
 from core.db.connection import get_connection  # noqa: E402
@@ -232,21 +233,21 @@ def main() -> None:
                 "AVG CUSTOMER LIFETIME",
                 lt_display,
                 unit="periods",
-                accent="var(--chart-1)",
+                accent="var(--chart-4)",
             )
         with kpi_cols[2]:
             kpi_card(
                 "EXPECTED CHURN (next period)",
                 f"{k['expected_churn']:.0f}",
                 unit="cust",
-                accent="var(--state-atrisk)",
+                accent="var(--state-churned)",
             )
         with kpi_cols[3]:
             rar = k["revenue_at_risk"]
             kpi_card(
                 "REVENUE AT RISK",
                 f"Rp {rar / 1_000_000:.1f}M",
-                accent="var(--state-churned)",
+                accent="var(--state-atrisk)",
                 tooltip=REVENUE_TOOLTIP,
             )
     else:
@@ -283,6 +284,8 @@ def main() -> None:
                 result.state_labels,
                 n_cols=SANKEY_N_COLS,
             )
+            # 5-item color legend above the Sankey (Issue 4 — pages3.jsx:32)
+            st.markdown(state_legend_html(result.state_labels), unsafe_allow_html=True)
             st.plotly_chart(fig_sankey, use_container_width=True)
 
             # Time scrubber (D-02)
@@ -372,7 +375,7 @@ def main() -> None:
                 else:
                     modified_dist = baseline_dist
 
-                narrative = impact_narrative(
+                summary = impact_summary(
                     overrides,
                     baseline_P,
                     baseline_dist,
@@ -382,11 +385,11 @@ def main() -> None:
                 )
 
                 st.markdown(
-                    '<div class="card accent-card" style="--accent:var(--state-active);'
-                    'padding:var(--space-5);">'
-                    '<div class="t-label">SCENARIO IMPACT</div>'
-                    f'<div class="t-sm" style="margin-top:var(--space-2);">{narrative}</div>'
-                    "</div>",
+                    f'<div class="card accent-card" style="--accent:{summary.accent_token};'
+                    f'padding:var(--space-5);">'
+                    f'<div class="t-label">SCENARIO IMPACT</div>'
+                    f'<div style="margin-top:var(--space-2);">{summary.html}</div>'
+                    f"</div>",
                     unsafe_allow_html=True,
                 )
 
