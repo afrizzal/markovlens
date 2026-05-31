@@ -206,3 +206,72 @@ def test_churn_page_imports_without_error():
     mod = _load_churn_page_module_importlib()
     assert hasattr(mod, "main"), "Missing main() in churn page module"
     assert hasattr(mod, "_cached_analysis"), "Missing _cached_analysis in churn page module"
+
+
+# ---------------------------------------------------------------------------
+# Home page (app/Home.py) smoke test — HOME-01
+# ---------------------------------------------------------------------------
+
+HOME_PAGE_PATH = str(Path(__file__).parent.parent.parent / "app" / "Home.py")
+
+
+def _load_home_page_module_importlib():
+    """Load app/Home.py as a Python module via importlib.
+
+    Home.py runs all UI code at module level (no main() wrapper).
+    Patches DB connection and query helpers to avoid needing a real DuckDB file.
+
+    Returns
+    -------
+    types.ModuleType
+        The loaded Home page module, or raises on failure.
+    """
+    from core.db.queries import HomeKpis
+
+    mock_conn = MagicMock()
+    mock_kpis = HomeKpis(
+        dataset_count=2,
+        sim_run_count=5,
+        last_forecast_at=None,
+        avg_mape=None,
+    )
+    mock_recent: list = []
+
+    patches = [
+        patch("core.db.connection.get_connection", return_value=mock_conn),
+        patch("core.db.queries.get_home_kpis", return_value=mock_kpis),
+        patch("core.db.queries.list_recent_forecasts", return_value=mock_recent),
+    ]
+
+    for p in patches:
+        p.start()
+
+    try:
+        spec = importlib.util.spec_from_file_location("home_page", HOME_PAGE_PATH)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Could not load spec for {HOME_PAGE_PATH}")
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules.pop("home_page", None)
+        sys.modules["home_page"] = mod
+        with contextlib.suppress(SystemExit):
+            # st.stop() raises SystemExit in test context — acceptable
+            spec.loader.exec_module(mod)  # type: ignore[union-attr]
+    finally:
+        for p in patches:
+            p.stop()
+
+    return mod
+
+
+def test_home_page_imports_without_error():
+    """HOME-01: Home page module can be loaded without an ImportError or syntax error.
+
+    Verifies that all imports resolve (including get_home_kpis, list_recent_forecasts,
+    register_theme, inject_theme, kpi_card, empty_state) and the wired KPI strip +
+    Recent Forecasts code paths execute without crashing.
+    Uses importlib fallback with mock.patch to avoid a real DuckDB connection.
+    """
+    mod = _load_home_page_module_importlib()
+    # Home.py has module-level constants — verify they are present after load
+    assert hasattr(mod, "DOMAIN_ICON"), "Missing DOMAIN_ICON constant in Home page module"
+    assert hasattr(mod, "_get_db"), "Missing _get_db() in Home page module"
