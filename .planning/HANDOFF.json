@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-31T02:11:57.057Z",
+  "phase": "03",
+  "phase_name": "churn-domain",
+  "phase_dir": ".planning/phases/03-churn-domain",
+  "plan": 4,
+  "task": 3,
+  "total_tasks": 4,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": "03-01", "name": "Test scaffold + ruff config", "status": "done", "commit": "e484e78"},
+    {"id": "03-02", "name": "Churn service.py rewrite", "status": "done", "commit": "74eced0"},
+    {"id": "03-03", "name": "Sankey component + what-if chart", "status": "done", "commit": "5332b38"},
+    {"id": "03-04-T1", "name": "Churn page skeleton + Overview tab", "status": "done", "commit": "655c22b"},
+    {"id": "03-04-T2", "name": "What-If tab + smoke test", "status": "done", "commit": "1efb8e9"},
+    {"id": "03-04-bugfix1", "name": "Fix overlapping stackgroups in whatif chart", "status": "done", "commit": "1e76686"},
+    {"id": "03-04-bugfix2", "name": "Fix shared_yaxes=True cross-panel stacking", "status": "done", "commit": "a7e5ebb"}
+  ],
+  "remaining_tasks": [
+    {"id": "03-04-T3", "name": "Human-verify Churn page in browser", "status": "awaiting_human"},
+    {"id": "03-04-T4", "name": "Update CLAUDE.md App Pages + README.md roadmap", "status": "not_started"}
+  ],
+  "blockers": [
+    {
+      "description": "Human checkpoint: user must verify What-If chart in browser before Task 4 runs",
+      "type": "human_action",
+      "workaround": "If shared_yaxes=False still doesn't fix visual, add key=f'{PAGE_NS}.whatif_chart.{hash(frozenset(overrides.items()))%10000}' to st.plotly_chart to force fresh component mount"
+    }
+  ],
+  "human_actions_pending": [
+    {
+      "action": "Open Churn page in browser, run analysis, move slider to 0.50, confirm RIGHT panel shows smaller green + larger red vs LEFT panel",
+      "context": "Verifying the shared_yaxes=False fix in build_whatif_chart. Baseline period-12: active=44%, churned=52%. Scenario: active=28%, churned=68%. Difference should be clearly visible.",
+      "blocking": true
+    }
+  ],
+  "decisions": [
+    {"decision": "make_subplots(shared_yaxes=False) for build_whatif_chart", "rationale": "shared_yaxes=True caused Plotly to merge stackgroup stacking across panels", "phase": "03"},
+    {"decision": "Diagnostic confirmed math correct — simulate_scenario returns different data", "rationale": "period-12 diff: active -0.164, churned +0.158", "phase": "03"},
+    {"decision": "impact_narrative uses ASCII -> not unicode arrow", "rationale": "Windows console encoding safety", "phase": "03"}
+  ],
+  "uncommitted_files": [
+    ".planning/REQUIREMENTS.md",
+    "CLAUDE.md",
+    "CONTRIBUTING.md",
+    "README.md"
+  ],
+  "next_action": "Present re-verify checkpoint to user for the shared_yaxes=False fix. If approved, run Task 4 (CLAUDE.md + README.md doc updates), then spawn gsd-verifier, then phase-complete.",
+  "context_notes": "77/77 tests pass. The math pipeline is confirmed correct (narrative works). Two sequential chart rendering bugs were fixed. The uncommitted files (.planning/REQUIREMENTS.md, CLAUDE.md, CONTRIBUTING.md, README.md) are normal GSD executor artifact updates — NOT Task 4 doc changes (Task 4 hasn't run yet). Do not confuse these with the Task 4 deliverables."
+}
