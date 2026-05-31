@@ -206,3 +206,67 @@ def test_churn_page_imports_without_error():
     mod = _load_churn_page_module_importlib()
     assert hasattr(mod, "main"), "Missing main() in churn page module"
     assert hasattr(mod, "_cached_analysis"), "Missing _cached_analysis in churn page module"
+
+
+# ---------------------------------------------------------------------------
+# Settings page (app/pages/4_Settings.py) smoke test — SET-01
+# ---------------------------------------------------------------------------
+
+SETTINGS_PAGE_PATH = str(
+    Path(__file__).parent.parent.parent / "app" / "pages" / "4_Settings.py"
+)
+
+
+def _load_settings_page_module_importlib():
+    """Load app/pages/4_Settings.py as a Python module via importlib.
+
+    The filename starts with a digit so standard import syntax cannot reference it.
+    Patches DB connection and list_datasets to return an empty list, which exercises
+    the empty_state path without needing a real DuckDB file.
+
+    Returns
+    -------
+    types.ModuleType
+        The loaded Settings page module, or raises on failure.
+    """
+    mock_conn = MagicMock()
+    mock_datasets: list = []
+
+    patches = [
+        patch("core.db.connection.get_connection", return_value=mock_conn),
+        patch("core.db.queries.list_datasets", return_value=mock_datasets),
+    ]
+
+    for p in patches:
+        p.start()
+
+    try:
+        spec = importlib.util.spec_from_file_location("settings_page", SETTINGS_PAGE_PATH)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Could not load spec for {SETTINGS_PAGE_PATH}")
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules.pop("settings_page", None)
+        sys.modules["settings_page"] = mod
+        with contextlib.suppress(SystemExit):
+            # st.stop() raises SystemExit in test context — acceptable
+            spec.loader.exec_module(mod)  # type: ignore[union-attr]
+    finally:
+        for p in patches:
+            p.stop()
+
+    return mod
+
+
+def test_settings_page_imports_without_error():
+    """SET-01: Settings page module can be loaded without an ImportError or syntax error.
+
+    Mirrors the brand-share and churn importlib smoke-tests. Verifies that all imports
+    resolve (list_datasets, empty_state, register_theme, inject_theme, core.config.settings)
+    and the 4-tab layout code executes without crashing.
+    Uses importlib fallback with mock.patch to avoid a real DuckDB connection.
+    """
+    mod = _load_settings_page_module_importlib()
+    # Settings page has module-level constants — verify they are present after load
+    assert hasattr(mod, "PAGE_NS"), "Missing PAGE_NS constant in Settings page module"
+    assert hasattr(mod, "APP_VERSION"), "Missing APP_VERSION constant in Settings page module"
+    assert hasattr(mod, "_get_db"), "Missing _get_db() in Settings page module"
