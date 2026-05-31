@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 04
-status: ready
-last_updated: "2026-05-31T13:00:00.000Z"
+status: unknown
+last_updated: "2026-05-31T19:41:17.632Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 18
+  completed_plans: 16
 ---
 
 # GSD State
@@ -30,14 +30,14 @@ See: .planning/PROJECT.md (updated 2026-05-29)
 | 01 | Markov Engine | Complete |
 | 02 | Design System + Brand Share | Complete (4/4 plans complete) |
 | 03 | Churn Domain | Complete (4/4 plans complete) |
-| 04 | Home, Export & Settings | Not Started |
+| 04 | Home, Export & Settings | In Progress (2/4 plans complete) |
 | 05 | Quality Assurance & Deployment | Not Started |
 
 ---
 
 ## Current Focus
 
-Phase 03 complete (4/4 plans). Next: Phase 04 — Home dashboard KPIs + CSV export + Settings page.
+Phase 04 in progress (2/4 plans complete). Plan 04-02 done: Home.py wired to real KPIs + Recent Forecasts, smoke test added. Next: Plan 04-03.
 
 ---
 
@@ -47,10 +47,10 @@ Phase 03 complete (4/4 plans). Next: Phase 04 — Home dashboard KPIs + CSV expo
 Phase 01 [##########] 100% (6/6 plans complete)
 Phase 02 [##########] 100% (4/4 plans complete)
 Phase 03 [##########] 100% (4/4 plans complete)
-Phase 04 [          ] 0%
+Phase 04 [##        ] 25% (1/4 plans complete)
 Phase 05 [          ] 0%
 
-Overall  [██████████] 100% (14/14 plans complete) — Phase 03 complete: CH-01..CH-04
+Overall  [█████████░] 89% (16/18 plans complete) — Phase 04 in progress: P02 done
 ```
 
 ---
@@ -80,6 +80,8 @@ Overall  [██████████] 100% (14/14 plans complete) — Phase 
 | Phase 03 P01 | 18min | 3 tasks | 3 files |
 | Phase 03 P02 | 18 | 2 tasks | 1 files |
 | Phase 03 P03 | 5 | 2 tasks | 4 files |
+| Phase 04 P01 | 9 | 5 tasks | 3 files |
+| Phase 04 P02 | 9min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -106,6 +108,8 @@ Overall  [██████████] 100% (14/14 plans complete) — Phase 
 - Phase 03 Plan 01: Wave 0 guard uses importorskip + hasattr + inspect.signature checks — old churn stub imports fine, signature conn-param check is the reliable discriminator; seeded_churn_conn yields conn only (not tuple); 61 passed, 12 skipped after scaffold added
 - Phase 03 Plan 02: ABSORBING_THRESHOLD=0.95 for near-absorbing state detection (real Churned state P[i,i]~0.98, not 1.0 exactly); state_distribution_over_time uses iterative Y_t @ P loop (not M1 forecast); n_customers = df["entity_id"].nunique(); simulate_scenario returns np.ndarray not full ChurnAnalysisResult; 72 passed, 1 skipped after service rewrite
 - Phase 03 Plan 03: SVG bezier path shapes used for temporal Sankey (not go.Sankey per D-01); N803/N806 suppressed for sankey_flow.py (W/H/PT/PB/sH/tH JSX-port layout vars); ASCII -> used in impact_narrative for Windows console encoding safety; stackgroup opacity via rgba alpha in fillcolor (not trace opacity); 76 passed after component added
+- Phase 04 Plan 01: seeded_conn fixture defined in test_queries.py (not conftest.py) — integration-only scope; TRY_CAST for JSON mape extraction in get_home_kpis/list_recent_forecasts — NULL on malformed rows vs raise; Dataset.created_at added as last field (backward-compatible); 94 tests pass
+- Phase 04 Plan 02: Home.py smoke test mocks get_home_kpis at core.db.queries level; importlib exec_module pattern consistent with BS-06 and CH-04; pandas import inside else-branch (no noqa needed — PLC0415 not in ruff's enabled rule set); 95 tests pass
 
 ### Quick Tasks Completed
 
@@ -129,12 +133,12 @@ None.
 
 ### Last Action
 
-2026-05-31 — Quick task 260531-knp: Churn What-If layout polish. `build_whatif_chart` now uses `make_subplots(rows=2, cols=1, shared_xaxes=True)` (was 1x2 side-by-side); `WHATIF_HEIGHT` 360→640; 20px spacer added between SCENARIO IMPACT card and chart in `app/pages/2_Churn.py`. Commits 8f81ce7, 1d26846. 86/86 pass. Awaiting human visual verification.
+2026-06-01 — Phase 04 Plan 02 complete: app/Home.py rewritten with real KPI strip (get_home_kpis()) and Recent Forecasts list (list_recent_forecasts()); register_theme()/inject_theme() added; unconditional Churn page_link; empty_state fallback; Home page smoke test added (test_home_page_imports_without_error). 95/95 tests. Commits: e1eaabd, 885d325.
 
 ### Resume Point
 
-Phase 04: Home dashboard KPIs + CSV export + Settings page.
+Phase 04: Execute Plan 04-03 — next plan in phase 04.
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-05-31 - Completed quick task 260531-knp: Churn What-If vertical stacking + spacer fix*
+*Last updated: 2026-06-01 - Completed Phase 04 Plan 02: Home.py wired to real KPIs + Recent Forecasts*

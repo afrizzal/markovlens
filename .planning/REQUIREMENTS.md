@@ -40,22 +40,22 @@
 
 ### Churn
 
-- [ ] **CH-01**: `domains/churn/service.py` orchestrates Markov churn pipeline; returns `ChurnAnalysisResult` with structured NumPy arrays (no Plotly coupling in domain layer)
-- [ ] **CH-02**: Sankey state flow diagram — link width proportional to raw counts (not probabilities), colored by from-state, absorbing "Churned" node at bottom in red
-- [ ] **CH-03**: What-if state simulator — slider to edit one row of P, live forecast update showing before/after comparison; row re-normalized on adjustment
+- [x] **CH-01**: `domains/churn/service.py` orchestrates Markov churn pipeline; returns `ChurnAnalysisResult` with structured NumPy arrays (no Plotly coupling in domain layer)
+- [x] **CH-02**: Sankey state flow diagram — link width proportional to raw counts (not probabilities), colored by from-state, absorbing "Churned" node at bottom in red
+- [x] **CH-03**: What-if state simulator — slider to edit one row of P, live forecast update showing before/after comparison; row re-normalized on adjustment
 - [ ] **CH-04**: `app/pages/2_Churn.py` — full page with designed loading, empty, and error states
 
 ### Export
 
-- [ ] **RPT-01**: CSV export — download forecast results and transition matrix for current session via `st.download_button`
+- [x] **RPT-01**: CSV export — download forecast results and transition matrix for current session via `st.download_button`
 
 ### Home Dashboard
 
-- [ ] **HOME-01**: `app/Home.py` wired to real data — KPI strip showing dataset count, last forecast timestamp, total simulation runs, overall model accuracy (MAPE) from `forecasts` table
+- [x] **HOME-01**: `app/Home.py` wired to real data — KPI strip showing dataset count, last forecast timestamp, total simulation runs, overall model accuracy (MAPE) from `forecasts` table
 
 ### Settings
 
-- [ ] **SET-01**: `app/pages/4_Settings.py` — list registered datasets with row count, state count, domain, and last-seeded timestamp; allow re-running seed script
+- [x] **SET-01**: `app/pages/4_Settings.py` — list registered datasets with row count, state count, domain, and last-seeded timestamp; allow re-running seed script
 
 ### Deployment
 
@@ -124,12 +124,12 @@
 | BS-04 | Phase 02 | Complete |
 | BS-05 | Phase 02 | Complete |
 | BS-06 | Phase 02 | Complete |
-| CH-01 | Phase 03 | Pending |
-| CH-02 | Phase 03 | Pending |
-| CH-03 | Phase 03 | Pending |
+| CH-01 | Phase 03 | Complete |
+| CH-02 | Phase 03 | Complete |
+| CH-03 | Phase 03 | Complete |
 | CH-04 | Phase 03 | Pending |
-| HOME-01 | Phase 04 | Pending |
-| RPT-01 | Phase 04 | Pending |
+| HOME-01 | Phase 04 | Complete |
+| RPT-01 | Phase 04 | Complete |
 | SET-01 | Phase 04 | Pending |
 | QA-01 | Phase 05 | Pending |
 | QA-02 | Phase 05 | Pending |
