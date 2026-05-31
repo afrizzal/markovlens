@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import uuid
 from dataclasses import dataclass
+from datetime import datetime
 
 import duckdb
 import numpy as np
@@ -25,6 +26,7 @@ class Dataset:
     source_path: str
     row_count: int
     n_states: int
+    created_at: datetime | None
 
 
 def register_dataset(
@@ -94,12 +96,12 @@ def list_datasets(
     """
     if domain is None:
         df = conn.execute(
-            "SELECT id, domain, name, source_path, row_count, n_states "
+            "SELECT id, domain, name, source_path, row_count, n_states, created_at "
             "FROM datasets ORDER BY created_at DESC"
         ).df()
     else:
         df = conn.execute(
-            "SELECT id, domain, name, source_path, row_count, n_states "
+            "SELECT id, domain, name, source_path, row_count, n_states, created_at "
             "FROM datasets WHERE domain = ? ORDER BY created_at DESC",
             [domain],
         ).df()
@@ -112,6 +114,7 @@ def list_datasets(
             source_path=row["source_path"],
             row_count=int(row["row_count"] or 0),
             n_states=int(row["n_states"] or 0),
+            created_at=row["created_at"] if row["created_at"] is not None else None,
         )
         for _, row in df.iterrows()
     ]
@@ -138,7 +141,7 @@ def get_dataset(conn: duckdb.DuckDBPyConnection, dataset_id: str) -> Dataset:
         If no dataset with the given id exists.
     """
     df = conn.execute(
-        "SELECT id, domain, name, source_path, row_count, n_states FROM datasets WHERE id = ?",
+        "SELECT id, domain, name, source_path, row_count, n_states, created_at FROM datasets WHERE id = ?",
         [dataset_id],
     ).df()
     if df.empty:
@@ -154,6 +157,7 @@ def get_dataset(conn: duckdb.DuckDBPyConnection, dataset_id: str) -> Dataset:
         source_path=row["source_path"],
         row_count=int(row["row_count"] or 0),
         n_states=int(row["n_states"] or 0),
+        created_at=row["created_at"] if row["created_at"] is not None else None,
     )
 
 
@@ -312,3 +316,120 @@ def build_transition_matrix(
 
     validate_transition_matrix(matrix, transition_counts=counts)
     return matrix, counts
+
+
+@dataclass(frozen=True)
+class HomeKpis:
+    """Aggregate KPIs for the Home dashboard."""
+
+    dataset_count: int
+    sim_run_count: int
+    last_forecast_at: datetime | None
+    avg_mape: float | None
+
+
+def get_home_kpis(conn: duckdb.DuckDBPyConnection) -> HomeKpis:
+    """Fetch aggregate KPIs for the Home dashboard.
+
+    Parameters
+    ----------
+    conn : duckdb.DuckDBPyConnection
+        Open DuckDB connection.
+
+    Returns
+    -------
+    HomeKpis
+        dataset_count, sim_run_count, last_forecast_at, avg_mape.
+        last_forecast_at and avg_mape are None if forecasts table is empty.
+    """
+    counts = conn.execute(
+        "SELECT COUNT(*) AS n_datasets FROM datasets"
+    ).fetchone()
+    sim_counts = conn.execute(
+        "SELECT COUNT(*) AS n_sims FROM simulation_runs"
+    ).fetchone()
+    forecast_row = conn.execute(
+        "SELECT MAX(created_at) AS last_at FROM forecasts"
+    ).fetchone()
+
+    # avg_mape: parse JSON field — only include rows where mape key exists
+    mape_row = conn.execute(
+        """
+        SELECT AVG(TRY_CAST(
+            json_extract_string(accuracy_metrics_json, '$.mape') AS DOUBLE
+        )) AS avg_mape
+        FROM forecasts
+        WHERE accuracy_metrics_json IS NOT NULL
+        """
+    ).fetchone()
+
+    return HomeKpis(
+        dataset_count=int(counts[0] if counts else 0),
+        sim_run_count=int(sim_counts[0] if sim_counts else 0),
+        last_forecast_at=forecast_row[0] if forecast_row and forecast_row[0] else None,
+        avg_mape=float(mape_row[0]) if mape_row and mape_row[0] is not None else None,
+    )
+
+
+@dataclass(frozen=True)
+class RecentForecast:
+    """Summary row for the Home Recent Forecasts list."""
+
+    forecast_id: str
+    dataset_name: str
+    domain: str
+    model_type: str
+    created_at: datetime
+    mape: float | None
+
+
+def list_recent_forecasts(
+    conn: duckdb.DuckDBPyConnection,
+    n: int = 5,
+) -> list[RecentForecast]:
+    """List the most recent n forecasts with dataset metadata.
+
+    Parameters
+    ----------
+    conn : duckdb.DuckDBPyConnection
+        Open DuckDB connection.
+    n : int
+        Maximum number of forecasts to return (default 5).
+
+    Returns
+    -------
+    list[RecentForecast]
+        Ordered by created_at descending (newest first).
+    """
+    df = conn.execute(
+        """
+        SELECT
+            f.id              AS forecast_id,
+            d.name            AS dataset_name,
+            d.domain          AS domain,
+            f.model_type      AS model_type,
+            f.created_at      AS created_at,
+            TRY_CAST(
+                json_extract_string(f.accuracy_metrics_json, '$.mape') AS DOUBLE
+            )                 AS mape
+        FROM forecasts f
+        LEFT JOIN datasets d ON f.dataset_id = d.id
+        ORDER BY f.created_at DESC
+        LIMIT ?
+        """,
+        [n],
+    ).df()
+
+    results: list[RecentForecast] = []
+    for _, row in df.iterrows():
+        results.append(
+            RecentForecast(
+                forecast_id=str(row["forecast_id"]),
+                dataset_name=str(row["dataset_name"]) if row["dataset_name"] else "Unknown",
+                domain=str(row["domain"]) if row["domain"] else "unknown",
+                model_type=str(row["model_type"]),
+                created_at=row["created_at"],
+                mape=float(row["mape"]) if row["mape"] is not None else None,
+            )
+        )
+    return results

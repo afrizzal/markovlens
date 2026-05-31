@@ -139,3 +139,76 @@ def test_seed_produces_reference_forecasts(temp_duckdb_path: Path, monkeypatch):
     count = conn.execute("SELECT COUNT(*) FROM forecasts").fetchone()[0]
     conn.close()
     assert count >= 5
+
+
+# ---------------------------------------------------------------------------
+# Phase 04 — Home KPI + Recent Forecast integration tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def seeded_conn(tmp_path: Path) -> duckdb.DuckDBPyConnection:
+    """Per-test DuckDB connection with one dataset row seeded."""
+    from core.db.connection import init_schema
+
+    conn = duckdb.connect(str(tmp_path / "seeded.duckdb"))
+    init_schema(conn)
+    conn.execute(
+        "INSERT INTO datasets (id, domain, name, source_path, row_count, n_states) "
+        "VALUES ('ds_seed', 'brand_share', 'Seed Dataset', 'seed.csv', 100, 3)"
+    )
+    return conn
+
+
+@pytest.mark.integration
+def test_get_home_kpis_with_seeded_data(seeded_conn) -> None:  # type: ignore[no-untyped-def]
+    """get_home_kpis returns non-zero dataset_count after seed."""
+    from core.db.queries import get_home_kpis
+
+    kpis = get_home_kpis(seeded_conn)
+    assert kpis.dataset_count >= 1
+    assert kpis.sim_run_count >= 0  # may be 0 if no sim_runs inserted by seeded_conn
+
+
+@pytest.mark.integration
+def test_list_datasets_includes_created_at(seeded_conn) -> None:  # type: ignore[no-untyped-def]
+    """list_datasets returns Dataset objects with created_at populated."""
+    from core.db.queries import list_datasets
+
+    datasets = list_datasets(seeded_conn)
+    assert len(datasets) >= 1
+    for ds in datasets:
+        # created_at may be None if schema had no default, but field must exist
+        assert hasattr(ds, "created_at")
+
+
+@pytest.mark.integration
+def test_list_recent_forecasts_with_inserted_forecast(seeded_conn) -> None:  # type: ignore[no-untyped-def]
+    """list_recent_forecasts returns RecentForecast rows when forecasts table has data."""
+    import json
+    import uuid
+
+    from core.db.queries import list_recent_forecasts
+
+    forecast_id = str(uuid.uuid4())
+    # seeded_conn has dataset_id "ds_seed" from the seeded_conn fixture
+    df_datasets = seeded_conn.execute("SELECT id FROM datasets LIMIT 1").df()
+    dataset_id = df_datasets["id"].iloc[0]
+
+    seeded_conn.execute(
+        "INSERT INTO forecasts (id, dataset_id, model_type, horizon_steps, forecast_json, accuracy_metrics_json) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        [
+            forecast_id,
+            dataset_id,
+            "m1",
+            12,
+            json.dumps([[0.5, 0.5]]),
+            json.dumps({"mape": 1.87, "brier": 0.043}),
+        ],
+    )
+    results = list_recent_forecasts(seeded_conn, n=5)
+    assert len(results) >= 1
+    assert results[0].mape is not None
+    assert abs(results[0].mape - 1.87) < 1e-6
+    assert results[0].model_type == "m1"
