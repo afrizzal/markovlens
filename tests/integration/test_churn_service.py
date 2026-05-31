@@ -224,6 +224,34 @@ def test_simulate_scenario_rows_renormalized(seeded_churn_conn) -> None:
 
 
 @pytest.mark.integration
+def test_baseline_forecast_shape_matches_horizon_and_states(seeded_churn_conn) -> None:
+    """Scrubber range fix: baseline_forecast.shape must be (horizon+1, n_states).
+
+    Regression guard: snapshot datasets (1 historical period) have
+    state_distribution_over_time.shape[0] == 2, which collapsed the scrubber to 0-1.
+    The page now uses baseline_forecast.shape[0] == horizon+1 == 13 for horizon=12.
+    """
+    pytest.importorskip("domains.churn.service")
+    from domains.churn import service
+
+    if not hasattr(service, "run_analysis"):
+        pytest.skip("run_analysis not yet implemented (Plan 02)")
+
+    import inspect
+    if "conn" not in inspect.signature(service.run_analysis).parameters:
+        pytest.skip("run_analysis has old stub signature (Plan 02)")
+
+    horizon = 12
+    result = service.run_analysis(seeded_churn_conn, "ds_churn_test", horizon=horizon)
+    n_states = len(result.state_labels)
+
+    assert result.baseline_forecast.shape == (horizon + 1, n_states), (
+        f"Expected baseline_forecast.shape == ({horizon + 1}, {n_states}), "
+        f"got {result.baseline_forecast.shape}"
+    )
+
+
+@pytest.mark.integration
 def test_list_datasets_churn_domain(seeded_churn_conn) -> None:
     """CH-01: list_datasets returns at least the seeded churn dataset."""
     pytest.importorskip("domains.churn.service")

@@ -4,6 +4,7 @@ Renders a styled KPI card with an accent top-bar, label, large value, optional
 delta indicator, and optional sparkline SVG.  Matches the ``KPICard`` component
 contract from ``docs/design-reference/js/ui.jsx`` (line 99-122).
 """
+
 from __future__ import annotations
 
 import streamlit as st
@@ -90,14 +91,18 @@ def kpi_card(
     """
     is_empty = value == "---" or value == "—"
 
+    # Icon in top-right corner (faded, accent-colored; matches prototype lines 25-28)
+    corner_icon_html = ""
+    if icon is not None:
+        corner_icon_html = (
+            f'<div style="position:absolute;top:var(--space-3,12px);right:var(--space-3,12px);'
+            f'opacity:0.35;color:{accent};line-height:0;">{icon}</div>'
+        )
+
     # Label row
-    icon_html = f'<span style="margin-right:var(--space-1);">{icon}</span>' if icon else ""
     tooltip_attr = f' title="{tooltip}"' if tooltip else ""
     label_html = (
-        f'<div class="t-label" '
-        f'style="display:flex;align-items:center;gap:var(--space-1);"{tooltip_attr}>'
-        f"{icon_html}{label}"
-        f"</div>"
+        f'<div class="t-label" style="display:flex;align-items:center;"{tooltip_attr}>{label}</div>'
     )
 
     # Value row
@@ -127,7 +132,7 @@ def kpi_card(
             color = "var(--color-danger)"
         delta_html = (
             f'<div class="mono" style="font-size:var(--fs-12);font-weight:600;'
-            f"color:{color};margin-top:var(--space-1);\">"
+            f'color:{color};margin-top:var(--space-1);">'
             f"{arrow} {abs(delta):.1f}{delta_suffix}"
             f"</div>"
         )
@@ -141,7 +146,9 @@ def kpi_card(
     card_html = (
         f'<div class="card accent-card card-pad" '
         f'style="--accent:{accent};padding:var(--space-5);'
-        f'display:flex;flex-direction:column;gap:var(--space-3);">'
+        f"display:flex;flex-direction:column;gap:var(--space-3);"
+        f'position:relative;">'
+        f"{corner_icon_html}"
         f"{label_html}"
         f"{value_html}"
         f"{delta_html}"

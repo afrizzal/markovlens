@@ -1,4 +1,5 @@
 """Customer Churn page for MarkovLens."""
+
 from __future__ import annotations
 
 # stdlib
@@ -45,6 +46,25 @@ inject_theme()
 # Module constants — no magic numbers
 # ---------------------------------------------------------------------------
 PAGE_NS: str = "churn"
+# Lucide SVG icon strings — passed to kpi_card icon= kwarg (prototype lines 25-28)
+_SVG_OPEN = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+_ICON_USERS: str = (
+    f'{_SVG_OPEN}<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>'
+    f'<circle cx="9" cy="7" r="4"/>'
+    f'<path d="M22 21v-2a4 4 0 0 0-3-3.87"/>'
+    f'<path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+)
+_ICON_CLOCK: str = (
+    f'{_SVG_OPEN}<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+)
+_ICON_TRENDING_UP: str = (
+    f'{_SVG_OPEN}<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>'
+    f'<polyline points="16 7 22 7 22 13"/></svg>'
+)
+_ICON_DOLLAR: str = (
+    f'{_SVG_OPEN}<line x1="12" y1="1" x2="12" y2="23"/>'
+    f'<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>'
+)
 DEFAULT_HORIZON: int = 12
 HORIZON_MIN: int = 1
 HORIZON_MAX: int = 24
@@ -63,6 +83,7 @@ STATE_BAR_COLORS: dict[str, str] = {
 # ---------------------------------------------------------------------------
 # Cached infrastructure
 # ---------------------------------------------------------------------------
+
 
 @st.cache_resource
 def _get_db():
@@ -83,6 +104,7 @@ def _cached_scenario(dataset_id: str, horizon: int, overrides_frozen: frozenset)
 # ---------------------------------------------------------------------------
 # Private helpers
 # ---------------------------------------------------------------------------
+
 
 def _norm_label(label: str) -> str:
     """Normalize state label to a bar-color dict key."""
@@ -112,10 +134,20 @@ def _stacked_bar_html(distribution: np.ndarray, state_labels: list[str]) -> str:
         norm = _norm_label(label)
         color = STATE_BAR_COLORS.get(norm, "#A1A1AA")
         title = f"{label}: {share * 100:.1f}%"
+        # Inline % label for segments > 8% (prototype pages3.jsx:41)
+        label_txt = (
+            (
+                f'<span style="font-size:11px;color:#fff;font-weight:600;'
+                f'font-family:var(--font-mono,monospace);">{share * 100:.0f}%</span>'
+            )
+            if share > 0.08
+            else ""
+        )
         segments.append(
             f'<div style="flex:{share:.6f};height:28px;background:{color};'
             f'overflow:hidden;display:grid;place-items:center;" title="{title}">'
-            f'</div>'
+            f"{label_txt}"
+            f"</div>"
         )
     inner = "".join(segments)
     return (
@@ -128,6 +160,7 @@ def _stacked_bar_html(distribution: np.ndarray, state_labels: list[str]) -> str:
 # ---------------------------------------------------------------------------
 # Main render function
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     """Render the Customer Churn page."""
@@ -219,12 +252,33 @@ def main() -> None:
 
     if result is not None:
         k = result.kpis
+        # Compute forecast-trend deltas from baseline_forecast (mid-horizon → end)
+        _bf = result.baseline_forecast
+        _sl = result.state_labels
+        _ai = next((idx for idx, s in enumerate(_sl) if s.lower() == "active"), 0)
+        _ci = next((idx for idx, s in enumerate(_sl) if s.lower() == "churned"), -1)
+        _h = _bf.shape[0] - 1
+        _mid = max(1, _h // 2)
+        _init_a = float(_bf[0, _ai])
+        _mid_a = float(_bf[_mid, _ai])
+        _end_a = float(_bf[_h, _ai])
+        # Retention delta (pp): active share trend from mid to end, normalised to initial
+        _ret_delta: float | None = (
+            round((_end_a - _mid_a) / _init_a * 100, 1) if _init_a > 1e-12 else None
+        )
+        # Expected churn delta: negated so positive = fewer churning = green arrow (improvement)
+        _p_ch = float(result.transition_matrix[_ai, _ci]) if _ci >= 0 else 0.0
+        _churn_delta: float = round((_mid_a - _end_a) * result.n_customers * _p_ch)
+
         with kpi_cols[0]:
             kpi_card(
                 "RETENTION RATE",
                 f"{k['retention_rate'] * 100:.1f}",
                 unit="%",
                 accent="var(--state-active)",
+                delta=_ret_delta,
+                delta_suffix="pp",
+                icon=_ICON_USERS,
             )
         with kpi_cols[1]:
             lt = k["avg_lifetime"]
@@ -234,6 +288,7 @@ def main() -> None:
                 lt_display,
                 unit="periods",
                 accent="var(--chart-4)",
+                icon=_ICON_CLOCK,
             )
         with kpi_cols[2]:
             kpi_card(
@@ -241,6 +296,9 @@ def main() -> None:
                 f"{k['expected_churn']:.0f}",
                 unit="cust",
                 accent="var(--state-churned)",
+                delta=_churn_delta,
+                delta_suffix=" cust",
+                icon=_ICON_TRENDING_UP,
             )
         with kpi_cols[3]:
             rar = k["revenue_at_risk"]
@@ -249,6 +307,7 @@ def main() -> None:
                 f"Rp {rar / 1_000_000:.1f}M",
                 accent="var(--state-atrisk)",
                 tooltip=REVENUE_TOOLTIP,
+                icon=_ICON_DOLLAR,
             )
     else:
         for col in kpi_cols:
@@ -277,9 +336,10 @@ def main() -> None:
                 unsafe_allow_html=True,
             )
 
-            # Build and render the temporal Sankey
+            # Build and render the temporal Sankey — use baseline_forecast so snapshot
+            # datasets (1 historical period) still show a full n_cols forecast horizon
             fig_sankey = build_sankey_figure(
-                result.state_distribution_over_time,
+                result.baseline_forecast,
                 result.transition_matrix,
                 result.state_labels,
                 n_cols=SANKEY_N_COLS,
@@ -288,26 +348,27 @@ def main() -> None:
             st.markdown(state_legend_html(result.state_labels), unsafe_allow_html=True)
             st.plotly_chart(fig_sankey, use_container_width=True)
 
-            # Time scrubber (D-02)
-            n_cols_actual = min(SANKEY_N_COLS, result.state_distribution_over_time.shape[0])
+            # Time scrubber (D-02) — range from baseline_forecast (horizon+1 rows)
+            n_cols_actual = min(SANKEY_N_COLS, result.baseline_forecast.shape[0])
             period = st.slider(
                 "Period",
                 0,
                 n_cols_actual - 1,
                 n_cols_actual - 1,
+                format="P%d",
                 key=f"{PAGE_NS}.scrub_period",
             )
 
             # Distribution label row
             st.markdown(
                 f'<div class="t-xs t-ter mono" style="margin-bottom:4px;">'
-                f"Distribution at period {period} — drag to scrub"
+                f"Distribution at P{period} — drag to scrub"
                 f"</div>",
                 unsafe_allow_html=True,
             )
 
             # Stacked distribution bar — inline HTML flex (Pitfall 6: NOT a Plotly chart)
-            dist_at_period = result.state_distribution_over_time[period]
+            dist_at_period = result.baseline_forecast[period]
             bar_html = _stacked_bar_html(dist_at_period, result.state_labels)
             st.markdown(bar_html, unsafe_allow_html=True)
 
@@ -339,20 +400,20 @@ def main() -> None:
                     with st.expander(f"From {from_label}", expanded=(i == 0)):
                         for j, to_label in enumerate(result.state_labels):
                             baseline_val = float(baseline_P[i, j])
-                            # Key pattern: churn.what_if.{i}_{j} (namespaced, Pitfall 3)
+                            baseline_pct = round(baseline_val * 100)
                             key = f"{PAGE_NS}.what_if.{i}_{j}"
-                            # Initialize session state to baseline on first run
-                            # Do NOT pass value= when key is already set (Pitfall 3)
+                            # Initialize as percentage (0-100); display-only change (Pitfall 3)
                             if key not in st.session_state:
-                                st.session_state[key] = baseline_val
-                            current = st.slider(
-                                f"-> {to_label}  (baseline {baseline_val:.2f})",
+                                st.session_state[key] = float(baseline_pct)
+                            current_pct = st.slider(
+                                f"-> {to_label}  (baseline {baseline_pct}%)",
                                 0.0,
-                                1.0,
-                                step=0.01,
-                                format="%.2f",
+                                100.0,
+                                step=1.0,
+                                format="%.0f%%",
                                 key=key,
                             )
+                            current = current_pct / 100.0  # convert to 0-1 for matrix
                             if abs(current - baseline_val) > 1e-6:
                                 overrides[(i, j)] = current
                                 any_changed = True
