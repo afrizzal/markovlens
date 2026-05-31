@@ -2,8 +2,11 @@
 from __future__ import annotations
 
 # stdlib
+import csv
+import io
 import random
 import sys
+from datetime import datetime
 from pathlib import Path
 
 # Ensure project root is on sys.path so `from app.X`, `from core.X`, `from domains.X` resolve.
@@ -68,6 +71,34 @@ _MODEL_REASON: dict[str, str] = {
     "m2": "A time-varying model captures shifting brand-switching rates that a constant-matrix m1 cannot.",
     "m3": "The extended model with growth multiplier better captures changes in total market size alongside shifting switching rates.",
 }
+
+
+# ---------------------------------------------------------------------------
+# CSV export helper (RPT-01)
+# ---------------------------------------------------------------------------
+
+def _brand_share_csv_bytes(result: service.BrandShareForecastResult) -> bytes:
+    """Serialize forecast result to CSV bytes (two sections: Forecast + Transition Matrix)."""
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    labels = result.state_labels
+
+    # Forecast section — use best_model forecast
+    forecast = result.forecasts.get(result.best_model) or result.forecasts["m1"]
+
+    w.writerow(["# Forecast", f"model={result.best_model}"])
+    w.writerow(["period", *labels])
+    for period, row in enumerate(forecast):
+        w.writerow([period, *[f"{v:.6f}" for v in row]])
+
+    # Transition Matrix section
+    w.writerow([])
+    w.writerow(["# Transition Matrix"])
+    w.writerow(["from_state", *labels])
+    for i, label in enumerate(labels):
+        w.writerow([label, *[f"{v:.6f}" for v in result.transition_matrix[i]]])
+
+    return buf.getvalue().encode("utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -388,6 +419,19 @@ def main() -> None:
         for col in kpi_cols:
             with col:
                 kpi_card("--", "--")
+
+    # CSV export download button (RPT-01)
+    if st.session_state.get(f"{PAGE_NS}.result") is not None:
+        _result_for_export = st.session_state[f"{PAGE_NS}.result"]
+        _ts = datetime.now().strftime("%Y%m%d_%H%M")
+        st.download_button(
+            label="Download forecast CSV",
+            data=_brand_share_csv_bytes(_result_for_export),
+            file_name=f"markovlens_brand_share_forecast_{_ts}.csv",
+            mime="text/csv",
+            key="brand_share_download_csv",
+            help="Download transition matrix and forecast as CSV",
+        )
 
     # -- Tabs -----------------------------------------------------------------
     tab_overview, tab_matrix, tab_mc, tab_compare = st.tabs(

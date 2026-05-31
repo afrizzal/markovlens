@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 # stdlib
+import csv
+import io
 import sys
+from datetime import datetime
 from pathlib import Path
 
 # Ensure project root is on sys.path so `from app.X`, `from core.X`, `from domains.X` resolve.
@@ -78,6 +81,33 @@ STATE_BAR_COLORS: dict[str, str] = {
     "reactivated": "#0891B2",
     "churned": "#DC2626",
 }
+
+
+# ---------------------------------------------------------------------------
+# CSV export helper (RPT-01)
+# ---------------------------------------------------------------------------
+
+
+def _churn_csv_bytes(result: service.ChurnAnalysisResult) -> bytes:
+    """Serialize churn analysis result to CSV bytes (two sections: Forecast + Transition Matrix)."""
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    labels = result.state_labels
+
+    # Baseline forecast section
+    w.writerow(["# Baseline Forecast", "model=m1"])
+    w.writerow(["period", *labels])
+    for period, row in enumerate(result.baseline_forecast):
+        w.writerow([period, *[f"{v:.6f}" for v in row]])
+
+    # Transition Matrix section
+    w.writerow([])
+    w.writerow(["# Transition Matrix"])
+    w.writerow(["from_state", *labels])
+    for i, label in enumerate(labels):
+        w.writerow([label, *[f"{v:.6f}" for v in result.transition_matrix[i]]])
+
+    return buf.getvalue().encode("utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -313,6 +343,19 @@ def main() -> None:
         for col in kpi_cols:
             with col:
                 kpi_card("--", "--")
+
+    # CSV export download button (RPT-01)
+    if st.session_state.get(f"{PAGE_NS}.result") is not None:
+        _result_for_export = st.session_state[f"{PAGE_NS}.result"]
+        _ts = datetime.now().strftime("%Y%m%d_%H%M")
+        st.download_button(
+            label="Download churn CSV",
+            data=_churn_csv_bytes(_result_for_export),
+            file_name=f"markovlens_churn_forecast_{_ts}.csv",
+            mime="text/csv",
+            key="churn_download_csv",
+            help="Download transition matrix and baseline forecast as CSV",
+        )
 
     # -- Tabs (D-06 — EXACTLY 2 tabs) ----------------------------------------
     tab_overview, tab_whatif = st.tabs(["Overview", "What-If Simulator"])
