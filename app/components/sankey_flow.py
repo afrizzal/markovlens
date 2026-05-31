@@ -53,7 +53,7 @@ STATE_COLORS_SOLID: dict[str, str] = {
 STATE_COLORS_FAINT: dict[str, str] = {k: v.replace("0.8)", "0.18)") for k, v in STATE_COLORS_SOLID.items()}
 DEFAULT_SOLID: str = "rgba(100,100,100,0.8)"
 DEFAULT_FAINT: str = "rgba(100,100,100,0.18)"
-WHATIF_HEIGHT: int = 360
+WHATIF_HEIGHT: int = 640   # ~300px per panel + title + bottom legend (was 360 for side-by-side)
 
 # ---------------------------------------------------------------------------
 # Solid hex color map — mirrors CSS --state-* tokens for legend swatches.
@@ -310,14 +310,17 @@ def build_whatif_chart(
     modified_dist: np.ndarray,
     state_labels: list[str],
 ) -> go.Figure:
-    """Build a side-by-side stacked-area comparison chart for the what-if simulator.
+    """Build a vertically stacked stacked-area comparison chart for the what-if simulator.
 
-    Renders two adjacent stacked-area panels:
-    - Left panel (``stackgroup="baseline"``) — baseline forecast distribution.
-    - Right panel (``stackgroup="modified"``) — scenario after overrides applied.
+    Renders two stacked-area panels arranged VERTICALLY (Baseline on top, Scenario below):
+    - Top panel (``stackgroup="baseline"``) — baseline forecast distribution.
+    - Bottom panel (``stackgroup="modified"``) — scenario after overrides applied.
 
-    Side-by-side panels are required because single-panel overlapping stackgroups
+    Stacked-vertical panels are required because single-panel overlapping stackgroups
     make the baseline invisible under the solid modified traces (both occupy y=0..1).
+    At ~50% column width the previous side-by-side layout (rows=1, cols=2) made axis
+    labels and the legend too cramped — vertical stacking gives each panel the full
+    column width.
     Opacity is set via the rgba alpha in ``fillcolor`` only — NOT via the
     trace-level ``opacity`` parameter (Plotly 6.x anti-pattern per RESEARCH).
 
@@ -333,24 +336,22 @@ def build_whatif_chart(
     Returns
     -------
     go.Figure
-        Plotly figure with two subplots: ``stackgroup="baseline"`` (left) and
-        ``stackgroup="modified"`` (right). Ready for ``st.plotly_chart``.
+        Plotly figure with two subplots: ``stackgroup="baseline"`` (top) and
+        ``stackgroup="modified"`` (bottom). Ready for ``st.plotly_chart``.
     """
-    # shared_yaxes=False: independent axes per panel so stackgroups don't bleed
-    # across subplots (shared_yaxes=True causes Plotly to merge the stacks).
     fig = make_subplots(
-        rows=1,
-        cols=2,
+        rows=2,
+        cols=1,
         subplot_titles=("Baseline", "Scenario"),
-        shared_yaxes=False,
-        horizontal_spacing=0.06,
+        shared_xaxes=True,
+        vertical_spacing=0.12,
     )
     periods = list(range(len(baseline_dist)))
     for i, label in enumerate(state_labels):
         key = _norm_label(label)
         faint = STATE_COLORS_FAINT.get(key, DEFAULT_FAINT)
         solid = STATE_COLORS_SOLID.get(key, DEFAULT_SOLID)
-        # Baseline panel (left) — faint fill so the distribution is visible without
+        # Baseline panel (top) — faint fill so the distribution is visible without
         # competing with the scenario panel for visual weight.
         fig.add_trace(
             go.Scatter(
@@ -365,7 +366,7 @@ def build_whatif_chart(
             row=1,
             col=1,
         )
-        # Scenario panel (right) — solid fill for the modified distribution.
+        # Scenario panel (bottom) — solid fill for the modified distribution.
         fig.add_trace(
             go.Scatter(
                 x=periods,
@@ -377,20 +378,19 @@ def build_whatif_chart(
                 showlegend=True,
                 legendgroup=label,
             ),
-            row=1,
-            col=2,
+            row=2,
+            col=1,
         )
-    fig.update_yaxes(tickformat=".0%", range=[0, 1.05])   # applies to both panels
-    fig.update_xaxes(title_text="Period")
-    # Ensure right panel y-axis is NOT hidden (shared_yaxes=False leaves it visible by default)
-    fig.update_yaxes(showticklabels=True, row=1, col=2)
+    fig.update_yaxes(tickformat=".0%", range=[0, 1.05])  # applies to both rows
+    # With shared_xaxes=True the Period title belongs only on the bottom panel
+    fig.update_xaxes(title_text="Period", row=2, col=1)
     fig.update_layout(
         height=WHATIF_HEIGHT,
         title="Baseline vs. scenario — state mix over horizon",
         legend={
             "orientation": "h",
             "yanchor": "bottom",
-            "y": -0.35,
+            "y": -0.18,
             "xanchor": "center",
             "x": 0.5,
         },
