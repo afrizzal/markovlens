@@ -139,3 +139,103 @@ def test_m3_forecast_replicates_chan_2015(sample_4x4_chan_matrix):
     expected_t2 = np.array([0.5799, 0.2847, 0.0603, 0.0751])
     shares_t2 = result.forecast_array[0] / result.forecast_array[0].sum()
     np.testing.assert_allclose(shares_t2, expected_t2, atol=1e-2)
+
+
+# ── Targeted branch-coverage tests (Phase 05, D-02) ─────────────────────────────────────────────
+
+
+def test_validate_rejects_non_2d():
+    from core.exceptions import InvalidTransitionMatrixError
+    from core.models import validate_transition_matrix
+
+    with pytest.raises(InvalidTransitionMatrixError):
+        validate_transition_matrix(np.array([0.5, 0.5]))  # 1-D → L53
+
+
+def test_validate_rejects_nan():
+    from core.exceptions import InvalidTransitionMatrixError
+    from core.models import validate_transition_matrix
+
+    P = np.array([[np.nan, 0.5], [0.5, 0.5]], dtype=np.float64)
+    with pytest.raises(InvalidTransitionMatrixError):
+        validate_transition_matrix(P)  # non-finite → L60
+
+
+def test_compute_stationary_returns_normalized(sample_4x4_chan_matrix):
+    from core.models import compute_stationary
+
+    P = sample_4x4_chan_matrix.astype(np.float64)
+    stat = compute_stationary(P)
+    assert stat is not None
+    assert stat.shape == (4,)
+    np.testing.assert_allclose(stat.sum(), 1.0, atol=1e-6)
+    assert (stat >= 0).all()
+
+
+def test_compute_stationary_trivial_one_state():
+    from core.models import compute_stationary
+
+    stat = compute_stationary(np.array([[1.0]], dtype=np.float64))
+    assert stat is not None
+    np.testing.assert_allclose(stat, np.array([1.0]), atol=1e-9)
+
+
+def test_m2_rejects_non_3d():
+    from core.models import M2TimeVarying
+
+    with pytest.raises(ValueError, match="must be 3D"):
+        M2TimeVarying(np.zeros((2, 2), dtype=np.float64))  # L186
+
+
+def test_m2_rejects_non_square_inner():
+    from core.models import M2TimeVarying
+
+    with pytest.raises(ValueError, match="must be square"):
+        M2TimeVarying(np.zeros((1, 2, 3), dtype=np.float64))  # L191
+
+
+def test_m3_rejects_non_3d():
+    from core.models import M3Extended
+
+    with pytest.raises(ValueError, match="must be 3D"):
+        M3Extended(np.zeros((2, 2), dtype=np.float64), np.ones(2))  # L228
+
+
+def test_m3_rejects_non_square_inner():
+    from core.models import M3Extended
+
+    with pytest.raises(ValueError, match="must be square"):
+        M3Extended(np.zeros((1, 2, 3), dtype=np.float64), np.ones(2))  # L233
+
+
+def test_m3_rejects_bad_g_ndim():
+    from core.models import M3Extended
+
+    P_t = np.array([[[0.7, 0.3], [0.4, 0.6]]], dtype=np.float64)  # (1,2,2) valid
+    with pytest.raises(ValueError, match="G must be 1D"):
+        M3Extended(P_t, np.ones((1, 1, 2)))  # G ndim 3 → L238
+
+
+def test_m3_rejects_g_wrong_last_dim():
+    from core.models import M3Extended
+
+    P_t = np.array([[[0.7, 0.3], [0.4, 0.6]]], dtype=np.float64)  # n_states=2
+    with pytest.raises(ValueError, match="G last dim"):
+        M3Extended(P_t, np.ones(3))  # G last-dim 3 != 2 → L242
+
+
+def test_m3_forecast_2d_g_holds_last():
+    from core.models import M3Extended
+
+    P_t = np.array(
+        [
+            [[0.7, 0.3], [0.4, 0.6]],
+            [[0.6, 0.4], [0.5, 0.5]],
+        ],
+        dtype=np.float64,
+    )  # n_periods=2, n_states=2
+    G = np.array([[1.0, 1.0], [1.01, 0.99]], dtype=np.float64)  # 2-D G (2,2)
+    model = M3Extended(P_t, G)
+    result = model.forecast(np.array([0.6, 0.4]), horizon=4)  # 4 > 2 → else G[-1]
+    assert result.forecast_array.shape == (4, 2)
+    assert result.model_type == "m3"

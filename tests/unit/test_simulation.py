@@ -134,3 +134,92 @@ def test_walk_forward_no_leakage():
     assert isinstance(results, list)
     assert len(results) > 0
     assert all("period" in r for r in results)
+
+
+# ── Targeted branch-coverage tests (Phase 05, D-02) ─────────────────────────────────────────────
+
+
+def test_quantile_bands_rejects_1d_extractor():
+    from core.simulation import compute_quantile_bands
+
+    paths = np.zeros((100, 13), dtype=np.int64)
+    with pytest.raises(ValueError, match="must return a 2-D"):
+        compute_quantile_bands(paths, target_extractor=lambda p: p[:, -1])  # 1-D → L165
+
+
+def test_counts_from_empty_df_returns_zeros():
+    import pandas as pd
+
+    from core.simulation import _counts_from_long_df
+
+    df = pd.DataFrame(columns=["from_state", "to_state", "weight"])
+    state_idx = {"A": 0, "B": 1}
+    counts = _counts_from_long_df(df, state_idx, n_states=2)
+    assert counts.shape == (2, 2)
+    assert (counts == 0).all()
+
+
+def test_state_distribution_from_empty_df_returns_zeros():
+    import pandas as pd
+
+    from core.simulation import _state_distribution_from_long_df
+
+    df = pd.DataFrame(columns=["to_state", "weight"])
+    state_idx = {"A": 0, "B": 1}
+    vec = _state_distribution_from_long_df(df, state_idx, n_states=2, state_col="to_state")
+    assert vec.shape == (2,)
+    assert (vec == 0).all()
+
+
+def test_walk_forward_assigns_default_weight():
+    import pandas as pd
+
+    from core.simulation import walk_forward_backtest
+
+    df = pd.DataFrame(
+        {
+            "period": list(range(1, 13)),
+            "from_state": ["A"] * 6 + ["B"] * 6,
+            "to_state": ["A"] * 5 + ["B"] * 7,
+        }
+    )  # NO weight column
+    results = walk_forward_backtest(df, window=3)
+    assert isinstance(results, list)
+    assert len(results) > 0
+
+
+def test_walk_forward_too_few_periods_returns_empty():
+    import pandas as pd
+
+    from core.simulation import walk_forward_backtest
+
+    df = pd.DataFrame(
+        {
+            "period": [1, 1, 2, 2],
+            "from_state": ["A", "B", "A", "B"],
+            "to_state": ["A", "B", "A", "B"],
+            "weight": [1.0, 1.0, 1.0, 1.0],
+        }
+    )  # only 2 unique periods, window=3 → []
+    assert walk_forward_backtest(df, window=3) == []
+
+
+def test_walk_forward_mape_exception_sets_none():
+    from unittest.mock import patch
+
+    import pandas as pd
+
+    from core.simulation import walk_forward_backtest
+
+    df = pd.DataFrame(
+        {
+            "period": list(range(1, 13)),
+            "from_state": ["A"] * 6 + ["B"] * 6,
+            "to_state": ["A"] * 5 + ["B"] * 7,
+            "weight": [1.0] * 12,
+        }
+    )
+    with patch("core.metrics.mape", side_effect=ValueError("boom")):
+        results = walk_forward_backtest(df, window=3)
+    assert len(results) > 0
+    assert all(r["mape"] is None for r in results)
