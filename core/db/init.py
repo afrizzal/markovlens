@@ -26,14 +26,15 @@ def ensure_seeded(conn: duckdb.DuckDBPyConnection) -> None:
     conn : duckdb.DuckDBPyConnection
         Open connection with schema already applied (init_schema run).
     """
-    count = conn.execute("SELECT COUNT(*) FROM forecasts").fetchone()[0]
+    row = conn.execute("SELECT COUNT(*) FROM forecasts").fetchone()
+    count = row[0] if row is not None else 0
     if count > 0:
         return  # already seeded — fast path (D-04)
 
     log.info("forecasts table empty — running cold-start seed pipeline")
-    import numpy as np  # noqa: PLC0415 — deferred import to keep core/db/init.py import-light
+    import numpy as np  # deferred: keeps core/db/init.py import-light on warm reruns
 
-    from scripts.seed_data import RNG_SEED, _seed_brand_share, _seed_churn  # noqa: PLC0415
+    from scripts.seed_data import RNG_SEED, _seed_brand_share, _seed_churn  # deferred: see above
 
     rng = np.random.default_rng(RNG_SEED)
     _seed_brand_share(conn, rng)
