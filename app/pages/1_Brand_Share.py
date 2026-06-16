@@ -91,7 +91,9 @@ def _brand_share_csv_bytes(result: service.BrandShareForecastResult) -> bytes:
     labels = result.state_labels
 
     # Forecast section — use best_model forecast
-    forecast = result.forecasts.get(result.best_model) or result.forecasts["m1"]
+    forecast = result.forecasts.get(result.best_model)
+    if forecast is None:
+        forecast = result.forecasts["m1"]
 
     w.writerow(["# Forecast", f"model={result.best_model}"])
     w.writerow(["period", *labels])
