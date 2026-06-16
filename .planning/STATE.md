@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 05
 status: unknown
-last_updated: "2026-05-31T20:26:35.862Z"
+last_updated: "2026-06-16T03:09:45.586Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 18
-  completed_plans: 18
+  completed_plans: 19
 ---
 
 # GSD State
@@ -83,6 +83,7 @@ Overall  [██████████] 100% (18/18 plans complete) — Phase 
 | Phase 04 P01 | 9 | 5 tasks | 3 files |
 | Phase 04 P02 | 9min | 2 tasks | 2 files |
 | Phase 04 P04 | 17 | 4 tasks | 4 files |
+| Phase 05 P02 | 14 | 4 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,7 @@ Overall  [██████████] 100% (18/18 plans complete) — Phase 
 - Phase 04 Plan 01: seeded_conn fixture defined in test_queries.py (not conftest.py) — integration-only scope; TRY_CAST for JSON mape extraction in get_home_kpis/list_recent_forecasts — NULL on malformed rows vs raise; Dataset.created_at added as last field (backward-compatible); 94 tests pass
 - Phase 04 Plan 02: Home.py smoke test mocks get_home_kpis at core.db.queries level; importlib exec_module pattern consistent with BS-06 and CH-04; pandas import inside else-branch (no noqa needed — PLC0415 not in ruff's enabled rule set); 95 tests pass
 - Phase 04 Plan 04: Settings page Re-run seed in st.expander(Advanced) prevents accidental clicks; subprocess.run(["uv","run","python",...]) avoids shell=True; importlib+mock.patch smoke test matches BS-06/CH-04/HOME-01 convention; merged master to bring in Plans 01-03 (worktree was branched before those commits); 101 tests pass
+- Phase 05 Plan 02: forecasts table COUNT sentinel for cold-start seeding (ensure_seeded fast-path on warm rerun); app/db.py get_db() consolidates 5 per-page _get_db functions into one shared cached accessor with env-aware seed failure guard (D-08); noqa BLE001/PLC0415 removed (rules not in ruff select list); fetchone None-guard added to core/db/init.py and scripts/seed_data.py (mypy compliance); 103 tests pass
 
 ### Quick Tasks Completed
 
@@ -135,12 +137,12 @@ None.
 
 ### Last Action
 
-2026-06-01 — Phase 04 Plan 04 complete: app/pages/4_Settings.py created with 4-tab layout (Datasets/Preferences/Appearance/About); Re-run seed button in Advanced expander; Settings smoke test added to test_page_import.py; docs updated (task-progress.md, CLAUDE.md); master merged to bring Plans 01-03 code; 101/101 tests pass. Commits: 039b373, 8a379fb, 01a0302, 34f5e20.
+2026-06-16 — Phase 05 Plan 02 complete (parallel agent): core/db/init.py ensure_seeded() cold-start sentinel, app/db.py shared get_db() with env-aware guard, all 5 pages wired, page smoke tests updated, D-15 confirmed, 103/103 tests pass. Commits: e1f3951, 003f5dc, 8cacab8, b6bd079.
 
 ### Resume Point
 
-Phase 04 complete. Next: Phase 05 — Quality Assurance & Deployment.
+Completed 05-02-PLAN.md. Next: Phase 05 Plan 03 or 04 (QA coverage / deployment).
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-06-01 - Completed Phase 04 Plan 04: Settings page + Phase 04 complete*
+*Last updated: 2026-06-16 - Completed Phase 05 Plan 02: cold-start auto-seeding (DEPLOY-01)*
