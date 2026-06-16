@@ -348,10 +348,14 @@ def main() -> None:
     _seed_churn(conn)
 
     # Verify: count rows across key tables
-    n_datasets = conn.execute("SELECT COUNT(*) FROM datasets").fetchone()[0]
-    n_transitions = conn.execute("SELECT COUNT(*) FROM transitions").fetchone()[0]
-    n_matrices = conn.execute("SELECT COUNT(*) FROM transition_matrices").fetchone()[0]
-    n_forecasts = conn.execute("SELECT COUNT(*) FROM forecasts").fetchone()[0]
+    def _count(table: str) -> int:
+        row = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()  # noqa: S608
+        return int(row[0]) if row is not None else 0
+
+    n_datasets = _count("datasets")
+    n_transitions = _count("transitions")
+    n_matrices = _count("transition_matrices")
+    n_forecasts = _count("forecasts")
 
     log.info(
         "Seed complete — datasets=%d, transitions=%d, matrices=%d, forecasts=%d",

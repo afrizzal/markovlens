@@ -24,9 +24,9 @@ st.set_page_config(
 
 # local — imported after streamlit so register_theme() can compose the template
 from app.components.empty_state import empty_state  # noqa: E402
+from app.db import get_db  # noqa: E402
 from app.styles import inject_theme, register_theme  # noqa: E402
 from core.config import settings  # noqa: E402
-from core.db.connection import get_connection  # noqa: E402
 from core.db.queries import list_datasets  # noqa: E402
 
 # ── Register Plotly template before any chart is rendered (D-05) ───────────
@@ -39,11 +39,6 @@ DOMAIN_LABELS: dict[str, str] = {
     "brand_share": "Brand Share",
     "churn": "Customer Churn",
 }
-
-
-@st.cache_resource
-def _get_db():
-    return get_connection()
 
 
 # ── Header ────────────────────────────────────────────────────────────────────
@@ -60,7 +55,7 @@ with tab_datasets:
     st.subheader("Registered datasets")
 
     try:
-        _conn = _get_db()
+        _conn = get_db()
         _datasets = list_datasets(_conn)
         _db_error: str | None = None
     except Exception as e:

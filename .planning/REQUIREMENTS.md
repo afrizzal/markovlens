@@ -59,7 +59,7 @@
 
 ### Deployment
 
-- [ ] **DEPLOY-01**: App deployed to Streamlit Cloud; cold start verified — seed script runs automatically if `forecasts` table is empty, all pages load without error
+- [x] **DEPLOY-01**: App deployed to Streamlit Cloud; cold start verified — seed script runs automatically if `forecasts` table is empty, all pages load without error
 - [ ] **DEPLOY-02**: Production smoke check documented — checklist in `docs/DEPLOYMENT.md` confirming: app loads, both domain pages render, Home KPIs show real data, CSV export works
 
 ### Quality
@@ -134,7 +134,7 @@
 | QA-01 | Phase 05 | Complete |
 | QA-02 | Phase 05 | Complete |
 | QA-03 | Phase 05 | Complete |
-| DEPLOY-01 | Phase 05 | Pending |
+| DEPLOY-01 | Phase 05 | Complete |
 | DEPLOY-02 | Phase 05 | Pending |
 
 **Coverage:**

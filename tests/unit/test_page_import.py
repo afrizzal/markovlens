@@ -55,6 +55,7 @@ def _load_page_module_importlib():
     # Build mock patches for DB + service
     patches = [
         patch("core.db.connection.get_connection", return_value=mock_conn),
+        patch("core.db.init.ensure_seeded", return_value=None),
         patch("domains.brand_share.service.list_datasets", return_value=mock_datasets),
     ]
 
@@ -173,6 +174,7 @@ def _load_churn_page_module_importlib():
 
     patches = [
         patch("core.db.connection.get_connection", return_value=mock_conn),
+        patch("core.db.init.ensure_seeded", return_value=None),
         patch("domains.churn.service.list_datasets", return_value=mock_datasets),
     ]
 
@@ -239,6 +241,7 @@ def _load_home_page_module_importlib():
 
     patches = [
         patch("core.db.connection.get_connection", return_value=mock_conn),
+        patch("core.db.init.ensure_seeded", return_value=None),
         patch("core.db.queries.get_home_kpis", return_value=mock_kpis),
         patch("core.db.queries.list_recent_forecasts", return_value=mock_recent),
     ]
@@ -274,7 +277,7 @@ def test_home_page_imports_without_error():
     mod = _load_home_page_module_importlib()
     # Home.py has module-level constants — verify they are present after load
     assert hasattr(mod, "DOMAIN_ICON"), "Missing DOMAIN_ICON constant in Home page module"
-    assert hasattr(mod, "_get_db"), "Missing _get_db() in Home page module"
+    assert hasattr(mod, "get_db"), "Missing get_db import in Home page module"
 
 
 # ---------------------------------------------------------------------------
@@ -303,6 +306,7 @@ def _load_settings_page_module_importlib():
 
     patches = [
         patch("core.db.connection.get_connection", return_value=mock_conn),
+        patch("core.db.init.ensure_seeded", return_value=None),
         patch("core.db.queries.list_datasets", return_value=mock_datasets),
     ]
 
@@ -338,4 +342,4 @@ def test_settings_page_imports_without_error():
     # Settings page has module-level constants — verify they are present after load
     assert hasattr(mod, "PAGE_NS"), "Missing PAGE_NS constant in Settings page module"
     assert hasattr(mod, "APP_VERSION"), "Missing APP_VERSION constant in Settings page module"
-    assert hasattr(mod, "_get_db"), "Missing _get_db() in Settings page module"
+    assert hasattr(mod, "get_db"), "Missing get_db import in Settings page module"

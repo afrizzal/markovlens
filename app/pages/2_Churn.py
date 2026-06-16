@@ -36,8 +36,8 @@ from app.components.sankey_flow import (  # noqa: E402
     impact_summary,
     state_legend_html,
 )
+from app.db import get_db  # noqa: E402
 from app.styles import inject_theme, register_theme  # noqa: E402
-from core.db.connection import get_connection  # noqa: E402
 from core.exceptions import DatasetTooSparseError  # noqa: E402
 from domains.churn import service  # noqa: E402
 
@@ -115,20 +115,15 @@ def _churn_csv_bytes(result: service.ChurnAnalysisResult) -> bytes:
 # ---------------------------------------------------------------------------
 
 
-@st.cache_resource
-def _get_db():
-    return get_connection()
-
-
 @st.cache_data(show_spinner=False)
 def _cached_analysis(dataset_id: str, horizon: int):
-    return service.run_analysis(_get_db(), dataset_id, horizon)
+    return service.run_analysis(get_db(), dataset_id, horizon)
 
 
 @st.cache_data(show_spinner=False)
 def _cached_scenario(dataset_id: str, horizon: int, overrides_frozen: frozenset) -> np.ndarray:
     """Cache simulate_scenario keyed on (dataset_id, horizon, frozenset(overrides.items()))."""
-    return service.simulate_scenario(_get_db(), dataset_id, horizon, dict(overrides_frozen))
+    return service.simulate_scenario(get_db(), dataset_id, horizon, dict(overrides_frozen))
 
 
 # ---------------------------------------------------------------------------
@@ -199,7 +194,7 @@ def main() -> None:
     st.caption("Model customer state flow and retention with an absorbing Markov chain.")
 
     # -- Load datasets --------------------------------------------------------
-    datasets = service.list_datasets(_get_db())
+    datasets = service.list_datasets(get_db())
     if not datasets:
         empty_state(
             "empty",

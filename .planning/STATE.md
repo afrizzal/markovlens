@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 05
 status: unknown
-last_updated: "2026-06-16T03:02:53.934Z"
+last_updated: "2026-06-16T03:09:45.586Z"
 progress:
   total_phases: 5
   completed_phases: 4
@@ -84,6 +84,7 @@ Overall  [█████████░]  86% (19/22 plans complete) — Phase 
 | Phase 04 P02 | 9min | 2 tasks | 2 files |
 | Phase 04 P04 | 17 | 4 tasks | 4 files |
 | Phase 05 P01 | 7 | 3 tasks | 2 files |
+| Phase 05 P02 | 14 | 4 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,7 @@ Overall  [█████████░]  86% (19/22 plans complete) — Phase 
 - Phase 04 Plan 04: Settings page Re-run seed in st.expander(Advanced) prevents accidental clicks; subprocess.run(["uv","run","python",...]) avoids shell=True; importlib+mock.patch smoke test matches BS-06/CH-04/HOME-01 convention; merged master to bring in Plans 01-03 (worktree was branched before those commits); 101 tests pass
 - Phase 05 Plan 01: PT011 requires match= on pytest.raises(ValueError) — use specific error message substring from actual raises; bare ValueError is too broad per ruff
 - Phase 05 Plan 01: compute_stationary dual-fallback branches (L116-117, L132-134) left uncovered — triggering both scipy.linalg.eig AND power-iteration failure simultaneously is unreliable; 96% core/ exceeds 80% threshold by 16pp
+- Phase 05 Plan 02: forecasts table COUNT sentinel for cold-start seeding (ensure_seeded fast-path on warm rerun); app/db.py get_db() consolidates 5 per-page _get_db functions into one shared cached accessor with env-aware seed failure guard (D-08); noqa BLE001/PLC0415 removed (rules not in ruff select list); fetchone None-guard added to core/db/init.py and scripts/seed_data.py (mypy compliance); 103 tests pass
 
 ### Quick Tasks Completed
 
@@ -138,12 +140,12 @@ None.
 
 ### Last Action
 
-2026-06-16 — Phase 05 Plan 01 complete: 17 targeted branch-coverage tests added to test_models.py (11) and test_simulation.py (6); QA-01/QA-02/QA-03 all satisfied; core/ 96%, domains/ ~83%, 118 tests green, pytest -m integration 20 passed. Commits: e0ad660, bc1d5b2, e63f69d.
+2026-06-16 — Phase 05 Plans 01+02+03 complete (parallel wave 1): 17 new tests (96% core coverage), cold-start ensure_seeded() + shared app/db.py (5 pages wired), .github/workflows/ci.yml with 4-gate CI. 118+ tests green. QA-01/02/03/DEPLOY-01 satisfied. Commits: e0ad660, bc1d5b2, e63f69d (05-01); e1f3951, 003f5dc, 8cacab8, b6bd079 (05-02); 0690d91, 07413c6 (05-03).
 
 ### Resume Point
 
-Phase 05 Plan 01 complete. Next: Phase 05 Plan 02 (05-02) and other wave-1 plans.
+Phase 05 Wave 1 complete (plans 01, 02, 03). Next: Phase 05 Plan 04 — deploy to Streamlit Cloud (human checkpoint required).
 
 ---
 *State initialized: 2026-05-29*
-*Last updated: 2026-06-16 - Completed Phase 05 Plan 01: targeted test coverage (QA-01/QA-02/QA-03)*
+*Last updated: 2026-06-16 - Completed Phase 05 Wave 1: QA tests, cold-start seeding, CI workflow*
