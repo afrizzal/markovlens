@@ -423,7 +423,7 @@ def list_recent_forecasts(
                 domain=str(row["domain"]) if row["domain"] else "unknown",
                 model_type=str(row["model_type"]),
                 created_at=row["created_at"],
-                mape=float(row["mape"]) if row["mape"] is not None else None,
+                mape=float(row["mape"]) if pd.notna(row["mape"]) else None,
             )
         )
     return results
