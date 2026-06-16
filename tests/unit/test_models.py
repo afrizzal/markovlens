@@ -183,28 +183,28 @@ def test_compute_stationary_trivial_one_state():
 def test_m2_rejects_non_3d():
     from core.models import M2TimeVarying
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="must be 3D"):
         M2TimeVarying(np.zeros((2, 2), dtype=np.float64))  # L186
 
 
 def test_m2_rejects_non_square_inner():
     from core.models import M2TimeVarying
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="must be square"):
         M2TimeVarying(np.zeros((1, 2, 3), dtype=np.float64))  # L191
 
 
 def test_m3_rejects_non_3d():
     from core.models import M3Extended
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="must be 3D"):
         M3Extended(np.zeros((2, 2), dtype=np.float64), np.ones(2))  # L228
 
 
 def test_m3_rejects_non_square_inner():
     from core.models import M3Extended
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="must be square"):
         M3Extended(np.zeros((1, 2, 3), dtype=np.float64), np.ones(2))  # L233
 
 
@@ -212,7 +212,7 @@ def test_m3_rejects_bad_g_ndim():
     from core.models import M3Extended
 
     P_t = np.array([[[0.7, 0.3], [0.4, 0.6]]], dtype=np.float64)  # (1,2,2) valid
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="G must be 1D"):
         M3Extended(P_t, np.ones((1, 1, 2)))  # G ndim 3 → L238
 
 
@@ -220,7 +220,7 @@ def test_m3_rejects_g_wrong_last_dim():
     from core.models import M3Extended
 
     P_t = np.array([[[0.7, 0.3], [0.4, 0.6]]], dtype=np.float64)  # n_states=2
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="G last dim"):
         M3Extended(P_t, np.ones(3))  # G last-dim 3 != 2 → L242
 
 

@@ -143,7 +143,7 @@ def test_quantile_bands_rejects_1d_extractor():
     from core.simulation import compute_quantile_bands
 
     paths = np.zeros((100, 13), dtype=np.int64)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="must return a 2-D"):
         compute_quantile_bands(paths, target_extractor=lambda p: p[:, -1])  # 1-D → L165
 
 
@@ -205,8 +205,9 @@ def test_walk_forward_too_few_periods_returns_empty():
 
 
 def test_walk_forward_mape_exception_sets_none():
-    import pandas as pd
     from unittest.mock import patch
+
+    import pandas as pd
 
     from core.simulation import walk_forward_backtest
 
