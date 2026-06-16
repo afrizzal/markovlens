@@ -2,7 +2,7 @@
 
 > Living document. Updated after every coding session.
 >
-> Last updated: 2026-06-01 (Phase 04 complete — Home KPI + CSV export + Settings page)
+> Last updated: 2026-06-16 (post-launch hotfixes — live app at https://markovlens.streamlit.app/)
 >
 > **Note:** Phase numbering follows the GSD workflow (`.planning/STATE.md`). Authoritative live state is in `.planning/STATE.md` + `.planning/phases/NN-*/`.
 
@@ -119,6 +119,21 @@
 | Production smoke check (all pages load, charts render) | 🟡 Pending | |
 | README live demo URL + badge | 🟡 Pending | |
 | Phase plan via `/gsd:plan-phase 05` | 🟡 Pending | |
+
+---
+
+## Post-launch hotfixes (live app) ✅ Complete
+
+> 2026-06-16 — bugs found by manual QA on the live Streamlit Cloud deployment.
+
+| Task | Status | Commit | Notes |
+|---|---|---|---|
+| Home "Recent Forecasts" rendered `nan% MAPE` | ✅ Done | e68d5d7 | SQL NULL → `np.nan` in Pandas, not `None`; `is not None` let NaN through. Fixed in `list_recent_forecasts` via `pd.notna()`. Churn forecasts legitimately have NULL mape → render "—" |
+| Brand Share "Run Forecast" → `ValueError` on CSV export | ✅ Done | 0547b13 | `result.forecasts.get(best_model) or …` triggered ambiguous-truth-value on `np.ndarray`. Replaced `or`-fallback with explicit `is None` check in `_brand_share_csv_bytes` |
+| Settings "Re-run seed script" → DuckDB `Conflicting lock` | ✅ Done | 8d99e15 | Subprocess opened a 2nd writer to the live DB file. Added `seed_database(conn)` + call in-process via `get_db()`. See decisions.md 2026-06-16 |
+| Verification — ruff clean, 10 seed/db tests green | ✅ Done | 8d99e15 | In-process re-seed validated against an already-open connection |
+
+> **Deploy note:** all three require a Streamlit Cloud reboot (Manage app → Reboot) to pull the latest build; auto-redeploy on push can lag or stall when the free-tier app is asleep.
 
 ---
 

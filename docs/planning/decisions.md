@@ -4,6 +4,33 @@
 
 ---
 
+## 2026-06-16 — Re-seed runs in-process, not via subprocess (DuckDB single-writer lock)
+
+**Context:** On the live Streamlit Cloud deployment, the Settings → Advanced → "Re-run seed script" button failed with `IO Error: Could not set lock on file "…/markovlens.duckdb": Conflicting lock is held in …/python3.12 (PID 88)`. The handler spawned `uv run python scripts/seed_data.py` as a **separate OS process**, which called `get_connection()` → `duckdb.connect(path)` and tried to open the same DuckDB file the running app process already held open via `app/db.py get_db()` (`@st.cache_resource`). DuckDB enforces a single read-write process per file, so the second connection was rejected. This never surfaced in local dev when the app wasn't running, masking the bug until production.
+
+**Decision:** Re-seeding runs **in-process** against the app's existing cached connection — never by spawning a second process.
+1. Added a public `seed_database(conn: duckdb.DuckDBPyConnection) -> dict[str, int]` entrypoint in `scripts/seed_data.py` (applies schema, runs `_seed_brand_share` + `_seed_churn`, returns row counts, keeps the `forecasts >= 5` assertion).
+2. `main()` now delegates to `seed_database(get_connection())` (CLI behavior unchanged).
+3. `app/pages/4_Settings.py` calls `seed_database(get_db())` directly inside the button handler — `subprocess` import removed.
+
+**Why:**
+- One process, one writer — eliminates the file-lock conflict entirely (the root cause), rather than papering over it with retries.
+- Reuses the same connection the cold-start path already uses (`core/db/init.py ensure_seeded` imports the same `_seed_*` helpers), so behavior is consistent across cold-start auto-seed and manual re-seed.
+- Faster and dependency-light on Streamlit Cloud — no `uv` subprocess spin-up, no second venv resolution.
+- Idempotent already guaranteed by D-23 DELETE-WHERE in each `_seed_*` helper, so running on the live connection is safe.
+
+**Impact:**
+- `scripts/seed_data.py` — new `seed_database()`; `main()` refactored to use it.
+- `app/pages/4_Settings.py` — in-process call; richer success message (shows dataset + forecast counts); `subprocess` removed.
+- Commit `8d99e15`. 10 related tests (`test_queries.py`, `test_db_init.py`) green; ruff clean.
+
+**Alternatives considered:**
+- Close the app's cached connection before spawning the subprocess, then reconnect — rejected: fragile under multiple concurrent Streamlit sessions, and DuckDB lock release/re-acquire timing is racy.
+- Retry-with-backoff on the lock — rejected: doesn't fix the cause; the app holds the lock for its whole lifetime, so retries always fail.
+- Run seed against an in-memory copy then swap files — rejected: massively over-engineered for a 7k-row demo dataset.
+
+---
+
 ## 2026-05-31 — sys.path manipulation in Streamlit entry scripts
 
 **Context:** Brand Share page crashed at runtime with `ModuleNotFoundError: No module named 'app'` on the line `from app.components.empty_state import empty_state`. Pytest passed all imports fine; the failure was Streamlit-runtime-specific. Investigation revealed that Streamlit adds the **entry script's directory** (`app/`) to `sys.path`, not the project root — so `from app.X`, `from core.X`, `from domains.X` all fail at runtime even though they resolve correctly under pytest (where project root is the rootdir).
