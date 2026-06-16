@@ -13,7 +13,7 @@
 - [ ] **Phase 03: Churn Domain** — Deliver the fully wired Customer Churn domain page reusing Phase 02 design system
 - [x] **Phase 04: Home, Export & Settings** — Wire the Home dashboard to real data, add CSV export, and complete the Settings page
  (completed 2026-05-31)
-- [ ] **Phase 05: Quality Assurance & Deployment** — Achieve test coverage targets and deploy a verified, cold-start-clean app to Streamlit Cloud
+- [x] **Phase 05: Quality Assurance & Deployment** — Achieve test coverage targets and deploy a verified, cold-start-clean app to Streamlit Cloud (completed 2026-06-16)
 
 ---
 
@@ -109,7 +109,7 @@
 | 02. Design System + Brand Share | 4/4 | Complete    | 2026-05-30 |
 | 03. Churn Domain | 0/4 | Planned | - |
 | 04. Home, Export & Settings | 0/TBD | Complete    | 2026-05-31 |
-| 05. Quality Assurance & Deployment | 0/4 | Planned | - |
+| 05. Quality Assurance & Deployment | 0/4 | Complete    | 2026-06-16 |
 
 ---
 
