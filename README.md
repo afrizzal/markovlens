@@ -10,12 +10,23 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Built with Streamlit](https://img.shields.io/badge/Built%20with-Streamlit-FF4B4B.svg)](https://streamlit.io)
 [![DuckDB](https://img.shields.io/badge/Database-DuckDB-FFF000.svg)](https://duckdb.org)
+[![CI](https://github.com/afrizzal/markovlens/actions/workflows/ci.yml/badge.svg)](https://github.com/afrizzal/markovlens/actions/workflows/ci.yml)
 
-[Demo (coming soon)](#) · [Documentation](docs/) · [User Guide](manual-book.md)
+[Live Demo](https://markovlens.streamlit.app) · [Documentation](docs/) · [User Guide](manual-book.md)
 
 </div>
 
 ---
+
+## Screenshots
+
+| Home — KPI Dashboard | Brand Share — Market Forecast |
+|---|---|
+| ![Home KPI dashboard](docs/assets/screenshots/home-kpis.jpg) | ![Brand Share market share forecast](docs/assets/screenshots/brand-share-overview.jpg) |
+
+| Customer Churn — What-If Simulator | Settings — Dataset Registry |
+|---|---|
+| ![Customer Churn what-if simulator](docs/assets/screenshots/churn-what-if.jpg) | ![Settings dataset registry](docs/assets/screenshots/settings-datasets.jpg) |
 
 ## What is MarkovLens?
 
@@ -176,8 +187,8 @@ See [docs/planning/task-progress.md](docs/planning/task-progress.md) for live ta
 - [x] **Phase 01** — Markov engine core (m1/m2/m3 + Monte Carlo + calibration + walk-forward backtest) — 90.76% coverage, 40 tests
 - [x] **Phase 02** — Design system + Brand Share page (heatmap, fan chart, model comparison, stationary distribution) — 61 tests, derived from Claude Design prototype
 - [x] **Phase 03** — Customer Churn domain (temporal Sankey state flow + what-if simulator) — page live at /Churn
-- [ ] **Phase 04** — Home dashboard wired to real KPIs + CSV export + Settings
-- [ ] **Phase 05** — Coverage gate + deploy to Streamlit Cloud + production smoke check
+- [x] **Phase 04** — Home dashboard wired to real KPIs + CSV export + Settings
+- [x] **Phase 05** — Coverage gate (96% core/) + deployed to Streamlit Cloud + production smoke check passed
 
 ## Data Sources
 
