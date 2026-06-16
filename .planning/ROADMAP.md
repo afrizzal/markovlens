@@ -11,7 +11,8 @@
 - [x] **Phase 01: Markov Engine** — Implement and validate the complete core engine: all three model classes, Monte Carlo simulation, calibration, metrics, and data layer
 - [x] **Phase 02: Design System + Brand Share** — Establish the Plotly/CSS design system and deliver the fully wired Brand Share domain page (completed 2026-05-30)
 - [ ] **Phase 03: Churn Domain** — Deliver the fully wired Customer Churn domain page reusing Phase 02 design system
-- [x] **Phase 04: Home, Export & Settings** — Wire the Home dashboard to real data, add CSV export, and complete the Settings page (completed 2026-05-31)
+- [x] **Phase 04: Home, Export & Settings** — Wire the Home dashboard to real data, add CSV export, and complete the Settings page
+ (completed 2026-05-31)
 - [ ] **Phase 05: Quality Assurance & Deployment** — Achieve test coverage targets and deploy a verified, cold-start-clean app to Streamlit Cloud
 
 ---
@@ -92,7 +93,11 @@
   2. The integration test suite (`pytest -m integration`) passes against a fresh temporary DuckDB file — `build_transition_matrix()`, `core/io/loaders.py`, and all `queries.py` paths covered
   3. The Streamlit Cloud URL loads the Home page within 60 seconds on a cold start (empty cache), displaying real KPI values — confirming the seed script auto-ran and the `forecasts` table is not empty
   4. `docs/DEPLOYMENT.md` contains a completed smoke-check checklist with green status for: app loads, Brand Share page renders, Churn page renders, Home KPIs show real data, CSV export works
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 05-01-PLAN.md — Targeted unit tests for uncovered Markov-math branches (QA-01/02/03)
+- [ ] 05-02-PLAN.md — Cold-start auto-seeding: ensure_seeded + shared app/db.py get_db() (DEPLOY-01)
+- [ ] 05-03-PLAN.md — CI workflow: .github/workflows/ci.yml with uv + 4 gates (QA-01)
+- [ ] 05-04-PLAN.md — Deploy to Streamlit Cloud + DEPLOYMENT.md smoke check + README patch (DEPLOY-01/02)
 
 ---
 
@@ -104,7 +109,7 @@
 | 02. Design System + Brand Share | 4/4 | Complete    | 2026-05-30 |
 | 03. Churn Domain | 0/4 | Planned | - |
 | 04. Home, Export & Settings | 0/TBD | Complete    | 2026-05-31 |
-| 05. Quality Assurance & Deployment | 0/TBD | Not started | - |
+| 05. Quality Assurance & Deployment | 0/4 | Planned | - |
 
 ---
 
@@ -150,4 +155,4 @@
 
 ---
 *Roadmap created: 2026-05-29*
-*Last updated: 2026-05-31 after Phase 03 planning — 4 plans created*
+*Last updated: 2026-06-16 after Phase 05 planning — 4 plans created (2 waves)*
