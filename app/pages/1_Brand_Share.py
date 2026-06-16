@@ -796,30 +796,23 @@ def main() -> None:
                 bt_rows = ""
                 for bt in result.backtest_results:
                     period_bt = bt.get("period", "--")
-                    actual_bt = bt.get("actual", "--")
-                    forecast_bt_val = bt.get("forecast", "--")
                     mape_bt = bt.get("mape", None)
+                    brier_bt = bt.get("brier", None)
+                    mape_cell = f"{mape_bt:.2f}%" if mape_bt is not None else "--"
+                    brier_cell = f"{brier_bt:.4f}" if brier_bt is not None else "--"
                     bt_rows += (
                         "<tr>"
                         f"<td>{period_bt}</td>"
-                        f'<td class="num">'
-                        f"{actual_bt if isinstance(actual_bt, str) else f'{actual_bt:.4f}'}"
-                        f"</td>"
-                        f'<td class="num">'
-                        f"{forecast_bt_val if isinstance(forecast_bt_val, str) else f'{forecast_bt_val:.4f}'}"
-                        f"</td>"
-                        f'<td class="num">'
-                        f"{f'{mape_bt:.2f}%' if mape_bt is not None else '--'}"
-                        f"</td>"
+                        f'<td class="num">{mape_cell}</td>'
+                        f'<td class="num">{brier_cell}</td>'
                         "</tr>"
                     )
                 bt_table = (
                     '<table class="tbl" style="width:100%;border-collapse:collapse;">'
                     "<thead><tr>"
                     '<th class="t-xs t-sec" style="text-align:left;padding:6px;">Period</th>'
-                    '<th class="t-xs t-sec" style="text-align:right;padding:6px;">Actual</th>'
-                    '<th class="t-xs t-sec" style="text-align:right;padding:6px;">Forecast</th>'
                     '<th class="t-xs t-sec" style="text-align:right;padding:6px;">MAPE</th>'
+                    '<th class="t-xs t-sec" style="text-align:right;padding:6px;">Brier</th>'
                     "</tr></thead>"
                     f"<tbody>{bt_rows}</tbody>"
                     "</table>"
