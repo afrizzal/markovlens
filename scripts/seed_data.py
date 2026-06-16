@@ -32,6 +32,7 @@ import sys
 import uuid
 from pathlib import Path
 
+import duckdb
 import numpy as np
 import pandas as pd
 
@@ -335,36 +336,57 @@ def _seed_churn(conn) -> None:
     log.info("  Churn seeding complete ✓")
 
 
+def seed_database(conn: duckdb.DuckDBPyConnection) -> dict[str, int]:
+    """Seed all built-in datasets into an existing connection (in-process).
+
+    Idempotent via DELETE-WHERE in each ``_seed_*`` helper. Safe to call against
+    the live Streamlit app connection — this avoids the DuckDB single-writer
+    file-lock conflict that spawning seed_data.py as a separate process triggers.
+
+    Parameters
+    ----------
+    conn : duckdb.DuckDBPyConnection
+        Open connection (caller-managed). Schema is (re)applied here.
+
+    Returns
+    -------
+    dict[str, int]
+        Row counts for datasets, transitions, transition_matrices, forecasts.
+    """
+    init_schema(conn)
+
+    rng = np.random.default_rng(RNG_SEED)
+    _seed_brand_share(conn, rng)
+    _seed_churn(conn)
+
+    def _count(table: str) -> int:
+        row = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()
+        return int(row[0]) if row is not None else 0
+
+    counts = {
+        "datasets": _count("datasets"),
+        "transitions": _count("transitions"),
+        "transition_matrices": _count("transition_matrices"),
+        "forecasts": _count("forecasts"),
+    }
+    assert counts["forecasts"] >= 5, (
+        f"DATA-02 SC 5 failed: only {counts['forecasts']} forecast rows"
+    )
+    return counts
+
+
 def main() -> None:
     """Seed DuckDB with all datasets. Idempotent — safe to re-run."""
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     log.info("Connecting to DuckDB …")
-    conn = get_connection()
-    init_schema(conn)
-
-    rng = np.random.default_rng(RNG_SEED)
-
-    _seed_brand_share(conn, rng)
-    _seed_churn(conn)
-
-    # Verify: count rows across key tables
-    def _count(table: str) -> int:
-        row = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()  # noqa: S608
-        return int(row[0]) if row is not None else 0
-
-    n_datasets = _count("datasets")
-    n_transitions = _count("transitions")
-    n_matrices = _count("transition_matrices")
-    n_forecasts = _count("forecasts")
-
+    counts = seed_database(get_connection())
     log.info(
         "Seed complete — datasets=%d, transitions=%d, matrices=%d, forecasts=%d",
-        n_datasets,
-        n_transitions,
-        n_matrices,
-        n_forecasts,
+        counts["datasets"],
+        counts["transitions"],
+        counts["transition_matrices"],
+        counts["forecasts"],
     )
-    assert n_forecasts >= 5, f"DATA-02 SC 5 failed: only {n_forecasts} forecast rows"
 
 
 if __name__ == "__main__":

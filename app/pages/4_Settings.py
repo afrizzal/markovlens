@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import subprocess
 import sys
 from pathlib import Path
 
@@ -104,19 +103,23 @@ with tab_datasets:
             "Any custom data will be lost."
         )
         if st.button("Re-run seed script", type="secondary", key=f"{PAGE_NS}.reseed"):
-            with st.spinner("Seeding database…"):
-                _result = subprocess.run(
-                    ["uv", "run", "python", "scripts/seed_data.py"],
-                    capture_output=True,
-                    text=True,
-                    cwd=str(_PROJECT_ROOT),
-                )
-            if _result.returncode == 0:
-                st.success("Seed completed. Reload the page to see updated counts.")
+            try:
+                with st.spinner("Seeding database…"):
+                    # In-process seed reuses the app's live connection — spawning a
+                    # subprocess would open a second writer and DuckDB rejects the
+                    # concurrent file lock (single-writer).
+                    from scripts.seed_data import seed_database
+
+                    _counts = seed_database(get_db())
                 st.cache_resource.clear()
-            else:
-                st.error(f"Seed failed (exit {_result.returncode}):")
-                st.code(_result.stderr[-1000:] if _result.stderr else "(no stderr)")
+                st.success(
+                    f"Seed completed — datasets={_counts['datasets']}, "
+                    f"forecasts={_counts['forecasts']}. Reload the page to see updated counts."
+                )
+            except Exception as e:
+                st.error(f"Seed failed: {e}")
+                if settings.app_env == "development":
+                    st.exception(e)
 
 # ── Preferences tab ───────────────────────────────────────────────────────────
 with tab_prefs:
