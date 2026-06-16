@@ -64,9 +64,9 @@
 
 ### Quality
 
-- [ ] **QA-01**: Unit tests for `core/` — > 80% coverage; Chan (2015) Table 3/4 regression tests un-skipped and passing; all ENG-01..ENG-10 covered
-- [ ] **QA-02**: Integration tests for `core/db/` — `queries.py` and data loading paths tested against real temp DuckDB (`tmp_path` fixture)
-- [ ] **QA-03**: Domain layer tests for `domains/` — > 60% coverage; service orchestration paths covered
+- [x] **QA-01**: Unit tests for `core/` — > 80% coverage; Chan (2015) Table 3/4 regression tests un-skipped and passing; all ENG-01..ENG-10 covered
+- [x] **QA-02**: Integration tests for `core/db/` — `queries.py` and data loading paths tested against real temp DuckDB (`tmp_path` fixture)
+- [x] **QA-03**: Domain layer tests for `domains/` — > 60% coverage; service orchestration paths covered
 
 ## v2 Requirements
 
@@ -131,9 +131,9 @@
 | HOME-01 | Phase 04 | Complete |
 | RPT-01 | Phase 04 | Complete |
 | SET-01 | Phase 04 | Complete |
-| QA-01 | Phase 05 | Pending |
-| QA-02 | Phase 05 | Pending |
-| QA-03 | Phase 05 | Pending |
+| QA-01 | Phase 05 | Complete |
+| QA-02 | Phase 05 | Complete |
+| QA-03 | Phase 05 | Complete |
 | DEPLOY-01 | Phase 05 | Pending |
 | DEPLOY-02 | Phase 05 | Pending |
 

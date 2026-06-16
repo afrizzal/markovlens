@@ -94,7 +94,7 @@
   3. The Streamlit Cloud URL loads the Home page within 60 seconds on a cold start (empty cache), displaying real KPI values — confirming the seed script auto-ran and the `forecasts` table is not empty
   4. `docs/DEPLOYMENT.md` contains a completed smoke-check checklist with green status for: app loads, Brand Share page renders, Churn page renders, Home KPIs show real data, CSV export works
 **Plans**: 4 plans
-- [ ] 05-01-PLAN.md — Targeted unit tests for uncovered Markov-math branches (QA-01/02/03)
+- [x] 05-01-PLAN.md — Targeted unit tests for uncovered Markov-math branches (QA-01/02/03)
 - [ ] 05-02-PLAN.md — Cold-start auto-seeding: ensure_seeded + shared app/db.py get_db() (DEPLOY-01)
 - [ ] 05-03-PLAN.md — CI workflow: .github/workflows/ci.yml with uv + 4 gates (QA-01)
 - [ ] 05-04-PLAN.md — Deploy to Streamlit Cloud + DEPLOYMENT.md smoke check + README patch (DEPLOY-01/02)
