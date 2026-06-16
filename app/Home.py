@@ -21,8 +21,8 @@ st.set_page_config(
 
 from app.components.empty_state import empty_state  # noqa: E402
 from app.components.kpi_card import kpi_card  # noqa: E402
+from app.db import get_db  # noqa: E402
 from app.styles import inject_theme, register_theme  # noqa: E402
-from core.db.connection import get_connection  # noqa: E402
 from core.db.queries import get_home_kpis, list_recent_forecasts  # noqa: E402
 
 register_theme()
@@ -33,11 +33,6 @@ DOMAIN_COLOR: dict[str, str] = {"brand_share": "#4338CA", "churn": "#059669"}
 MODEL_BADGE_COLOR: dict[str, str] = {"m1": "#6366F1", "m2": "#0891B2", "m3": "#7C3AED"}
 
 
-@st.cache_resource
-def _get_db():
-    return get_connection()
-
-
 # ── Header ──────────────────────────────────────────────────
 st.title("MarkovLens")
 st.caption("*Same math, different stories — Markov chains applied to real business decisions.*")
@@ -45,7 +40,7 @@ st.markdown("---")
 
 # ── KPI Strip (real data) ────────────────────────────────────
 try:
-    _db = _get_db()
+    _db = get_db()
     _kpis = get_home_kpis(_db)
     _kpi_error: str | None = None
 except Exception as e:
@@ -115,7 +110,7 @@ st.markdown("---")
 # ── Recent Forecasts ─────────────────────────────────────────
 st.subheader("Recent Forecasts")
 try:
-    _db2 = _get_db()
+    _db2 = get_db()
     _recent = list_recent_forecasts(_db2, n=5)
 except Exception:
     _recent = []

@@ -33,8 +33,8 @@ from app.components.empty_state import empty_state  # noqa: E402
 from app.components.kpi_card import kpi_card  # noqa: E402
 from app.components.monte_carlo_fan import monte_carlo_fan  # noqa: E402
 from app.components.transition_heatmap import transition_heatmap  # noqa: E402
+from app.db import get_db  # noqa: E402
 from app.styles import inject_theme, register_theme  # noqa: E402
-from core.db.connection import get_connection  # noqa: E402
 from core.db.queries import build_transition_matrix, load_transitions  # noqa: E402
 from core.exceptions import DatasetTooSparseError  # noqa: E402
 from domains.brand_share import service  # noqa: E402
@@ -105,11 +105,6 @@ def _brand_share_csv_bytes(result: service.BrandShareForecastResult) -> bytes:
 # Cached infrastructure
 # ---------------------------------------------------------------------------
 
-@st.cache_resource
-def _get_db():
-    return get_connection()
-
-
 @st.cache_data(show_spinner=False)
 def _cached_forecast(
     dataset_id: str,
@@ -119,7 +114,7 @@ def _cached_forecast(
     seed: int,
 ):
     return service.run_forecast(
-        _get_db(),
+        get_db(),
         dataset_id,
         model_type,
         horizon,
@@ -131,7 +126,7 @@ def _cached_forecast(
 @st.cache_data(show_spinner=False)
 def _dataset_period_count(dataset_id: str) -> int:
     """Return distinct period count for the dataset (cheap, cached by dataset_id)."""
-    return int(load_transitions(_get_db(), dataset_id)["period"].nunique())
+    return int(load_transitions(get_db(), dataset_id)["period"].nunique())
 
 
 # ---------------------------------------------------------------------------
@@ -276,7 +271,7 @@ def main() -> None:
     st.caption("Predict market share evolution from consumer switching data.")
 
     # -- Load datasets --------------------------------------------------------
-    datasets = service.list_datasets(_get_db())
+    datasets = service.list_datasets(get_db())
     if not datasets:
         empty_state(
             "empty",
@@ -514,11 +509,11 @@ def main() -> None:
     with tab_matrix:
         if ds is not None:
             try:
-                hm_matrix, hm_counts = build_transition_matrix(_get_db(), ds.id)
+                hm_matrix, hm_counts = build_transition_matrix(get_db(), ds.id)
                 if result is not None:
                     hm_states: list[str] = result.state_labels
                 else:
-                    _df_hm = load_transitions(_get_db(), ds.id)
+                    _df_hm = load_transitions(get_db(), ds.id)
                     hm_states = sorted(set(_df_hm["from_state"]) | set(_df_hm["to_state"]))
 
                 period_label_arg: str | None = None
