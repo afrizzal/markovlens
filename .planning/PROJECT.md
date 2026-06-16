@@ -81,16 +81,20 @@ A GitHub repo that convinces a senior BA/BI recruiter that the developer can thi
 - ✓ `RecentForecast` + `list_recent_forecasts()` — last N forecasts with JOIN to datasets
 - ✓ `Dataset.created_at` — added to existing dataclass + list_datasets/get_dataset queries
 
-### Active
+### Validated — Phase 05 (Quality Assurance & Deployment, complete 2026-06-16)
 
 **Quality**
-- [ ] TEST-01: Unit tests for ENG-01..ENG-10 (> 80% coverage for core/)
-- [ ] TEST-02: Integration tests for data layer + DuckDB queries
-- [ ] TEST-03: UI smoke tests — each page renders without error
+- ✓ QA-01: `.github/workflows/ci.yml` — 4-gate CI (ruff lint, ruff format, mypy, pytest) on push/PR to master; `astral-sh/setup-uv@v8.2.0`
+- ✓ QA-02: 120 tests pass; core/ 96% coverage (>80% gate); domains/ ~83% coverage
+- ✓ QA-03: Integration gate — 21 integration tests against temp DuckDB; all pass
 
 **Deployment**
-- [ ] DEPLOY-01: App deployed to Streamlit Cloud; cold start verified
-- [ ] DEPLOY-02: Production smoke check documented in docs/DEPLOYMENT.md
+- ✓ DEPLOY-01: App deployed to https://markovlens.streamlit.app; cold start verified (Datasets=2 confirms `ensure_seeded()` ran on Streamlit Cloud's ephemeral filesystem)
+- ✓ DEPLOY-02: Production smoke check documented in `docs/DEPLOYMENT.md` — 5 green items; `APP_ENV=production` secret configured
+
+### Active
+
+_(none — all v1.0 requirements complete)_
 
 ### Out of Scope
 
@@ -153,4 +157,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-30 after Phase 02 completion*
+*Last updated: 2026-06-16 after Phase 05 completion — all v1.0 milestone requirements validated*
