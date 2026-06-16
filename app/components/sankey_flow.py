@@ -5,6 +5,7 @@ Pure Plotly figure builders — no Streamlit imports. All functions are unit-tes
 The Sankey uses SVG cubic bezier path shapes (go.Figure + layout.shapes).
 See D-01 in CONTEXT.md: do NOT use the built-in Sankey trace (loses temporal dimension).
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -19,11 +20,11 @@ from plotly.subplots import make_subplots
 # Values are derived from docs/design-reference/markov.css --state-* tokens.
 # ---------------------------------------------------------------------------
 STATE_COLOR_PREFIX: dict[str, str] = {
-    "active":      "rgba(5,150,105,",    # --state-active:      #059669
-    "atrisk":      "rgba(217,119,6,",    # --state-atrisk:      #D97706
-    "inactive":    "rgba(161,161,170,",  # --state-inactive:    #A1A1AA
-    "reactivated": "rgba(8,145,178,",    # --state-reactivated: #0891B2
-    "churned":     "rgba(220,38,38,",    # --state-churned:     #DC2626 (red, CH-02)
+    "active": "rgba(5,150,105,",  # --state-active:      #059669
+    "atrisk": "rgba(217,119,6,",  # --state-atrisk:      #D97706
+    "inactive": "rgba(161,161,170,",  # --state-inactive:    #A1A1AA
+    "reactivated": "rgba(8,145,178,",  # --state-reactivated: #0891B2
+    "churned": "rgba(220,38,38,",  # --state-churned:     #DC2626 (red, CH-02)
 }
 DEFAULT_COLOR_PREFIX: str = "rgba(100,100,100,"
 
@@ -34,7 +35,7 @@ SANKEY_PAD_TOP: int = 10
 SANKEY_PAD_BOTTOM: int = 10
 SANKEY_COL_W: int = 13
 SANKEY_GAP: int = 7
-NODE_MIN_SHARE: float = 0.002   # states below this share are not drawn as nodes
+NODE_MIN_SHARE: float = 0.002  # states below this share are not drawn as nodes
 FLOW_MIN_SHARE: float = 0.0015  # ribbons below this flow are skipped
 RIBBON_ALPHA: str = "0.24)"
 NODE_ALPHA: str = "1.0)"
@@ -44,33 +45,36 @@ NODE_ALPHA: str = "1.0)"
 # Keys are normalized state labels (same normalization as above).
 # ---------------------------------------------------------------------------
 STATE_COLORS_SOLID: dict[str, str] = {
-    "active":      "rgba(5,150,105,0.8)",
-    "atrisk":      "rgba(217,119,6,0.8)",
-    "inactive":    "rgba(161,161,170,0.8)",
+    "active": "rgba(5,150,105,0.8)",
+    "atrisk": "rgba(217,119,6,0.8)",
+    "inactive": "rgba(161,161,170,0.8)",
     "reactivated": "rgba(8,145,178,0.8)",
-    "churned":     "rgba(220,38,38,0.8)",
+    "churned": "rgba(220,38,38,0.8)",
 }
-STATE_COLORS_FAINT: dict[str, str] = {k: v.replace("0.8)", "0.18)") for k, v in STATE_COLORS_SOLID.items()}
+STATE_COLORS_FAINT: dict[str, str] = {
+    k: v.replace("0.8)", "0.18)") for k, v in STATE_COLORS_SOLID.items()
+}
 DEFAULT_SOLID: str = "rgba(100,100,100,0.8)"
 DEFAULT_FAINT: str = "rgba(100,100,100,0.18)"
-WHATIF_HEIGHT: int = 640   # ~300px per panel + title + bottom legend (was 360 for side-by-side)
+WHATIF_HEIGHT: int = 640  # ~300px per panel + title + bottom legend (was 360 for side-by-side)
 
 # ---------------------------------------------------------------------------
 # Solid hex color map — mirrors CSS --state-* tokens for legend swatches.
 # Keys are normalized state labels (lower-case, no hyphens/spaces).
 # ---------------------------------------------------------------------------
 STATE_HEX: dict[str, str] = {
-    "active":      "#059669",   # --state-active
-    "atrisk":      "#D97706",   # --state-atrisk
-    "inactive":    "#A1A1AA",   # --state-inactive
-    "reactivated": "#0891B2",   # --state-reactivated
-    "churned":     "#DC2626",   # --state-churned
+    "active": "#059669",  # --state-active
+    "atrisk": "#D97706",  # --state-atrisk
+    "inactive": "#A1A1AA",  # --state-inactive
+    "reactivated": "#0891B2",  # --state-reactivated
+    "churned": "#DC2626",  # --state-churned
 }
 DEFAULT_HEX: str = "#646464"
 
 # ---------------------------------------------------------------------------
 # ImpactSummary — structured return from impact_summary()
 # ---------------------------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class ImpactSummary:
@@ -97,6 +101,7 @@ class ImpactSummary:
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
 
 def _norm_label(label: str) -> str:
     """Normalize a state label to a dict key: lower-case, no hyphens/spaces."""
@@ -128,6 +133,7 @@ def _color_prefix(label: str, state_colors: dict[str, str] | None) -> str:
 # ---------------------------------------------------------------------------
 # CH-02: Temporal Sankey ribbon figure
 # ---------------------------------------------------------------------------
+
 
 def build_sankey_figure(
     state_distribution_over_time: np.ndarray,
@@ -305,6 +311,7 @@ def build_sankey_figure(
 # CH-03: What-if stacked-area chart
 # ---------------------------------------------------------------------------
 
+
 def build_whatif_chart(
     baseline_dist: np.ndarray,
     modified_dist: np.ndarray,
@@ -404,6 +411,7 @@ def build_whatif_chart(
 # CH-03: Impact narrative helper
 # ---------------------------------------------------------------------------
 
+
 def impact_narrative(
     overrides: dict[tuple[int, int], float],
     baseline_P: np.ndarray,
@@ -449,9 +457,7 @@ def impact_narrative(
     delta_pp = (overrides[best_key] - baseline_P[i, j]) * 100
     direction = "Reducing" if delta_pp < 0 else "Increasing"
 
-    churned_idx = next(
-        (k for k, s in enumerate(state_labels) if _norm_label(s) == "churned"), -1
-    )
+    churned_idx = next((k for k, s in enumerate(state_labels) if _norm_label(s) == "churned"), -1)
 
     if churned_idx >= 0:
         churn_delta = (
@@ -470,6 +476,7 @@ def impact_narrative(
 # ---------------------------------------------------------------------------
 # CH-03 UI helpers: impact_summary + state_legend_html
 # ---------------------------------------------------------------------------
+
 
 def _impact_parts(
     overrides: dict[tuple[int, int], float],
@@ -493,9 +500,7 @@ def _impact_parts(
     delta_pp = (overrides[best_key] - baseline_P[i, j]) * 100
     direction_word = "Reducing" if delta_pp < 0 else "Increasing"
 
-    churned_idx = next(
-        (k for k, s in enumerate(state_labels) if _norm_label(s) == "churned"), -1
-    )
+    churned_idx = next((k for k, s in enumerate(state_labels) if _norm_label(s) == "churned"), -1)
     churn_delta = (
         (baseline_dist[-1, churned_idx] - modified_dist[-1, churned_idx]) * n_customers
         if churned_idx >= 0
@@ -557,10 +562,7 @@ def impact_summary(
         accent_token = "var(--color-warning)"
         customers_color = "var(--color-danger)"
 
-    pp_span = (
-        f'<span class="mono" style="color:var(--color-primary);">'
-        f"{abs(delta_pp):.0f}pp</span>"
-    )
+    pp_span = f'<span class="mono" style="color:var(--color-primary);">{abs(delta_pp):.0f}pp</span>'
     customers_span = (
         f'<span class="mono" style="color:{customers_color};">'
         f"{abs(churn_delta):.0f} customers</span>"
@@ -614,9 +616,7 @@ def state_legend_html(
             f'background:{color};flex-shrink:0;"></div>'
         )
         text = f'<span class="t-xs" style="margin-left:4px;">{label}</span>'
-        items.append(
-            f'<div style="display:flex;align-items:center;gap:2px;">{swatch}{text}</div>'
-        )
+        items.append(f'<div style="display:flex;align-items:center;gap:2px;">{swatch}{text}</div>')
     inner = "".join(items)
     return (
         f'<div style="display:flex;flex-wrap:wrap;gap:var(--space-4,16px);'

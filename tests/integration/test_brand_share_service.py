@@ -14,6 +14,7 @@ import pytest
 # Fixture: seeded_conn
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def seeded_conn(temp_duckdb_path: Path):
     """Open a temp DuckDB, run the schema, seed a brand_share dataset.
@@ -78,6 +79,7 @@ def seeded_conn(temp_duckdb_path: Path):
 # Task 1: Structural test — BS-01
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.integration
 def test_run_forecast_returns_numpy_only(seeded_conn):
     """BS-01: run_forecast returns BrandShareForecastResult with no Plotly objects.
@@ -141,6 +143,7 @@ def test_list_datasets_filters_brand_share(seeded_conn):
 # ---------------------------------------------------------------------------
 # Task 2: Full pipeline tests — BS-04
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.integration
 def test_model_comparison(seeded_conn):
@@ -219,6 +222,4 @@ def test_stationary_present(seeded_conn):
     if result.stationary_distribution is not None:
         assert isinstance(result.stationary_distribution, np.ndarray)
         total = float(result.stationary_distribution.sum())
-        assert abs(total - 1.0) < 1e-6, (
-            f"stationary_distribution sums to {total}, expected ~1.0"
-        )
+        assert abs(total - 1.0) < 1e-6, f"stationary_distribution sums to {total}, expected ~1.0"

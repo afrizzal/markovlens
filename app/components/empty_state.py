@@ -3,6 +3,7 @@
 Matches the ``EmptyState`` component contract from
 ``docs/design-reference/js/ui.jsx`` (line 222-233).
 """
+
 from __future__ import annotations
 
 from collections.abc import Callable

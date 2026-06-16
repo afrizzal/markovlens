@@ -1,4 +1,5 @@
 """MarkovLens — Home / Landing page."""
+
 from __future__ import annotations
 
 import sys
@@ -102,7 +103,9 @@ with left:
 
 with right:
     st.subheader("Quick Actions")
-    st.page_link("pages/1_Brand_Share.py", label="📈 Run Brand Share Forecast", use_container_width=True)
+    st.page_link(
+        "pages/1_Brand_Share.py", label="📈 Run Brand Share Forecast", use_container_width=True
+    )
     st.page_link("pages/2_Churn.py", label="🔁 Analyze Customer Churn", use_container_width=True)
 
 st.markdown("---")
@@ -127,14 +130,17 @@ else:
         _icon = DOMAIN_ICON.get(fc.domain, "📊")
         _mape_str = f"{fc.mape:.2f}% MAPE" if fc.mape is not None else "—"
         _date_str = fc.created_at.strftime("%Y-%m-%d %H:%M") if fc.created_at else "—"
-        _rows.append({
-            "": _icon,
-            "Dataset": fc.dataset_name,
-            "Model": fc.model_type,
-            "Run at": _date_str,
-            "MAPE": _mape_str,
-        })
+        _rows.append(
+            {
+                "": _icon,
+                "Dataset": fc.dataset_name,
+                "Model": fc.model_type,
+                "Run at": _date_str,
+                "MAPE": _mape_str,
+            }
+        )
     import pandas as pd
+
     st.dataframe(
         pd.DataFrame(_rows),
         use_container_width=True,

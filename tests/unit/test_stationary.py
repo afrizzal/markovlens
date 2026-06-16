@@ -1,4 +1,5 @@
 """Tests for BS-05: compute_stationary() helper in core/models.py."""
+
 from __future__ import annotations
 
 import numpy as np

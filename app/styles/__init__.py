@@ -1,4 +1,5 @@
 """Styling — CSS theme injection + Plotly theme template."""
+
 from __future__ import annotations
 
 from pathlib import Path

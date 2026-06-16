@@ -16,6 +16,7 @@ Mechanism:
     Since main() is called unconditionally at module load, we monkey-patch
     st.stop / st.cache_resource etc. to no-ops before the importlib load.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -83,6 +84,7 @@ def _load_page_module_importlib():
 # Test 1: Page module is importable (smoke test)
 # ---------------------------------------------------------------------------
 
+
 def test_brand_share_page_imports_without_error():
     """BS-06: Brand Share page module can be loaded without an ImportError or syntax error.
 
@@ -101,6 +103,7 @@ def test_brand_share_page_imports_without_error():
 # ---------------------------------------------------------------------------
 # Test 2: _build_overview_figure structural check
 # ---------------------------------------------------------------------------
+
 
 def test_overview_figure_has_separator():
     """Overview stacked-area helper produces a figure with >= 1 trace and a 'today' separator.
@@ -135,16 +138,13 @@ def test_overview_figure_has_separator():
     fig = build_fn(historical_shares, forecast, state_labels, horizon=n_fc, model="m1")
 
     # Assert (a): at least one trace from historical data
-    assert len(fig.data) >= 1, (
-        f"Expected >= 1 trace in overview figure, got {len(fig.data)}"
-    )
+    assert len(fig.data) >= 1, f"Expected >= 1 trace in overview figure, got {len(fig.data)}"
 
     # Assert (b): 'today' separator is present
     # add_vline() adds to fig.layout.shapes (Plotly stores vlines as shapes).
     today_in_shapes = len(fig.layout.shapes) >= 1
     today_in_annotations = any(
-        "today" in (getattr(a, "text", "") or "")
-        for a in (fig.layout.annotations or [])
+        "today" in (getattr(a, "text", "") or "") for a in (fig.layout.annotations or [])
     )
     assert today_in_shapes or today_in_annotations, (
         "Expected a 'today' separator (shape or annotation) in the overview figure. "
@@ -156,6 +156,7 @@ def test_overview_figure_has_separator():
 # ---------------------------------------------------------------------------
 # Churn page (2_Churn.py) smoke test — CH-04
 # ---------------------------------------------------------------------------
+
 
 def _load_churn_page_module_importlib():
     """Load app/pages/2_Churn.py as a Python module via importlib.
@@ -284,9 +285,7 @@ def test_home_page_imports_without_error():
 # Settings page (app/pages/4_Settings.py) smoke test — SET-01
 # ---------------------------------------------------------------------------
 
-SETTINGS_PAGE_PATH = str(
-    Path(__file__).parent.parent.parent / "app" / "pages" / "4_Settings.py"
-)
+SETTINGS_PAGE_PATH = str(Path(__file__).parent.parent.parent / "app" / "pages" / "4_Settings.py")
 
 
 def _load_settings_page_module_importlib():

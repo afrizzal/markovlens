@@ -1,4 +1,5 @@
 """MarkovLens Plotly theme template (UI-01)."""
+
 from __future__ import annotations
 
 import plotly.graph_objects as go
@@ -6,11 +7,19 @@ import plotly.io as pio
 from plotly.graph_objs.layout import Template
 
 CATEGORICAL_COLORWAY: list[str] = [
-    "#4338CA", "#059669", "#D97706", "#0891B2", "#DC2626", "#7C3AED",
+    "#4338CA",
+    "#059669",
+    "#D97706",
+    "#0891B2",
+    "#DC2626",
+    "#7C3AED",
 ]
 HEATMAP_COLORSCALE: list[list] = [
-    [0.0, "#EEF2FF"], [0.25, "#C7D2FE"],
-    [0.5, "#818CF8"], [0.75, "#4338CA"], [1.0, "#1E1B4B"],
+    [0.0, "#EEF2FF"],
+    [0.25, "#C7D2FE"],
+    [0.5, "#818CF8"],
+    [0.75, "#4338CA"],
+    [1.0, "#1E1B4B"],
 ]
 
 
@@ -26,7 +35,11 @@ def register_theme() -> None:
     t.layout.colorway = CATEGORICAL_COLORWAY
     t.layout.paper_bgcolor = "#FFFFFF"
     t.layout.plot_bgcolor = "#FFFFFF"
-    t.layout.font = {"family": "Geist, Inter, -apple-system, sans-serif", "size": 13, "color": "#52525B"}
+    t.layout.font = {
+        "family": "Geist, Inter, -apple-system, sans-serif",
+        "size": 13,
+        "color": "#52525B",
+    }
     t.layout.xaxis = {
         "gridcolor": "#E4E4E7",
         "linecolor": "#D4D4D8",

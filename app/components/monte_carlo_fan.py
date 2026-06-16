@@ -3,6 +3,7 @@
 Renders a Plotly fan chart with P10/P50/P90 quantile bands, a historical/forecast
 vertical separator, and an explicit named legend.
 """
+
 from __future__ import annotations
 
 import numpy as np

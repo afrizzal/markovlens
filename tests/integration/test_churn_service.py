@@ -44,7 +44,7 @@ def seeded_churn_conn(temp_duckdb_path: Path):
         domain="churn",
         name="Test Churn Dataset",
         source_path="test_churn.csv",
-        row_count=450,   # 5 periods x 3 states x 30 transitions
+        row_count=450,  # 5 periods x 3 states x 30 transitions
         n_states=3,
         dataset_id=dataset_id,
     )
@@ -54,8 +54,8 @@ def seeded_churn_conn(temp_duckdb_path: Path):
     records = []
     entity_counter = 0
     pattern = {
-        "active":  [("active", 22), ("atrisk", 6), ("churned", 2)],
-        "atrisk":  [("active", 8),  ("atrisk", 14), ("churned", 8)],
+        "active": [("active", 22), ("atrisk", 6), ("churned", 2)],
+        "atrisk": [("active", 8), ("atrisk", 14), ("churned", 8)],
         "churned": [("churned", 30)],
     }
     for period in range(1, 6):  # periods 1..5
@@ -96,6 +96,7 @@ def test_run_analysis_returns_result(seeded_churn_conn) -> None:
         pytest.skip("run_analysis not yet implemented (Plan 02)")
 
     import inspect
+
     sig = inspect.signature(service.run_analysis)
     if "conn" not in sig.parameters:
         pytest.skip("run_analysis has old stub signature without conn param (Plan 02)")
@@ -103,13 +104,16 @@ def test_run_analysis_returns_result(seeded_churn_conn) -> None:
     result = service.run_analysis(seeded_churn_conn, "ds_churn_test", horizon=12)
 
     assert result.transition_matrix.shape == (3, 3)
-    np.testing.assert_allclose(
-        result.transition_matrix.sum(axis=1), [1, 1, 1], atol=1e-9
-    )
+    np.testing.assert_allclose(result.transition_matrix.sum(axis=1), [1, 1, 1], atol=1e-9)
     assert result.state_distribution_over_time.shape[1] == 3
     assert result.state_distribution_over_time.shape[0] >= 2
-    assert result.baseline_forecast.shape == (13, 3)   # horizon+1 = 13 rows
-    assert set(result.kpis) == {"retention_rate", "avg_lifetime", "expected_churn", "revenue_at_risk"}
+    assert result.baseline_forecast.shape == (13, 3)  # horizon+1 = 13 rows
+    assert set(result.kpis) == {
+        "retention_rate",
+        "avg_lifetime",
+        "expected_churn",
+        "revenue_at_risk",
+    }
     assert result.n_customers > 0
 
 
@@ -126,6 +130,7 @@ def test_state_distribution_includes_period_zero(seeded_churn_conn) -> None:
         pytest.skip("run_analysis not yet implemented (Plan 02)")
 
     import inspect
+
     if "conn" not in inspect.signature(service.run_analysis).parameters:
         pytest.skip("run_analysis has old stub signature (Plan 02)")
 
@@ -147,6 +152,7 @@ def test_baseline_forecast_rows_sum_to_one(seeded_churn_conn) -> None:
         pytest.skip("run_analysis not yet implemented (Plan 02)")
 
     import inspect
+
     if "conn" not in inspect.signature(service.run_analysis).parameters:
         pytest.skip("run_analysis has old stub signature (Plan 02)")
 
@@ -173,6 +179,7 @@ def test_simulate_scenario_differs(seeded_churn_conn) -> None:
         pytest.skip("simulate_scenario not yet implemented (Plan 02)")
 
     import inspect
+
     if "conn" not in inspect.signature(service.run_analysis).parameters:
         pytest.skip("simulate_scenario has old stub signature (Plan 02)")
 
@@ -181,7 +188,7 @@ def test_simulate_scenario_differs(seeded_churn_conn) -> None:
         seeded_churn_conn,
         "ds_churn_test",
         12,
-        {(0, 2): 0.30},   # force active->churned to 0.30
+        {(0, 2): 0.30},  # force active->churned to 0.30
     )
 
     assert scenario.shape == (13, 3)
@@ -206,6 +213,7 @@ def test_simulate_scenario_rows_renormalized(seeded_churn_conn) -> None:
         pytest.skip("simulate_scenario not yet implemented (Plan 02)")
 
     import inspect
+
     if "conn" not in inspect.signature(service.simulate_scenario).parameters:
         pytest.skip("simulate_scenario has old stub signature (Plan 02)")
 
@@ -213,7 +221,7 @@ def test_simulate_scenario_rows_renormalized(seeded_churn_conn) -> None:
         seeded_churn_conn,
         "ds_churn_test",
         12,
-        {(0, 1): 0.5},   # force active->atrisk to 0.50
+        {(0, 1): 0.5},  # force active->atrisk to 0.50
     )
 
     np.testing.assert_allclose(
@@ -238,6 +246,7 @@ def test_baseline_forecast_shape_matches_horizon_and_states(seeded_churn_conn) -
         pytest.skip("run_analysis not yet implemented (Plan 02)")
 
     import inspect
+
     if "conn" not in inspect.signature(service.run_analysis).parameters:
         pytest.skip("run_analysis has old stub signature (Plan 02)")
 
@@ -261,6 +270,7 @@ def test_list_datasets_churn_domain(seeded_churn_conn) -> None:
         pytest.skip("list_datasets not yet implemented (Plan 02)")
 
     import inspect
+
     if "conn" not in inspect.signature(service.list_datasets).parameters:
         pytest.skip("list_datasets has old stub signature (Plan 02)")
 

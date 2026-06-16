@@ -5,6 +5,7 @@ objects — no Streamlit runtime is needed.  Each test module imports Streamlit
 first (RESEARCH Pitfall 1) so the ``"streamlit"`` template is registered before
 ``register_theme()`` runs.
 """
+
 from __future__ import annotations
 
 import inspect
@@ -29,11 +30,13 @@ register_theme()
 @pytest.fixture
 def matrix_3x3() -> np.ndarray:
     """Valid 3x3 transition matrix (rows sum to 1)."""
-    P = np.array([
-        [0.70, 0.20, 0.10],
-        [0.15, 0.65, 0.20],
-        [0.05, 0.25, 0.70],
-    ])
+    P = np.array(
+        [
+            [0.70, 0.20, 0.10],
+            [0.15, 0.65, 0.20],
+            [0.05, 0.25, 0.70],
+        ]
+    )
     return P
 
 
@@ -119,7 +122,8 @@ class TestTransitionHeatmap:
 
         # At least one warning marker in warning color
         warning_annotations = [
-            a for a in annotations
+            a
+            for a in annotations
             if str(a.text).strip() == "⚠"  # ⚠
         ]
         assert len(warning_annotations) >= 1, "At least one sparsity marker expected"
@@ -161,9 +165,7 @@ class TestMonteCarlFan:
         trace_names = {str(t.name) for t in fig.data}
         required_names = {"Median (P50)", "P10", "P90", "Historical"}
         for name in required_names:
-            assert name in trace_names, (
-                f"Legend entry '{name}' not found. Got: {trace_names}"
-            )
+            assert name in trace_names, f"Legend entry '{name}' not found. Got: {trace_names}"
 
     def test_monte_carlo_fan_fill_present(
         self,

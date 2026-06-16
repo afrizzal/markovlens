@@ -1,4 +1,5 @@
 """Settings page for MarkovLens — dataset management and app preferences."""
+
 from __future__ import annotations
 
 import subprocess
@@ -74,17 +75,17 @@ with tab_datasets:
         _rows = []
         for ds in _datasets:
             _created = (
-                ds.created_at.strftime("%Y-%m-%d %H:%M")
-                if ds.created_at is not None
-                else "—"
+                ds.created_at.strftime("%Y-%m-%d %H:%M") if ds.created_at is not None else "—"
             )
-            _rows.append({
-                "Name": ds.name,
-                "Domain": DOMAIN_LABELS.get(ds.domain, ds.domain),
-                "Rows": ds.row_count,
-                "States": ds.n_states,
-                "Created": _created,
-            })
+            _rows.append(
+                {
+                    "Name": ds.name,
+                    "Domain": DOMAIN_LABELS.get(ds.domain, ds.domain),
+                    "Rows": ds.row_count,
+                    "States": ds.n_states,
+                    "Created": _created,
+                }
+            )
         st.dataframe(
             pd.DataFrame(_rows),
             use_container_width=True,

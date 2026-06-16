@@ -4,6 +4,7 @@ Renders an annotated Plotly heatmap with a fixed [0, 1] color scale,
 per-cell percentage annotations, and sparsity warning markers on cells
 with fewer than ``SPARSE_OBS_THRESHOLD`` observations.
 """
+
 from __future__ import annotations
 
 import numpy as np

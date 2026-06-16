@@ -1,4 +1,5 @@
 """Brand Share Forecaster page for MarkovLens."""
+
 from __future__ import annotations
 
 # stdlib
@@ -60,7 +61,12 @@ MODEL_TOOLTIPS: dict[str, str] = {
     "m3": "Q_{t+1} = (G x Qt)*Pt - time-varying with growth multiplier (absolute counts)",
 }
 CATEGORICAL_COLORS: list[str] = [
-    "#4338CA", "#059669", "#D97706", "#0891B2", "#DC2626", "#7C3AED",
+    "#4338CA",
+    "#059669",
+    "#D97706",
+    "#0891B2",
+    "#DC2626",
+    "#7C3AED",
 ]
 
 # ---------------------------------------------------------------------------
@@ -76,6 +82,7 @@ _MODEL_REASON: dict[str, str] = {
 # ---------------------------------------------------------------------------
 # CSV export helper (RPT-01)
 # ---------------------------------------------------------------------------
+
 
 def _brand_share_csv_bytes(result: service.BrandShareForecastResult) -> bytes:
     """Serialize forecast result to CSV bytes (two sections: Forecast + Transition Matrix)."""
@@ -105,6 +112,7 @@ def _brand_share_csv_bytes(result: service.BrandShareForecastResult) -> bytes:
 # Cached infrastructure
 # ---------------------------------------------------------------------------
 
+
 @st.cache_data(show_spinner=False)
 def _cached_forecast(
     dataset_id: str,
@@ -132,6 +140,7 @@ def _dataset_period_count(dataset_id: str) -> int:
 # ---------------------------------------------------------------------------
 # Private figure helpers (testable — no Streamlit side effects)
 # ---------------------------------------------------------------------------
+
 
 def _build_overview_figure(
     historical_shares: np.ndarray,
@@ -264,6 +273,7 @@ def _build_overview_figure(
 # Main render function
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
     """Render the Brand Share Forecaster page."""
     # -- Header ---------------------------------------------------------------
@@ -385,7 +395,9 @@ def main() -> None:
         leader_idx = int(np.argmax(final_shares))
         leader_label = state_labels[leader_idx]
 
-        first_hist = result.historical_shares[0] if len(result.historical_shares) > 0 else final_shares
+        first_hist = (
+            result.historical_shares[0] if len(result.historical_shares) > 0 else final_shares
+        )
         delta_shares = final_shares - first_hist
         pos_idxs = np.where(delta_shares > 0)[0]
         neg_idxs = np.where(delta_shares < 0)[0]
@@ -407,9 +419,21 @@ def main() -> None:
         with kpi_cols[0]:
             kpi_card("FORECASTED LEADER", leader_label, accent="var(--chart-1)")
         with kpi_cols[1]:
-            kpi_card("BIGGEST GAINER", gainer_label, delta=gainer_delta, delta_suffix="pp", accent="var(--chart-2)")
+            kpi_card(
+                "BIGGEST GAINER",
+                gainer_label,
+                delta=gainer_delta,
+                delta_suffix="pp",
+                accent="var(--chart-2)",
+            )
         with kpi_cols[2]:
-            kpi_card("BIGGEST LOSER", loser_label, delta=loser_delta, delta_suffix="pp", accent="var(--chart-5)")
+            kpi_card(
+                "BIGGEST LOSER",
+                loser_label,
+                delta=loser_delta,
+                delta_suffix="pp",
+                accent="var(--chart-5)",
+            )
     else:
         for col in kpi_cols:
             with col:
@@ -650,9 +674,7 @@ def main() -> None:
                 n_states_mc = len(state_labels_mc)
                 fc_arr_mc = mc_display_result.forecasts[active_model]
                 final_mc_shares = (
-                    fc_arr_mc[-1]
-                    if fc_arr_mc.shape[0] > 0
-                    else np.ones(n_states_mc) / n_states_mc
+                    fc_arr_mc[-1] if fc_arr_mc.shape[0] > 0 else np.ones(n_states_mc) / n_states_mc
                 )
                 st.markdown(
                     f'<div class="card accent-card" style="--accent:var(--chart-1);padding:var(--space-5);">'
@@ -779,13 +801,13 @@ def main() -> None:
                         "<tr>"
                         f"<td>{period_bt}</td>"
                         f'<td class="num">'
-                        f'{actual_bt if isinstance(actual_bt, str) else f"{actual_bt:.4f}"}'
+                        f"{actual_bt if isinstance(actual_bt, str) else f'{actual_bt:.4f}'}"
                         f"</td>"
                         f'<td class="num">'
-                        f'{forecast_bt_val if isinstance(forecast_bt_val, str) else f"{forecast_bt_val:.4f}"}'
+                        f"{forecast_bt_val if isinstance(forecast_bt_val, str) else f'{forecast_bt_val:.4f}'}"
                         f"</td>"
                         f'<td class="num">'
-                        f'{f"{mape_bt:.2f}%" if mape_bt is not None else "--"}'
+                        f"{f'{mape_bt:.2f}%' if mape_bt is not None else '--'}"
                         f"</td>"
                         "</tr>"
                     )

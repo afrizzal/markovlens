@@ -342,15 +342,9 @@ def get_home_kpis(conn: duckdb.DuckDBPyConnection) -> HomeKpis:
         dataset_count, sim_run_count, last_forecast_at, avg_mape.
         last_forecast_at and avg_mape are None if forecasts table is empty.
     """
-    counts = conn.execute(
-        "SELECT COUNT(*) AS n_datasets FROM datasets"
-    ).fetchone()
-    sim_counts = conn.execute(
-        "SELECT COUNT(*) AS n_sims FROM simulation_runs"
-    ).fetchone()
-    forecast_row = conn.execute(
-        "SELECT MAX(created_at) AS last_at FROM forecasts"
-    ).fetchone()
+    counts = conn.execute("SELECT COUNT(*) AS n_datasets FROM datasets").fetchone()
+    sim_counts = conn.execute("SELECT COUNT(*) AS n_sims FROM simulation_runs").fetchone()
+    forecast_row = conn.execute("SELECT MAX(created_at) AS last_at FROM forecasts").fetchone()
 
     # avg_mape: parse JSON field — only include rows where mape key exists
     mape_row = conn.execute(

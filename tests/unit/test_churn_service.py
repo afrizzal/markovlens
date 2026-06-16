@@ -28,11 +28,11 @@ def test_compute_avg_lifetime() -> None:
     P = np.array(
         [
             # Active   At-Risk  Inactive  Reactivated  Churned
-            [0.80,    0.12,    0.03,     0.02,        0.03],   # Active (row 0)
-            [0.10,    0.60,    0.15,     0.05,        0.10],   # At-Risk (row 1)
-            [0.05,    0.10,    0.65,     0.10,        0.10],   # Inactive (row 2)
-            [0.15,    0.10,    0.05,     0.65,        0.05],   # Reactivated (row 3)
-            [0.01,    0.00,    0.00,     0.01,        0.98],   # Churned (row 4)
+            [0.80, 0.12, 0.03, 0.02, 0.03],  # Active (row 0)
+            [0.10, 0.60, 0.15, 0.05, 0.10],  # At-Risk (row 1)
+            [0.05, 0.10, 0.65, 0.10, 0.10],  # Inactive (row 2)
+            [0.15, 0.10, 0.05, 0.65, 0.05],  # Reactivated (row 3)
+            [0.01, 0.00, 0.00, 0.01, 0.98],  # Churned (row 4)
         ],
         dtype=np.float64,
     )
@@ -70,9 +70,9 @@ def test_simulate_scenario_renormalizes() -> None:
     # 3x3 row-stochastic baseline P
     P = np.array(
         [
-            [0.70, 0.20, 0.10],   # row 0 — will be modified
-            [0.30, 0.50, 0.20],   # row 1 — untouched
-            [0.00, 0.05, 0.95],   # row 2 — untouched
+            [0.70, 0.20, 0.10],  # row 0 — will be modified
+            [0.30, 0.50, 0.20],  # row 1 — untouched
+            [0.00, 0.05, 0.95],  # row 2 — untouched
         ],
         dtype=np.float64,
     )
@@ -86,9 +86,7 @@ def test_simulate_scenario_renormalizes() -> None:
     np.testing.assert_allclose(P_mod[0].sum(), 1.0, atol=1e-9)
 
     # The overridden cell increased relative to original
-    assert P_mod[0, 1] > original_p01, (
-        f"Expected P_mod[0,1] > {original_p01}, got {P_mod[0, 1]}"
-    )
+    assert P_mod[0, 1] > original_p01, f"Expected P_mod[0,1] > {original_p01}, got {P_mod[0, 1]}"
 
     # Untouched rows are unchanged
     np.testing.assert_allclose(P_mod[1], P[1], atol=1e-12)
@@ -129,9 +127,12 @@ def test_kpi_keys_and_revenue_constant() -> None:
     if not hasattr(service, "KPI_KEYS"):
         pytest.skip("KPI_KEYS not yet defined (Plan 02)")
 
-    assert service.KPI_KEYS == ("retention_rate", "avg_lifetime", "expected_churn", "revenue_at_risk"), (
-        f"KPI_KEYS mismatch: {service.KPI_KEYS}"
-    )
+    assert service.KPI_KEYS == (
+        "retention_rate",
+        "avg_lifetime",
+        "expected_churn",
+        "revenue_at_risk",
+    ), f"KPI_KEYS mismatch: {service.KPI_KEYS}"
     assert service.DEFAULT_MONTHLY_REVENUE_PER_CUSTOMER == 50_000, (
         f"Expected 50_000, got {service.DEFAULT_MONTHLY_REVENUE_PER_CUSTOMER}"
     )
@@ -164,8 +165,8 @@ def test_build_sankey_figure() -> None:
 
     state_labels = ["active", "atrisk", "churned"]
     state_colors = {
-        "active":  "rgba(5,150,105,",
-        "atrisk":  "rgba(217,119,6,",
+        "active": "rgba(5,150,105,",
+        "atrisk": "rgba(217,119,6,",
         "churned": "rgba(220,38,38,",
     }
 
@@ -233,8 +234,12 @@ def test_apply_overrides_locks_modified_cell_exactly() -> None:
     P_mod = service._apply_overrides(P, {(0, 0): 0.50})
 
     # The modified cell must be EXACTLY 0.50 — not 0.877 (old renormalize bug)
-    np.testing.assert_allclose(P_mod[0, 0], 0.50, atol=1e-9,
-                               err_msg="Modified cell must be locked at target value, not renormalized away")
+    np.testing.assert_allclose(
+        P_mod[0, 0],
+        0.50,
+        atol=1e-9,
+        err_msg="Modified cell must be locked at target value, not renormalized away",
+    )
 
     # Row must still sum to 1.0
     np.testing.assert_allclose(P_mod[0].sum(), 1.0, atol=1e-9)
@@ -320,6 +325,7 @@ def test_impact_narrative_empty_overrides() -> None:
 # Tests for new helpers: ImpactSummary, impact_summary, state_legend_html
 # ---------------------------------------------------------------------------
 
+
 def test_impact_summary_empty_overrides_is_neutral() -> None:
     """Test 1 (empty): impact_summary with empty overrides -> applied=False, neutral."""
     from app.components.sankey_flow import ImpactSummary, impact_summary
@@ -339,15 +345,13 @@ def test_impact_summary_improving_scenario() -> None:
     """Test 2 (improving): override that reduces churn -> direction='improving'."""
     from app.components.sankey_flow import impact_summary
 
-    P = np.array(
-        [[0.6, 0.2, 0.2], [0.1, 0.7, 0.2], [0.0, 0.0, 1.0]], dtype=np.float64
-    )
+    P = np.array([[0.6, 0.2, 0.2], [0.1, 0.7, 0.2], [0.0, 0.0, 1.0]], dtype=np.float64)
     # Baseline: churned column at 0.2; modified: churned at 0.1 => improvement
     base = np.tile([0.6, 0.2, 0.2], (13, 1)).astype(np.float64)
     mod = np.tile([0.7, 0.2, 0.1], (13, 1)).astype(np.float64)
 
     result = impact_summary(
-        {(0, 2): 0.1},   # reduce active->churned from 0.2 to 0.1
+        {(0, 2): 0.1},  # reduce active->churned from 0.2 to 0.1
         P,
         base,
         mod,
@@ -366,15 +370,13 @@ def test_impact_summary_worsening_scenario() -> None:
     """Test 3 (worsening): override that raises churn -> direction='worsening'."""
     from app.components.sankey_flow import impact_summary
 
-    P = np.array(
-        [[0.6, 0.2, 0.2], [0.1, 0.7, 0.2], [0.0, 0.0, 1.0]], dtype=np.float64
-    )
+    P = np.array([[0.6, 0.2, 0.2], [0.1, 0.7, 0.2], [0.0, 0.0, 1.0]], dtype=np.float64)
     # Baseline: churned at 0.2; modified: churned at 0.4 => worsening
     base = np.tile([0.6, 0.2, 0.2], (13, 1)).astype(np.float64)
     mod = np.tile([0.4, 0.2, 0.4], (13, 1)).astype(np.float64)
 
     result = impact_summary(
-        {(0, 2): 0.4},   # increase active->churned from 0.2 to 0.4
+        {(0, 2): 0.4},  # increase active->churned from 0.2 to 0.4
         P,
         base,
         mod,

@@ -28,9 +28,13 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 CHURN_DOMAIN: str = "churn"
-DEFAULT_MONTHLY_REVENUE_PER_CUSTOMER: int = 50_000  # Rp (D-05; UI tooltip; future Settings v2 makes this configurable)
-ABSORBING_THRESHOLD: float = 0.95                   # P[i,i] >= this => state treated as absorbing (RESEARCH Pitfall 1)
-CONDITION_NUMBER_LIMIT: float = 1e10                # switch inv -> pinv above this (RESEARCH Pattern 3)
+DEFAULT_MONTHLY_REVENUE_PER_CUSTOMER: int = (
+    50_000  # Rp (D-05; UI tooltip; future Settings v2 makes this configurable)
+)
+ABSORBING_THRESHOLD: float = (
+    0.95  # P[i,i] >= this => state treated as absorbing (RESEARCH Pitfall 1)
+)
+CONDITION_NUMBER_LIMIT: float = 1e10  # switch inv -> pinv above this (RESEARCH Pattern 3)
 ACTIVE_STATE_KEY: str = "active"
 CHURNED_STATE_KEY: str = "churned"
 KPI_KEYS: tuple[str, ...] = ("retention_rate", "avg_lifetime", "expected_churn", "revenue_at_risk")
@@ -39,6 +43,7 @@ KPI_KEYS: tuple[str, ...] = ("retention_rate", "avg_lifetime", "expected_churn",
 # ---------------------------------------------------------------------------
 # Result type — NumPy-only, frozen dataclass (D-09)
 # ---------------------------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class ChurnAnalysisResult:
@@ -68,20 +73,23 @@ class ChurnAnalysisResult:
         Number of observed distinct periods in the dataset.
     """
 
-    transition_matrix: np.ndarray              # (n_states, n_states), row-stochastic
-    observation_counts: np.ndarray             # (n_states, n_states), raw counts
-    state_distribution_over_time: np.ndarray   # (n_periods+1, n_states) — INCLUDES period 0 (Pitfall 2)
-    baseline_forecast: np.ndarray              # (horizon+1, n_states) — INCLUDES period 0
-    kpis: dict[str, float]                     # keys == KPI_KEYS
-    state_labels: list[str]                    # ordered; state_labels[i] is row/col i
+    transition_matrix: np.ndarray  # (n_states, n_states), row-stochastic
+    observation_counts: np.ndarray  # (n_states, n_states), raw counts
+    state_distribution_over_time: (
+        np.ndarray
+    )  # (n_periods+1, n_states) — INCLUDES period 0 (Pitfall 2)
+    baseline_forecast: np.ndarray  # (horizon+1, n_states) — INCLUDES period 0
+    kpis: dict[str, float]  # keys == KPI_KEYS
+    state_labels: list[str]  # ordered; state_labels[i] is row/col i
     dataset_name: str
-    n_customers: int                           # distinct entity_id count
-    n_periods: int                             # number of observed periods
+    n_customers: int  # distinct entity_id count
+    n_periods: int  # number of observed periods
 
 
 # ---------------------------------------------------------------------------
 # Absorbing Markov chain — fundamental matrix helpers
 # ---------------------------------------------------------------------------
+
 
 def compute_fundamental_matrix(
     P: np.ndarray,
@@ -153,6 +161,7 @@ def compute_avg_lifetime(P: np.ndarray, active_state_idx: int) -> float | None:
 # ---------------------------------------------------------------------------
 # Private helpers
 # ---------------------------------------------------------------------------
+
 
 def _compute_share_vector(
     df: pd.DataFrame,
@@ -363,7 +372,9 @@ def _compute_kpis(
         Keys == KPI_KEYS: retention_rate, avg_lifetime, expected_churn, revenue_at_risk.
     """
     active_idx = next((i for i, s in enumerate(state_labels) if s.lower() == ACTIVE_STATE_KEY), 0)
-    churned_idx = next((i for i, s in enumerate(state_labels) if s.lower() == CHURNED_STATE_KEY), -1)
+    churned_idx = next(
+        (i for i, s in enumerate(state_labels) if s.lower() == CHURNED_STATE_KEY), -1
+    )
 
     # KPI 1: Retention Rate = Active share at horizon / initial Active share
     initial_active = baseline_forecast[0, active_idx]
@@ -392,6 +403,7 @@ def _compute_kpis(
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def list_datasets(conn: duckdb.DuckDBPyConnection, *, domain: str = CHURN_DOMAIN) -> list[Dataset]:
     """Return churn-domain datasets registered in the DB.
@@ -467,14 +479,20 @@ def run_analysis(
 
     # ── 5. Initial distribution + historical state evolution ───────────────
     Y_1 = _initial_distribution(df, state_labels, state_idx, n_states)
-    state_distribution_over_time = _state_distribution_over_time(Y_1, P, n_periods)  # (n_periods+1, n_states)
+    state_distribution_over_time = _state_distribution_over_time(
+        Y_1, P, n_periods
+    )  # (n_periods+1, n_states)
 
     # ── 6. Baseline forecast (horizon+1, n_states), prepend Y_1 as period 0 ─
-    fc = M1Homogeneous(P).forecast(Y_1, horizon)                         # forecast_array shape (horizon, n_states)
-    baseline_forecast = np.vstack([Y_1.reshape(1, -1), fc.forecast_array])  # (horizon+1, n_states), incl period 0
+    fc = M1Homogeneous(P).forecast(Y_1, horizon)  # forecast_array shape (horizon, n_states)
+    baseline_forecast = np.vstack(
+        [Y_1.reshape(1, -1), fc.forecast_array]
+    )  # (horizon+1, n_states), incl period 0
 
     # ── 7. KPI computation ─────────────────────────────────────────────────
-    kpis = _compute_kpis(P, state_distribution_over_time, baseline_forecast, state_labels, n_customers, horizon)
+    kpis = _compute_kpis(
+        P, state_distribution_over_time, baseline_forecast, state_labels, n_customers, horizon
+    )
 
     return ChurnAnalysisResult(
         transition_matrix=P,
@@ -536,4 +554,6 @@ def simulate_scenario(
     Y_1 = _initial_distribution(df, state_labels, state_idx, n_states)
 
     fc = M1Homogeneous(P_mod).forecast(Y_1, horizon)
-    return np.vstack([Y_1.reshape(1, -1), fc.forecast_array]).astype(np.float64)  # (horizon+1, n_states)
+    return np.vstack([Y_1.reshape(1, -1), fc.forecast_array]).astype(
+        np.float64
+    )  # (horizon+1, n_states)

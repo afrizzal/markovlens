@@ -5,6 +5,7 @@ because the 'streamlit' base template is registered by Streamlit at import time
 (RESEARCH.md Pitfall 1). Without this the composed default
 ``"streamlit+markovlens"`` raises ValueError.
 """
+
 from __future__ import annotations
 
 import plotly.io as pio

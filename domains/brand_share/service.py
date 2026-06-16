@@ -37,6 +37,7 @@ MODEL_KEYS: tuple[str, ...] = ("m1", "m2", "m3")
 # Result type — NumPy-only, frozen dataclass (D-18)
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class BrandShareForecastResult:
     """Output of run_forecast — structured NumPy arrays only.
@@ -95,6 +96,7 @@ class BrandShareForecastResult:
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def list_datasets(conn: duckdb.DuckDBPyConnection) -> list[Dataset]:
     """Return brand_share-domain datasets registered in the DB.
@@ -271,6 +273,7 @@ def run_forecast(
 # Private helpers
 # ---------------------------------------------------------------------------
 
+
 def _embed_matrix(
     small_P: np.ndarray,
     conn: duckdb.DuckDBPyConnection,
@@ -284,8 +287,7 @@ def _embed_matrix(
     Rows missing from a sparse period become absorbing self-loops.
     """
     period_df = conn.execute(
-        "SELECT DISTINCT from_state, to_state FROM transitions "
-        "WHERE dataset_id = ? AND period = ?",
+        "SELECT DISTINCT from_state, to_state FROM transitions WHERE dataset_id = ? AND period = ?",
         [dataset_id, period],
     ).df()
 

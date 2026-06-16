@@ -1,4 +1,5 @@
 """Section Header — page-section title with optional description."""
+
 from __future__ import annotations
 
 import streamlit as st

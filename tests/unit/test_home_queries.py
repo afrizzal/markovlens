@@ -1,4 +1,5 @@
 """Unit tests for Home dashboard query helpers (HOME-01)."""
+
 from __future__ import annotations
 
 
